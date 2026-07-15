@@ -1,0 +1,10 @@
+syntax =  "proto3";
+
+package notify;
+option go_package  = "./protogen/notify";
+
+
+message Meeting_schedule {
+ string name = 1;
+}
+
