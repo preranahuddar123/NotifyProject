@@ -32,7 +32,7 @@ func (x *MeetingSchedule) Reset() {
 	*x = MeetingSchedule{}
 	mi := &file_notify_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
+	ms.StoreMessageInfo(mi )
 }
 
 func (x *MeetingSchedule) String() string {
