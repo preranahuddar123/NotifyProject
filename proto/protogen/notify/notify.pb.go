@@ -7,6 +7,7 @@
 package notify
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -21,27 +22,83 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type MeetingSchedule struct {
+type MeetingStage int32
+
+const (
+	MeetingStage_STAGE_UNSPECIFIED       MeetingStage = 0
+	MeetingStage_STAGE_CONNECTION        MeetingStage = 1
+	MeetingStage_STAGE_EXPERIENCE_DESIGN MeetingStage = 2
+)
+
+// Enum value maps for MeetingStage.
+var (
+	MeetingStage_name = map[int32]string{
+		0: "STAGE_UNSPECIFIED",
+		1: "STAGE_CONNECTION",
+		2: "STAGE_EXPERIENCE_DESIGN",
+	}
+	MeetingStage_value = map[string]int32{
+		"STAGE_UNSPECIFIED":       0,
+		"STAGE_CONNECTION":        1,
+		"STAGE_EXPERIENCE_DESIGN": 2,
+	}
+)
+
+func (x MeetingStage) Enum() *MeetingStage {
+	p := new(MeetingStage)
+	*p = x
+	return p
+}
+
+func (x MeetingStage) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MeetingStage) Descriptor() protoreflect.EnumDescriptor {
+	return file_notify_proto_enumTypes[0].Descriptor()
+}
+
+func (MeetingStage) Type() protoreflect.EnumType {
+	return &file_notify_proto_enumTypes[0]
+}
+
+func (x MeetingStage) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MeetingStage.Descriptor instead.
+func (MeetingStage) EnumDescriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{0}
+}
+
+// Milestone = 'CANCELLED'
+type MeetingCancellation struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	MeetingId     int32                  `protobuf:"varint,1,opt,name=meeting_id,json=meetingId,proto3" json:"meeting_id,omitempty"`
+	LeadId        int32                  `protobuf:"varint,2,opt,name=lead_id,json=leadId,proto3" json:"lead_id,omitempty"`
+	LeadName      string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	Reason        string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
+	Stage         MeetingStage           `protobuf:"varint,5,opt,name=stage,proto3,enum=notify.MeetingStage" json:"stage,omitempty"`
+	EventDatetime string                 `protobuf:"bytes,6,opt,name=event_datetime,json=eventDatetime,proto3" json:"event_datetime,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *MeetingSchedule) Reset() {
-	*x = MeetingSchedule{}
+func (x *MeetingCancellation) Reset() {
+	*x = MeetingCancellation{}
 	mi := &file_notify_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi )
+	ms.StoreMessageInfo(mi)
 }
 
-func (x *MeetingSchedule) String() string {
+func (x *MeetingCancellation) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MeetingSchedule) ProtoMessage() {}
+func (*MeetingCancellation) ProtoMessage() {}
 
-func (x *MeetingSchedule) ProtoReflect() protoreflect.Message {
+func (x *MeetingCancellation) ProtoReflect() protoreflect.Message {
 	mi := &file_notify_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,14 +110,822 @@ func (x *MeetingSchedule) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MeetingSchedule.ProtoReflect.Descriptor instead.
-func (*MeetingSchedule) Descriptor() ([]byte, []int) {
+// Deprecated: Use MeetingCancellation.ProtoReflect.Descriptor instead.
+func (*MeetingCancellation) Descriptor() ([]byte, []int) {
 	return file_notify_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *MeetingSchedule) GetName() string {
+func (x *MeetingCancellation) GetMeetingId() int32 {
 	if x != nil {
-		return x.Name
+		return x.MeetingId
+	}
+	return 0
+}
+
+func (x *MeetingCancellation) GetLeadId() int32 {
+	if x != nil {
+		return x.LeadId
+	}
+	return 0
+}
+
+func (x *MeetingCancellation) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *MeetingCancellation) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *MeetingCancellation) GetStage() MeetingStage {
+	if x != nil {
+		return x.Stage
+	}
+	return MeetingStage_STAGE_UNSPECIFIED
+}
+
+func (x *MeetingCancellation) GetEventDatetime() string {
+	if x != nil {
+		return x.EventDatetime
+	}
+	return ""
+}
+
+func (x *MeetingCancellation) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+// successful
+type MeetingSuccess struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	LeadId             int32                  `protobuf:"varint,1,opt,name=lead_id,json=leadId,proto3" json:"lead_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	Description        string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Stage              MeetingStage           `protobuf:"varint,4,opt,name=stage,proto3,enum=notify.MeetingStage" json:"stage,omitempty"`
+	SuccessDatetime    string                 `protobuf:"bytes,5,opt,name=success_datetime,json=successDatetime,proto3" json:"success_datetime,omitempty"`
+	NextAction         string                 `protobuf:"bytes,6,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,7,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *MeetingSuccess) Reset() {
+	*x = MeetingSuccess{}
+	mi := &file_notify_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MeetingSuccess) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MeetingSuccess) ProtoMessage() {}
+
+func (x *MeetingSuccess) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MeetingSuccess.ProtoReflect.Descriptor instead.
+func (*MeetingSuccess) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *MeetingSuccess) GetLeadId() int32 {
+	if x != nil {
+		return x.LeadId
+	}
+	return 0
+}
+
+func (x *MeetingSuccess) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *MeetingSuccess) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *MeetingSuccess) GetStage() MeetingStage {
+	if x != nil {
+		return x.Stage
+	}
+	return MeetingStage_STAGE_UNSPECIFIED
+}
+
+func (x *MeetingSuccess) GetSuccessDatetime() string {
+	if x != nil {
+		return x.SuccessDatetime
+	}
+	return ""
+}
+
+func (x *MeetingSuccess) GetNextAction() string {
+	if x != nil {
+		return x.NextAction
+	}
+	return ""
+}
+
+func (x *MeetingSuccess) GetQuoteLinkGenerated() bool {
+	if x != nil {
+		return x.QuoteLinkGenerated
+	}
+	return false
+}
+
+func (x *MeetingSuccess) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+// Request messages — Cancellation
+type CreateCancellationRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	LeadId        int32                  `protobuf:"varint,1,opt,name=lead_id,json=leadId,proto3" json:"lead_id,omitempty"`
+	LeadName      string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
+	Stage         MeetingStage           `protobuf:"varint,4,opt,name=stage,proto3,enum=notify.MeetingStage" json:"stage,omitempty"`
+	EventDatetime string                 `protobuf:"bytes,5,opt,name=event_datetime,json=eventDatetime,proto3" json:"event_datetime,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateCancellationRequest) Reset() {
+	*x = CreateCancellationRequest{}
+	mi := &file_notify_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateCancellationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCancellationRequest) ProtoMessage() {}
+
+func (x *CreateCancellationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCancellationRequest.ProtoReflect.Descriptor instead.
+func (*CreateCancellationRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreateCancellationRequest) GetLeadId() int32 {
+	if x != nil {
+		return x.LeadId
+	}
+	return 0
+}
+
+func (x *CreateCancellationRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *CreateCancellationRequest) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *CreateCancellationRequest) GetStage() MeetingStage {
+	if x != nil {
+		return x.Stage
+	}
+	return MeetingStage_STAGE_UNSPECIFIED
+}
+
+func (x *CreateCancellationRequest) GetEventDatetime() string {
+	if x != nil {
+		return x.EventDatetime
+	}
+	return ""
+}
+
+type UpdateCancellationRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MeetingId     int32                  `protobuf:"varint,1,opt,name=meeting_id,json=meetingId,proto3" json:"meeting_id,omitempty"`
+	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
+	Stage         MeetingStage           `protobuf:"varint,3,opt,name=stage,proto3,enum=notify.MeetingStage" json:"stage,omitempty"`
+	EventDatetime string                 `protobuf:"bytes,4,opt,name=event_datetime,json=eventDatetime,proto3" json:"event_datetime,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCancellationRequest) Reset() {
+	*x = UpdateCancellationRequest{}
+	mi := &file_notify_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCancellationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCancellationRequest) ProtoMessage() {}
+
+func (x *UpdateCancellationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCancellationRequest.ProtoReflect.Descriptor instead.
+func (*UpdateCancellationRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *UpdateCancellationRequest) GetMeetingId() int32 {
+	if x != nil {
+		return x.MeetingId
+	}
+	return 0
+}
+
+func (x *UpdateCancellationRequest) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *UpdateCancellationRequest) GetStage() MeetingStage {
+	if x != nil {
+		return x.Stage
+	}
+	return MeetingStage_STAGE_UNSPECIFIED
+}
+
+func (x *UpdateCancellationRequest) GetEventDatetime() string {
+	if x != nil {
+		return x.EventDatetime
+	}
+	return ""
+}
+
+type GetByMeetingIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MeetingId     int32                  `protobuf:"varint,1,opt,name=meeting_id,json=meetingId,proto3" json:"meeting_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetByMeetingIDRequest) Reset() {
+	*x = GetByMeetingIDRequest{}
+	mi := &file_notify_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetByMeetingIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetByMeetingIDRequest) ProtoMessage() {}
+
+func (x *GetByMeetingIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetByMeetingIDRequest.ProtoReflect.Descriptor instead.
+func (*GetByMeetingIDRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetByMeetingIDRequest) GetMeetingId() int32 {
+	if x != nil {
+		return x.MeetingId
+	}
+	return 0
+}
+
+type DeleteByMeetingIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MeetingId     int32                  `protobuf:"varint,1,opt,name=meeting_id,json=meetingId,proto3" json:"meeting_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteByMeetingIDRequest) Reset() {
+	*x = DeleteByMeetingIDRequest{}
+	mi := &file_notify_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteByMeetingIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteByMeetingIDRequest) ProtoMessage() {}
+
+func (x *DeleteByMeetingIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteByMeetingIDRequest.ProtoReflect.Descriptor instead.
+func (*DeleteByMeetingIDRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *DeleteByMeetingIDRequest) GetMeetingId() int32 {
+	if x != nil {
+		return x.MeetingId
+	}
+	return 0
+}
+
+type CreateSuccessRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	LeadId             int32                  `protobuf:"varint,1,opt,name=lead_id,json=leadId,proto3" json:"lead_id,omitempty"`
+	Description        string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Stage              MeetingStage           `protobuf:"varint,3,opt,name=stage,proto3,enum=notify.MeetingStage" json:"stage,omitempty"`
+	SuccessDatetime    string                 `protobuf:"bytes,4,opt,name=success_datetime,json=successDatetime,proto3" json:"success_datetime,omitempty"`
+	NextAction         string                 `protobuf:"bytes,5,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,6,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *CreateSuccessRequest) Reset() {
+	*x = CreateSuccessRequest{}
+	mi := &file_notify_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateSuccessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSuccessRequest) ProtoMessage() {}
+
+func (x *CreateSuccessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSuccessRequest.ProtoReflect.Descriptor instead.
+func (*CreateSuccessRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *CreateSuccessRequest) GetLeadId() int32 {
+	if x != nil {
+		return x.LeadId
+	}
+	return 0
+}
+
+func (x *CreateSuccessRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateSuccessRequest) GetStage() MeetingStage {
+	if x != nil {
+		return x.Stage
+	}
+	return MeetingStage_STAGE_UNSPECIFIED
+}
+
+func (x *CreateSuccessRequest) GetSuccessDatetime() string {
+	if x != nil {
+		return x.SuccessDatetime
+	}
+	return ""
+}
+
+func (x *CreateSuccessRequest) GetNextAction() string {
+	if x != nil {
+		return x.NextAction
+	}
+	return ""
+}
+
+func (x *CreateSuccessRequest) GetQuoteLinkGenerated() bool {
+	if x != nil {
+		return x.QuoteLinkGenerated
+	}
+	return false
+}
+
+type UpdateSuccessRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	LeadId             int32                  `protobuf:"varint,1,opt,name=lead_id,json=leadId,proto3" json:"lead_id,omitempty"`
+	Description        string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Stage              MeetingStage           `protobuf:"varint,3,opt,name=stage,proto3,enum=notify.MeetingStage" json:"stage,omitempty"`
+	SuccessDatetime    string                 `protobuf:"bytes,4,opt,name=success_datetime,json=successDatetime,proto3" json:"success_datetime,omitempty"`
+	NextAction         string                 `protobuf:"bytes,5,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,6,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *UpdateSuccessRequest) Reset() {
+	*x = UpdateSuccessRequest{}
+	mi := &file_notify_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateSuccessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateSuccessRequest) ProtoMessage() {}
+
+func (x *UpdateSuccessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateSuccessRequest.ProtoReflect.Descriptor instead.
+func (*UpdateSuccessRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdateSuccessRequest) GetLeadId() int32 {
+	if x != nil {
+		return x.LeadId
+	}
+	return 0
+}
+
+func (x *UpdateSuccessRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateSuccessRequest) GetStage() MeetingStage {
+	if x != nil {
+		return x.Stage
+	}
+	return MeetingStage_STAGE_UNSPECIFIED
+}
+
+func (x *UpdateSuccessRequest) GetSuccessDatetime() string {
+	if x != nil {
+		return x.SuccessDatetime
+	}
+	return ""
+}
+
+func (x *UpdateSuccessRequest) GetNextAction() string {
+	if x != nil {
+		return x.NextAction
+	}
+	return ""
+}
+
+func (x *UpdateSuccessRequest) GetQuoteLinkGenerated() bool {
+	if x != nil {
+		return x.QuoteLinkGenerated
+	}
+	return false
+}
+
+type GetByLeadIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	LeadId        int32                  `protobuf:"varint,1,opt,name=lead_id,json=leadId,proto3" json:"lead_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetByLeadIDRequest) Reset() {
+	*x = GetByLeadIDRequest{}
+	mi := &file_notify_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetByLeadIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetByLeadIDRequest) ProtoMessage() {}
+
+func (x *GetByLeadIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetByLeadIDRequest.ProtoReflect.Descriptor instead.
+func (*GetByLeadIDRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetByLeadIDRequest) GetLeadId() int32 {
+	if x != nil {
+		return x.LeadId
+	}
+	return 0
+}
+
+type CancellationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          *MeetingCancellation   `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancellationResponse) Reset() {
+	*x = CancellationResponse{}
+	mi := &file_notify_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancellationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancellationResponse) ProtoMessage() {}
+
+func (x *CancellationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancellationResponse.ProtoReflect.Descriptor instead.
+func (*CancellationResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CancellationResponse) GetData() *MeetingCancellation {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type CancellationListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []*MeetingCancellation `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancellationListResponse) Reset() {
+	*x = CancellationListResponse{}
+	mi := &file_notify_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancellationListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancellationListResponse) ProtoMessage() {}
+
+func (x *CancellationListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancellationListResponse.ProtoReflect.Descriptor instead.
+func (*CancellationListResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CancellationListResponse) GetData() []*MeetingCancellation {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type SuccessResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          *MeetingSuccess        `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SuccessResponse) Reset() {
+	*x = SuccessResponse{}
+	mi := &file_notify_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SuccessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SuccessResponse) ProtoMessage() {}
+
+func (x *SuccessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SuccessResponse.ProtoReflect.Descriptor instead.
+func (*SuccessResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *SuccessResponse) GetData() *MeetingSuccess {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type SuccessListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []*MeetingSuccess      `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SuccessListResponse) Reset() {
+	*x = SuccessListResponse{}
+	mi := &file_notify_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SuccessListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SuccessListResponse) ProtoMessage() {}
+
+func (x *SuccessListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SuccessListResponse.ProtoReflect.Descriptor instead.
+func (*SuccessListResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *SuccessListResponse) GetData() []*MeetingSuccess {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type DeleteResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteResponse) Reset() {
+	*x = DeleteResponse{}
+	mi := &file_notify_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteResponse) ProtoMessage() {}
+
+func (x *DeleteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteResponse.ProtoReflect.Descriptor instead.
+func (*DeleteResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DeleteResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
 	}
 	return ""
 }
@@ -69,9 +934,89 @@ var File_notify_proto protoreflect.FileDescriptor
 
 const file_notify_proto_rawDesc = "" +
 	"\n" +
-	"\fnotify.proto\x12\x06notify\"&\n" +
-	"\x10Meeting_schedule\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04nameB\x13Z\x11./protogen/notifyb\x06proto3"
+	"\fnotify.proto\x12\x06notify\x1a\x1cgoogle/api/annotations.proto\"\xf4\x01\n" +
+	"\x13MeetingCancellation\x12\x1d\n" +
+	"\n" +
+	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\x12\x17\n" +
+	"\alead_id\x18\x02 \x01(\x05R\x06leadId\x12\x1b\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x16\n" +
+	"\x06reason\x18\x04 \x01(\tR\x06reason\x12*\n" +
+	"\x05stage\x18\x05 \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12%\n" +
+	"\x0eevent_datetime\x18\x06 \x01(\tR\reventDatetime\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\"\xb1\x02\n" +
+	"\x0eMeetingSuccess\x12\x17\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12*\n" +
+	"\x05stage\x18\x04 \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12)\n" +
+	"\x10success_datetime\x18\x05 \x01(\tR\x0fsuccessDatetime\x12\x1f\n" +
+	"\vnext_action\x18\x06 \x01(\tR\n" +
+	"nextAction\x120\n" +
+	"\x14quote_link_generated\x18\a \x01(\bR\x12quoteLinkGenerated\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\b \x01(\tR\tcreatedAt\"\xbc\x01\n" +
+	"\x19CreateCancellationRequest\x12\x17\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x16\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\x12*\n" +
+	"\x05stage\x18\x04 \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12%\n" +
+	"\x0eevent_datetime\x18\x05 \x01(\tR\reventDatetime\"\xa5\x01\n" +
+	"\x19UpdateCancellationRequest\x12\x1d\n" +
+	"\n" +
+	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\x12\x16\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\x12*\n" +
+	"\x05stage\x18\x03 \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12%\n" +
+	"\x0eevent_datetime\x18\x04 \x01(\tR\reventDatetime\"6\n" +
+	"\x15GetByMeetingIDRequest\x12\x1d\n" +
+	"\n" +
+	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"9\n" +
+	"\x18DeleteByMeetingIDRequest\x12\x1d\n" +
+	"\n" +
+	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"\xfb\x01\n" +
+	"\x14CreateSuccessRequest\x12\x17\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12*\n" +
+	"\x05stage\x18\x03 \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12)\n" +
+	"\x10success_datetime\x18\x04 \x01(\tR\x0fsuccessDatetime\x12\x1f\n" +
+	"\vnext_action\x18\x05 \x01(\tR\n" +
+	"nextAction\x120\n" +
+	"\x14quote_link_generated\x18\x06 \x01(\bR\x12quoteLinkGenerated\"\xfb\x01\n" +
+	"\x14UpdateSuccessRequest\x12\x17\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12*\n" +
+	"\x05stage\x18\x03 \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12)\n" +
+	"\x10success_datetime\x18\x04 \x01(\tR\x0fsuccessDatetime\x12\x1f\n" +
+	"\vnext_action\x18\x05 \x01(\tR\n" +
+	"nextAction\x120\n" +
+	"\x14quote_link_generated\x18\x06 \x01(\bR\x12quoteLinkGenerated\"-\n" +
+	"\x12GetByLeadIDRequest\x12\x17\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\"G\n" +
+	"\x14CancellationResponse\x12/\n" +
+	"\x04data\x18\x01 \x01(\v2\x1b.notify.MeetingCancellationR\x04data\"K\n" +
+	"\x18CancellationListResponse\x12/\n" +
+	"\x04data\x18\x01 \x03(\v2\x1b.notify.MeetingCancellationR\x04data\"=\n" +
+	"\x0fSuccessResponse\x12*\n" +
+	"\x04data\x18\x01 \x01(\v2\x16.notify.MeetingSuccessR\x04data\"A\n" +
+	"\x13SuccessListResponse\x12*\n" +
+	"\x04data\x18\x01 \x03(\v2\x16.notify.MeetingSuccessR\x04data\"*\n" +
+	"\x0eDeleteResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage*X\n" +
+	"\fMeetingStage\x12\x15\n" +
+	"\x11STAGE_UNSPECIFIED\x10\x00\x12\x14\n" +
+	"\x10STAGE_CONNECTION\x10\x01\x12\x1b\n" +
+	"\x17STAGE_EXPERIENCE_DESIGN\x10\x022\xba\t\n" +
+	"\rNotifyService\x12{\n" +
+	"\x12CreateCancellation\x12!.notify.CreateCancellationRequest\x1a\x1c.notify.CancellationResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/v1/meetings/cancellation\x12v\n" +
+	"\x13GetAllCancellations\x12\x1a.notify.GetByLeadIDRequest\x1a .notify.CancellationListResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/meetings/cancellation\x12\x82\x01\n" +
+	"\x13GetCancellationByID\x12\x1d.notify.GetByMeetingIDRequest\x1a\x1c.notify.CancellationResponse\".\x82\xd3\xe4\x93\x02(\x12&/v1/meetings/cancellation/{meeting_id}\x12\x88\x01\n" +
+	"\x12UpdateCancellation\x12!.notify.UpdateCancellationRequest\x1a\x1c.notify.CancellationResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\x1a&/v1/meetings/cancellation/{meeting_id}\x12~\n" +
+	"\x12DeleteCancellation\x12 .notify.DeleteByMeetingIDRequest\x1a\x16.notify.DeleteResponse\".\x82\xd3\xe4\x93\x02(*&/v1/meetings/cancellation/{meeting_id}\x12g\n" +
+	"\rCreateSuccess\x12\x1c.notify.CreateSuccessRequest\x1a\x17.notify.SuccessResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/v1/meetings/success\x12h\n" +
+	"\x0fGetAllSuccesses\x12\x1a.notify.GetByLeadIDRequest\x1a\x1b.notify.SuccessListResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v1/meetings/success\x12q\n" +
+	"\x12GetSuccessByLeadID\x12\x1a.notify.GetByLeadIDRequest\x1a\x17.notify.SuccessResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1/meetings/success/{lead_id}\x12q\n" +
+	"\rUpdateSuccess\x12\x1c.notify.UpdateSuccessRequest\x1a\x17.notify.SuccessResponse\")\x82\xd3\xe4\x93\x02#:\x01*\x1a\x1e/v1/meetings/success/{lead_id}\x12k\n" +
+	"\rDeleteSuccess\x12\x1a.notify.GetByLeadIDRequest\x1a\x16.notify.DeleteResponse\"&\x82\xd3\xe4\x93\x02 *\x1e/v1/meetings/success/{lead_id}B\x13Z\x11./protogen/notifyb\x06proto3"
 
 var (
 	file_notify_proto_rawDescOnce sync.Once
@@ -85,16 +1030,61 @@ func file_notify_proto_rawDescGZIP() []byte {
 	return file_notify_proto_rawDescData
 }
 
-var file_notify_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_notify_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_notify_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_notify_proto_goTypes = []any{
-	(*MeetingSchedule)(nil), // 0: notify.Meeting_schedule
+	(MeetingStage)(0),                 // 0: notify.MeetingStage
+	(*MeetingCancellation)(nil),       // 1: notify.MeetingCancellation
+	(*MeetingSuccess)(nil),            // 2: notify.MeetingSuccess
+	(*CreateCancellationRequest)(nil), // 3: notify.CreateCancellationRequest
+	(*UpdateCancellationRequest)(nil), // 4: notify.UpdateCancellationRequest
+	(*GetByMeetingIDRequest)(nil),     // 5: notify.GetByMeetingIDRequest
+	(*DeleteByMeetingIDRequest)(nil),  // 6: notify.DeleteByMeetingIDRequest
+	(*CreateSuccessRequest)(nil),      // 7: notify.CreateSuccessRequest
+	(*UpdateSuccessRequest)(nil),      // 8: notify.UpdateSuccessRequest
+	(*GetByLeadIDRequest)(nil),        // 9: notify.GetByLeadIDRequest
+	(*CancellationResponse)(nil),      // 10: notify.CancellationResponse
+	(*CancellationListResponse)(nil),  // 11: notify.CancellationListResponse
+	(*SuccessResponse)(nil),           // 12: notify.SuccessResponse
+	(*SuccessListResponse)(nil),       // 13: notify.SuccessListResponse
+	(*DeleteResponse)(nil),            // 14: notify.DeleteResponse
 }
 var file_notify_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: notify.MeetingCancellation.stage:type_name -> notify.MeetingStage
+	0,  // 1: notify.MeetingSuccess.stage:type_name -> notify.MeetingStage
+	0,  // 2: notify.CreateCancellationRequest.stage:type_name -> notify.MeetingStage
+	0,  // 3: notify.UpdateCancellationRequest.stage:type_name -> notify.MeetingStage
+	0,  // 4: notify.CreateSuccessRequest.stage:type_name -> notify.MeetingStage
+	0,  // 5: notify.UpdateSuccessRequest.stage:type_name -> notify.MeetingStage
+	1,  // 6: notify.CancellationResponse.data:type_name -> notify.MeetingCancellation
+	1,  // 7: notify.CancellationListResponse.data:type_name -> notify.MeetingCancellation
+	2,  // 8: notify.SuccessResponse.data:type_name -> notify.MeetingSuccess
+	2,  // 9: notify.SuccessListResponse.data:type_name -> notify.MeetingSuccess
+	3,  // 10: notify.NotifyService.CreateCancellation:input_type -> notify.CreateCancellationRequest
+	9,  // 11: notify.NotifyService.GetAllCancellations:input_type -> notify.GetByLeadIDRequest
+	5,  // 12: notify.NotifyService.GetCancellationByID:input_type -> notify.GetByMeetingIDRequest
+	4,  // 13: notify.NotifyService.UpdateCancellation:input_type -> notify.UpdateCancellationRequest
+	6,  // 14: notify.NotifyService.DeleteCancellation:input_type -> notify.DeleteByMeetingIDRequest
+	7,  // 15: notify.NotifyService.CreateSuccess:input_type -> notify.CreateSuccessRequest
+	9,  // 16: notify.NotifyService.GetAllSuccesses:input_type -> notify.GetByLeadIDRequest
+	9,  // 17: notify.NotifyService.GetSuccessByLeadID:input_type -> notify.GetByLeadIDRequest
+	8,  // 18: notify.NotifyService.UpdateSuccess:input_type -> notify.UpdateSuccessRequest
+	9,  // 19: notify.NotifyService.DeleteSuccess:input_type -> notify.GetByLeadIDRequest
+	10, // 20: notify.NotifyService.CreateCancellation:output_type -> notify.CancellationResponse
+	11, // 21: notify.NotifyService.GetAllCancellations:output_type -> notify.CancellationListResponse
+	10, // 22: notify.NotifyService.GetCancellationByID:output_type -> notify.CancellationResponse
+	10, // 23: notify.NotifyService.UpdateCancellation:output_type -> notify.CancellationResponse
+	14, // 24: notify.NotifyService.DeleteCancellation:output_type -> notify.DeleteResponse
+	12, // 25: notify.NotifyService.CreateSuccess:output_type -> notify.SuccessResponse
+	13, // 26: notify.NotifyService.GetAllSuccesses:output_type -> notify.SuccessListResponse
+	12, // 27: notify.NotifyService.GetSuccessByLeadID:output_type -> notify.SuccessResponse
+	12, // 28: notify.NotifyService.UpdateSuccess:output_type -> notify.SuccessResponse
+	14, // 29: notify.NotifyService.DeleteSuccess:output_type -> notify.DeleteResponse
+	20, // [20:30] is the sub-list for method output_type
+	10, // [10:20] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_notify_proto_init() }
@@ -107,13 +1097,14 @@ func file_notify_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_notify_proto_rawDesc), len(file_notify_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   1,
+			NumEnums:      1,
+			NumMessages:   14,
 			NumExtensions: 0,
-			NumServices:   0,
+			NumServices:   1,
 		},
 		GoTypes:           file_notify_proto_goTypes,
 		DependencyIndexes: file_notify_proto_depIdxs,
+		EnumInfos:         file_notify_proto_enumTypes,
 		MessageInfos:      file_notify_proto_msgTypes,
 	}.Build()
 	File_notify_proto = out.File

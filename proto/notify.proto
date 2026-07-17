@@ -1,10 +1,179 @@
-syntax =  "proto3";
+syntax = "proto3";
 
 package notify;
-option go_package  = "./protogen/notify";
 
+import "google/api/annotations.proto";
 
-message Meeting_schedule {
- string name = 1;
+option go_package = "./protogen/notify";
+
+enum MeetingStage {
+  STAGE_UNSPECIFIED       = 0;
+  STAGE_CONNECTION        = 1;
+  STAGE_EXPERIENCE_DESIGN = 2;
+}
+// Milestone = 'CANCELLED'
+message MeetingCancellation {
+  int32        meeting_id     = 1;
+  int32        lead_id        = 2;
+  string       lead_name      = 3;
+  string       reason         = 4;
+  MeetingStage stage          = 5;
+  string       event_datetime = 6;
+  string       created_at     = 7;
 }
 
+// successful
+message MeetingSuccess {
+  int32        lead_id              = 1;
+  string       lead_name            = 2;
+  string       description          = 3;
+  MeetingStage stage                = 4;
+  string       success_datetime     = 5;
+  string       next_action          = 6;
+  bool         quote_link_generated = 7;
+  string       created_at           = 8;
+}
+
+
+// Request messages — Cancellation
+message CreateCancellationRequest {
+  int32        lead_id        = 1;
+  string       lead_name      = 2;
+  string       reason         = 3;
+  MeetingStage stage          = 4;
+  string       event_datetime = 5;
+}
+
+message UpdateCancellationRequest {
+  int32        meeting_id     = 1;
+  string       reason         = 2;
+  MeetingStage stage          = 3;
+  string       event_datetime = 4;
+}
+
+message GetByMeetingIDRequest {
+  int32 meeting_id = 1;
+}
+
+message DeleteByMeetingIDRequest {
+  int32 meeting_id = 1;
+}
+
+// Request messages — Success
+
+message CreateSuccessRequest {
+  int32        lead_id              = 1;
+  string       description          = 2;
+  MeetingStage stage                = 3;
+  string       success_datetime     = 4;
+  string       next_action          = 5;
+  bool         quote_link_generated = 6;
+}
+
+message UpdateSuccessRequest {
+  int32        lead_id              = 1;
+  string       description          = 2;
+  MeetingStage stage                = 3;
+  string       success_datetime     = 4;
+  string       next_action          = 5;
+  bool         quote_link_generated = 6;
+}
+
+message GetByLeadIDRequest {
+  int32 lead_id = 1;
+}
+
+// Response messages
+
+message CancellationResponse {
+  MeetingCancellation data = 1;
+}
+
+message CancellationListResponse {
+  repeated MeetingCancellation data = 1;
+}
+
+message SuccessResponse {
+  MeetingSuccess data = 1;
+}
+
+message SuccessListResponse {
+  repeated MeetingSuccess data = 1;
+}
+
+message DeleteResponse {
+  string message = 1;
+}
+
+// Service
+
+service NotifyService {
+
+  // Cancellation meeting
+
+  rpc CreateCancellation(CreateCancellationRequest) returns (CancellationResponse) {
+    option (google.api.http) = {
+      post: "/v1/meetings/cancellation"
+      body: "*"
+    };
+  }
+
+  rpc GetAllCancellations(GetByLeadIDRequest) returns (CancellationListResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/cancellation"
+    };
+  }
+
+  rpc GetCancellationByID(GetByMeetingIDRequest) returns (CancellationResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/cancellation/{meeting_id}"
+    };
+  }
+
+  rpc UpdateCancellation(UpdateCancellationRequest) returns (CancellationResponse) {
+    option (google.api.http) = {
+      put: "/v1/meetings/cancellation/{meeting_id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteCancellation(DeleteByMeetingIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/meetings/cancellation/{meeting_id}"
+    };
+  }
+
+  // Successful meetings
+
+  rpc CreateSuccess(CreateSuccessRequest) returns (SuccessResponse) {
+    option (google.api.http) = {
+      post: "/v1/meetings/success"
+      body: "*"
+    };
+  }
+
+  rpc GetAllSuccesses(GetByLeadIDRequest) returns (SuccessListResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/success"
+    };
+  }
+
+  rpc GetSuccessByLeadID(GetByLeadIDRequest) returns (SuccessResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/success/{lead_id}"
+    };
+  }
+
+  rpc UpdateSuccess(UpdateSuccessRequest) returns (SuccessResponse) {
+    option (google.api.http) = {
+      put: "/v1/meetings/success/{lead_id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteSuccess(GetByLeadIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/meetings/success/{lead_id}"
+    };
+  }
+}
