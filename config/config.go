@@ -3,7 +3,7 @@ package config
 type Config struct {
 	MySQLDetails struct {
 		Username string `yaml:"username"`
-		Password string `yaml:"address"`
+		Password string `yaml:"password"`
 		Address  string `yaml:"address"`
 		Port     string `yaml:"port"`
 		DBName   string `yaml:"db_name"`

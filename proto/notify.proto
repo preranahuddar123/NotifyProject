@@ -105,6 +105,123 @@ message DeleteResponse {
   string message = 1;
 }
 
+// Scheduled meeting
+message MeetingScheduled {
+  int32        id           = 1;
+  int32        lead_id      = 2;
+  string       lead_name    = 3;
+  string       title        = 4;
+  string       description  = 5;
+  string       meeting_date = 6;
+  string       slot         = 7;
+  string       meeting_type = 8;
+  MeetingStage stage        = 9;
+  string       created_at   = 10;
+}
+
+// Rescheduled meeting
+message MeetingRescheduled {
+  int32        id           = 1;
+  int32        lead_id      = 2;
+  string       lead_name    = 3;
+  string       title        = 4;
+  string       description  = 5;
+  string       meeting_date = 6;
+  string       slot         = 7;
+  string       meeting_type = 8;
+  MeetingStage stage        = 9;
+  string       reason       = 10;
+  string       created_at   = 11;
+}
+
+// Request messages — Scheduled
+message CreateScheduledRequest {
+  int32        lead_id      = 1;
+  string       lead_name    = 2;
+  string       title        = 3;
+  string       description  = 4;
+  string       meeting_date = 5;
+  string       slot         = 6;
+  string       meeting_type = 7;
+  MeetingStage stage        = 8;
+}
+
+message UpdateScheduledRequest {
+  int32        id           = 1;
+  string       title        = 2;
+  string       description  = 3;
+  string       meeting_date = 4;
+  string       slot         = 5;
+  string       meeting_type = 6;
+  MeetingStage stage        = 7;
+}
+
+message GetScheduledByIDRequest {
+  int32 id = 1;
+}
+
+message DeleteScheduledByIDRequest {
+  int32 id = 1;
+}
+
+message GetScheduledByLeadIDRequest {
+  int32 lead_id = 1;
+}
+
+// Request messages — Rescheduled
+message CreateRescheduledRequest {
+  int32        lead_id      = 1;
+  string       lead_name    = 2;
+  string       title        = 3;
+  string       description  = 4;
+  string       meeting_date = 5;
+  string       slot         = 6;
+  string       meeting_type = 7;
+  MeetingStage stage        = 8;
+  string       reason       = 9;
+}
+
+message UpdateRescheduledRequest {
+  int32        id           = 1;
+  string       title        = 2;
+  string       description  = 3;
+  string       meeting_date = 4;
+  string       slot         = 5;
+  string       meeting_type = 6;
+  MeetingStage stage        = 7;
+  string       reason       = 8;
+}
+
+message GetRescheduledByIDRequest {
+  int32 id = 1;
+}
+
+message DeleteRescheduledByIDRequest {
+  int32 id = 1;
+}
+
+message GetRescheduledByLeadIDRequest {
+  int32 lead_id = 1;
+}
+
+// Response messages — Scheduled
+message ScheduledResponse {
+  MeetingScheduled data = 1;
+}
+
+message ScheduledListResponse {
+  repeated MeetingScheduled data = 1;
+}
+
+// Response messages — Rescheduled
+message RescheduledResponse {
+  MeetingRescheduled data = 1;
+}
+
+message RescheduledListResponse {
+  repeated MeetingRescheduled data = 1;
+}
+
 // Service
 
 service NotifyService {
@@ -174,6 +291,74 @@ service NotifyService {
   rpc DeleteSuccess(GetByLeadIDRequest) returns (DeleteResponse) {
     option (google.api.http) = {
       delete: "/v1/meetings/success/{lead_id}"
+    };
+  }
+
+  // Scheduled meetings
+
+  rpc CreateScheduled(CreateScheduledRequest) returns (ScheduledResponse) {
+    option (google.api.http) = {
+      post: "/v1/meetings/scheduled"
+      body: "*"
+    };
+  }
+
+  rpc GetAllScheduled(GetScheduledByLeadIDRequest) returns (ScheduledListResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/scheduled"
+    };
+  }
+
+  rpc GetScheduledByID(GetScheduledByIDRequest) returns (ScheduledResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/scheduled/{id}"
+    };
+  }
+
+  rpc UpdateScheduled(UpdateScheduledRequest) returns (ScheduledResponse) {
+    option (google.api.http) = {
+      put: "/v1/meetings/scheduled/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteScheduled(DeleteScheduledByIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/meetings/scheduled/{id}"
+    };
+  }
+
+  // Rescheduled meetings
+
+  rpc CreateRescheduled(CreateRescheduledRequest) returns (RescheduledResponse) {
+    option (google.api.http) = {
+      post: "/v1/meetings/rescheduled"
+      body: "*"
+    };
+  }
+
+  rpc GetAllRescheduled(GetRescheduledByLeadIDRequest) returns (RescheduledListResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/rescheduled"
+    };
+  }
+
+  rpc GetRescheduledByID(GetRescheduledByIDRequest) returns (RescheduledResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/rescheduled/{id}"
+    };
+  }
+
+  rpc UpdateRescheduled(UpdateRescheduledRequest) returns (RescheduledResponse) {
+    option (google.api.http) = {
+      put: "/v1/meetings/rescheduled/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteRescheduled(DeleteRescheduledByIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/meetings/rescheduled/{id}"
     };
   }
 }

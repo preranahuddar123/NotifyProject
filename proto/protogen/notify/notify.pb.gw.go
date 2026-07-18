@@ -182,5 +182,143 @@ func RegisterNotifyServiceHandler(
 		return err
 	}
 
+	// ---- Scheduled endpoints -------------------------------------------
+
+	// POST /v1/meetings/scheduled
+	if err := mux.HandlePath("POST", "/v1/meetings/scheduled",
+		func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+			var req CreateScheduledRequest
+			if err := codec.NewDecoder(r.Body).Decode(&req); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			resp, err := client.CreateScheduled(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// GET /v1/meetings/scheduled?lead_id=
+	if err := mux.HandlePath("GET", "/v1/meetings/scheduled",
+		func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+			var req GetScheduledByLeadIDRequest
+			parseIntParam(r.URL.Query().Get("lead_id"), &req.LeadId)
+			resp, err := client.GetAllScheduled(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// GET /v1/meetings/scheduled/{id}
+	if err := mux.HandlePath("GET", "/v1/meetings/scheduled/{id}",
+		func(w http.ResponseWriter, r *http.Request, params map[string]string) {
+			var req GetScheduledByIDRequest
+			parseIntParam(params["id"], &req.Id)
+			resp, err := client.GetScheduledByID(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// PUT /v1/meetings/scheduled/{id}
+	if err := mux.HandlePath("PUT", "/v1/meetings/scheduled/{id}",
+		func(w http.ResponseWriter, r *http.Request, params map[string]string) {
+			var req UpdateScheduledRequest
+			if err := codec.NewDecoder(r.Body).Decode(&req); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			parseIntParam(params["id"], &req.Id)
+			resp, err := client.UpdateScheduled(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// DELETE /v1/meetings/scheduled/{id}
+	if err := mux.HandlePath("DELETE", "/v1/meetings/scheduled/{id}",
+		func(w http.ResponseWriter, r *http.Request, params map[string]string) {
+			var req DeleteScheduledByIDRequest
+			parseIntParam(params["id"], &req.Id)
+			resp, err := client.DeleteScheduled(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// ---- Rescheduled endpoints -----------------------------------------
+
+	// POST /v1/meetings/rescheduled
+	if err := mux.HandlePath("POST", "/v1/meetings/rescheduled",
+		func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+			var req CreateRescheduledRequest
+			if err := codec.NewDecoder(r.Body).Decode(&req); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			resp, err := client.CreateRescheduled(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// GET /v1/meetings/rescheduled?lead_id=
+	if err := mux.HandlePath("GET", "/v1/meetings/rescheduled",
+		func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+			var req GetRescheduledByLeadIDRequest
+			parseIntParam(r.URL.Query().Get("lead_id"), &req.LeadId)
+			resp, err := client.GetAllRescheduled(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// GET /v1/meetings/rescheduled/{id}
+	if err := mux.HandlePath("GET", "/v1/meetings/rescheduled/{id}",
+		func(w http.ResponseWriter, r *http.Request, params map[string]string) {
+			var req GetRescheduledByIDRequest
+			parseIntParam(params["id"], &req.Id)
+			resp, err := client.GetRescheduledByID(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// PUT /v1/meetings/rescheduled/{id}
+	if err := mux.HandlePath("PUT", "/v1/meetings/rescheduled/{id}",
+		func(w http.ResponseWriter, r *http.Request, params map[string]string) {
+			var req UpdateRescheduledRequest
+			if err := codec.NewDecoder(r.Body).Decode(&req); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			parseIntParam(params["id"], &req.Id)
+			resp, err := client.UpdateRescheduled(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
+	// DELETE /v1/meetings/rescheduled/{id}
+	if err := mux.HandlePath("DELETE", "/v1/meetings/rescheduled/{id}",
+		func(w http.ResponseWriter, r *http.Request, params map[string]string) {
+			var req DeleteRescheduledByIDRequest
+			parseIntParam(params["id"], &req.Id)
+			resp, err := client.DeleteRescheduled(ctx, &req)
+			writeResponse(w, resp, err)
+		},
+	); err != nil {
+		return err
+	}
+
 	return nil
 }

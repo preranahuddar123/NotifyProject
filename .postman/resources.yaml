@@ -1,0 +1,9 @@
+# Use this workspace to collaborate
+workspace:
+  id: 0e0196df-74b3-4639-81e8-1a14ffb468f1
+
+localResources:
+  specs:
+    - ..\proto\notify.proto
+    - ..\proto\google\api\annotations.proto
+    - ..\proto\google\api\http.proto

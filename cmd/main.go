@@ -12,6 +12,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"gopkg.in/yaml.v2"
 
 	"NotifyProject/config"
@@ -49,6 +50,7 @@ func main() {
 	// Start the gRPC server
 	grpcServer := grpc.NewServer()
 	pb.RegisterNotifyServiceServer(grpcServer, notifyService)
+	reflection.Register(grpcServer)
 
 	lis, err := net.Listen(cfg.GrpcDetails.Network, cfg.GrpcDetails.Address)
 	if err != nil {

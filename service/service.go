@@ -374,3 +374,364 @@ func scanSuccess(fn func(...any) error) (*pb.MeetingSuccess, error) {
 	m.CreatedAt = fmtTime(createdAt)
 	return &m, nil
 }
+
+// Scheduled RPCs
+
+func (s *NotifyServiceServer) CreateScheduled(_ context.Context, req *pb.CreateScheduledRequest) (*pb.ScheduledResponse, error) {
+	if req.LeadId == 0 || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: lead_id and lead_name are required")
+	}
+	if req.MeetingDate == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: meeting_date is required (YYYY-MM-DD)")
+	}
+	if req.Slot == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: slot is required")
+	}
+	if req.MeetingType == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: meeting_type is required")
+	}
+	if req.Stage == pb.MeetingStage_STAGE_UNSPECIFIED {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: stage is required")
+	}
+
+	res, err := s.db.Exec(
+		`INSERT INTO meeting_details (lead_id, lead_name, milestone, title, description, meeting_date, slot, meeting_type, stage)
+		 VALUES (?, ?, 'SCHEDULED', ?, ?, ?, ?, ?, ?)`,
+		req.LeadId, req.LeadName, req.Title, req.Description,
+		req.MeetingDate, req.Slot, req.MeetingType, stageDBValue(req.Stage),
+	)
+	if err != nil {
+		log.Printf("Failed to create scheduled meeting: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to create scheduled meeting: %v", err)
+	}
+
+	id, _ := res.LastInsertId()
+	resp, err := s.getScheduledByID(int32(id))
+	if err != nil {
+		return nil, err
+	}
+	d := resp.Data
+	log.Printf("[SCHEDULED] Created | id=%d lead_id=%d lead_name=%q title=%q description=%q meeting_date=%s slot=%s meeting_type=%s stage=%s created_at=%s",
+		d.Id, d.LeadId, d.LeadName, d.Title, d.Description, d.MeetingDate, d.Slot, d.MeetingType, d.Stage, d.CreatedAt)
+	return resp, nil
+}
+
+func (s *NotifyServiceServer) GetAllScheduled(_ context.Context, req *pb.GetScheduledByLeadIDRequest) (*pb.ScheduledListResponse, error) {
+	var (
+		rows *sql.Rows
+		err  error
+	)
+
+	if req.LeadId != 0 {
+		rows, err = s.db.Query(
+			`SELECT id, lead_id, lead_name, title, description, meeting_date, slot, meeting_type, stage, created_at
+			 FROM meeting_scheduled WHERE lead_id = ? ORDER BY created_at DESC`, req.LeadId)
+	} else {
+		rows, err = s.db.Query(
+			`SELECT id, lead_id, lead_name, title, description, meeting_date, slot, meeting_type, stage, created_at
+			 FROM meeting_scheduled ORDER BY created_at DESC`)
+	}
+	if err != nil {
+		log.Printf("Failed to fetch scheduled meetings: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to fetch scheduled meetings: %v", err)
+	}
+	defer rows.Close()
+
+	var list []*pb.MeetingScheduled
+	for rows.Next() {
+		item, e := scanScheduled(rows.Scan)
+		if e != nil {
+			return nil, status.Errorf(codes.Internal, "Failed to scan scheduled meeting: %v", e)
+		}
+		log.Printf("[SCHEDULED] GetAll | id=%d lead_id=%d lead_name=%q title=%q description=%q meeting_date=%s slot=%s meeting_type=%s stage=%s created_at=%s",
+			item.Id, item.LeadId, item.LeadName, item.Title, item.Description, item.MeetingDate, item.Slot, item.MeetingType, item.Stage, item.CreatedAt)
+		list = append(list, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, status.Errorf(codes.Internal, "Row iteration error: %v", err)
+	}
+
+	return &pb.ScheduledListResponse{Data: list}, nil
+}
+
+func (s *NotifyServiceServer) GetScheduledByID(_ context.Context, req *pb.GetScheduledByIDRequest) (*pb.ScheduledResponse, error) {
+	if req.Id == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: id is required")
+	}
+	resp, err := s.getScheduledByID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	d := resp.Data
+	log.Printf("[SCHEDULED] GetByID | id=%d lead_id=%d lead_name=%q title=%q description=%q meeting_date=%s slot=%s meeting_type=%s stage=%s created_at=%s",
+		d.Id, d.LeadId, d.LeadName, d.Title, d.Description, d.MeetingDate, d.Slot, d.MeetingType, d.Stage, d.CreatedAt)
+	return resp, nil
+}
+
+func (s *NotifyServiceServer) UpdateScheduled(_ context.Context, req *pb.UpdateScheduledRequest) (*pb.ScheduledResponse, error) {
+	if req.Id == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: id is required")
+	}
+
+	res, err := s.db.Exec(
+		`UPDATE meeting_scheduled SET title = ?, description = ?, meeting_date = ?, slot = ?, meeting_type = ?, stage = ?
+		 WHERE id = ?`,
+		req.Title, req.Description, req.MeetingDate, req.Slot, req.MeetingType, stageDBValue(req.Stage), req.Id,
+	)
+	if err != nil {
+		log.Printf("Failed to update scheduled meeting: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to update scheduled meeting: %v", err)
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return nil, status.Errorf(codes.NotFound, "Scheduled meeting with id %d not found", req.Id)
+	}
+
+	resp, err := s.getScheduledByID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	d := resp.Data
+	log.Printf("[SCHEDULED] Updated | id=%d lead_id=%d lead_name=%q title=%q description=%q meeting_date=%s slot=%s meeting_type=%s stage=%s created_at=%s",
+		d.Id, d.LeadId, d.LeadName, d.Title, d.Description, d.MeetingDate, d.Slot, d.MeetingType, d.Stage, d.CreatedAt)
+	return resp, nil
+}
+
+func (s *NotifyServiceServer) DeleteScheduled(_ context.Context, req *pb.DeleteScheduledByIDRequest) (*pb.DeleteResponse, error) {
+	if req.Id == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: id is required")
+	}
+
+	res, err := s.db.Exec(`DELETE FROM meeting_scheduled WHERE id = ?`, req.Id)
+	if err != nil {
+		log.Printf("Failed to delete scheduled meeting: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to delete scheduled meeting: %v", err)
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return nil, status.Errorf(codes.NotFound, "Scheduled meeting with id %d not found", req.Id)
+	}
+
+	log.Printf("[SCHEDULED] Deleted | id=%d", req.Id)
+	return &pb.DeleteResponse{Message: "Deleted successfully"}, nil
+}
+
+// Rescheduled RPCs
+
+func (s *NotifyServiceServer) CreateRescheduled(_ context.Context, req *pb.CreateRescheduledRequest) (*pb.RescheduledResponse, error) {
+	if req.LeadId == 0 || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: lead_id and lead_name are required")
+	}
+	if req.MeetingDate == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: meeting_date is required (YYYY-MM-DD)")
+	}
+	if req.Slot == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: slot is required")
+	}
+	if req.MeetingType == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: meeting_type is required")
+	}
+	if req.Stage == pb.MeetingStage_STAGE_UNSPECIFIED {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: stage is required")
+	}
+	if req.Reason == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: reason is required")
+	}
+
+	res, err := s.db.Exec(
+		`INSERT INTO meeting_rescheduled (lead_id, lead_name, title, description, meeting_date, slot, meeting_type, stage, reason)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		req.LeadId, req.LeadName, req.Title, req.Description,
+		req.MeetingDate, req.Slot, req.MeetingType, stageDBValue(req.Stage), req.Reason,
+	)
+	if err != nil {
+		log.Printf("Failed to create rescheduled meeting: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to create rescheduled meeting: %v", err)
+	}
+
+	id, _ := res.LastInsertId()
+	resp, err := s.getRescheduledByID(int32(id))
+	if err != nil {
+		return nil, err
+	}
+	d := resp.Data
+	log.Printf("[RESCHEDULED] Created | id=%d lead_id=%d lead_name=%q title=%q description=%q meeting_date=%s slot=%s meeting_type=%s stage=%s reason=%q created_at=%s",
+		d.Id, d.LeadId, d.LeadName, d.Title, d.Description, d.MeetingDate, d.Slot, d.MeetingType, d.Stage, d.Reason, d.CreatedAt)
+	return resp, nil
+}
+
+func (s *NotifyServiceServer) GetAllRescheduled(_ context.Context, req *pb.GetRescheduledByLeadIDRequest) (*pb.RescheduledListResponse, error) {
+	var (
+		rows *sql.Rows
+		err  error
+	)
+
+	if req.LeadId != 0 {
+		rows, err = s.db.Query(
+			`SELECT id, lead_id, lead_name, title, description, meeting_date, slot, meeting_type, stage, reason, created_at
+			 FROM meeting_rescheduled WHERE lead_id = ? ORDER BY created_at DESC`, req.LeadId)
+	} else {
+		rows, err = s.db.Query(
+			`SELECT id, lead_id, lead_name, title, description, meeting_date, slot, meeting_type, stage, reason, created_at
+			 FROM meeting_rescheduled ORDER BY created_at DESC`)
+	}
+	if err != nil {
+		log.Printf("Failed to fetch rescheduled meetings: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to fetch rescheduled meetings: %v", err)
+	}
+	defer rows.Close()
+
+	var list []*pb.MeetingRescheduled
+	for rows.Next() {
+		item, e := scanRescheduled(rows.Scan)
+		if e != nil {
+			return nil, status.Errorf(codes.Internal, "Failed to scan rescheduled meeting: %v", e)
+		}
+		log.Printf("[RESCHEDULED] GetAll | id=%d lead_id=%d lead_name=%q title=%q description=%q meeting_date=%s slot=%s meeting_type=%s stage=%s reason=%q created_at=%s",
+			item.Id, item.LeadId, item.LeadName, item.Title, item.Description, item.MeetingDate, item.Slot, item.MeetingType, item.Stage, item.Reason, item.CreatedAt)
+		list = append(list, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, status.Errorf(codes.Internal, "Row iteration error: %v", err)
+	}
+
+	return &pb.RescheduledListResponse{Data: list}, nil
+}
+
+func (s *NotifyServiceServer) GetRescheduledByID(_ context.Context, req *pb.GetRescheduledByIDRequest) (*pb.RescheduledResponse, error) {
+	if req.Id == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: id is required")
+	}
+	resp, err := s.getRescheduledByID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	d := resp.Data
+	log.Printf("[RESCHEDULED] GetByID | id=%d lead_id=%d lead_name=%q title=%q description=%q meeting_date=%s slot=%s meeting_type=%s stage=%s reason=%q created_at=%s",
+		d.Id, d.LeadId, d.LeadName, d.Title, d.Description, d.MeetingDate, d.Slot, d.MeetingType, d.Stage, d.Reason, d.CreatedAt)
+	return resp, nil
+}
+
+func (s *NotifyServiceServer) UpdateRescheduled(_ context.Context, req *pb.UpdateRescheduledRequest) (*pb.RescheduledResponse, error) {
+	if req.Id == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: id is required")
+	}
+
+	res, err := s.db.Exec(
+		`UPDATE meeting_rescheduled SET title = ?, description = ?, meeting_date = ?, slot = ?, meeting_type = ?, stage = ?, reason = ?
+		 WHERE id = ?`,
+		req.Title, req.Description, req.MeetingDate, req.Slot, req.MeetingType, stageDBValue(req.Stage), req.Reason, req.Id,
+	)
+	if err != nil {
+		log.Printf("Failed to update rescheduled meeting: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to update rescheduled meeting: %v", err)
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return nil, status.Errorf(codes.NotFound, "Rescheduled meeting with id %d not found", req.Id)
+	}
+
+	resp, err := s.getRescheduledByID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	d := resp.Data
+	log.Printf("[RESCHEDULED] Updated | id=%d lead_id=%d lead_name=%q title=%q description=%q meeting_date=%s slot=%s meeting_type=%s stage=%s reason=%q created_at=%s",
+		d.Id, d.LeadId, d.LeadName, d.Title, d.Description, d.MeetingDate, d.Slot, d.MeetingType, d.Stage, d.Reason, d.CreatedAt)
+	return resp, nil
+}
+
+func (s *NotifyServiceServer) DeleteRescheduled(_ context.Context, req *pb.DeleteRescheduledByIDRequest) (*pb.DeleteResponse, error) {
+	if req.Id == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid request: id is required")
+	}
+
+	res, err := s.db.Exec(`DELETE FROM meeting_rescheduled WHERE id = ?`, req.Id)
+	if err != nil {
+		log.Printf("Failed to delete rescheduled meeting: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to delete rescheduled meeting: %v", err)
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return nil, status.Errorf(codes.NotFound, "Rescheduled meeting with id %d not found", req.Id)
+	}
+
+	log.Printf("[RESCHEDULED] Deleted | id=%d", req.Id)
+	return &pb.DeleteResponse{Message: "Deleted successfully"}, nil
+}
+
+// Private fetch helpers — Scheduled / Rescheduled
+
+func (s *NotifyServiceServer) getScheduledByID(id int32) (*pb.ScheduledResponse, error) {
+	row := s.db.QueryRow(
+		`SELECT id, lead_id, lead_name, title, description, meeting_date, slot, meeting_type, stage, created_at
+		 FROM meeting_scheduled WHERE id = ?`, id)
+
+	item, err := scanScheduled(row.Scan)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, status.Errorf(codes.NotFound, "Scheduled meeting with id %d not found", id)
+	}
+	if err != nil {
+		log.Printf("Failed to fetch scheduled meeting: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to fetch scheduled meeting: %v", err)
+	}
+	return &pb.ScheduledResponse{Data: item}, nil
+}
+
+func (s *NotifyServiceServer) getRescheduledByID(id int32) (*pb.RescheduledResponse, error) {
+	row := s.db.QueryRow(
+		`SELECT id, lead_id, lead_name, title, description, meeting_date, slot, meeting_type, stage, reason, created_at
+		 FROM meeting_rescheduled WHERE id = ?`, id)
+
+	item, err := scanRescheduled(row.Scan)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, status.Errorf(codes.NotFound, "Rescheduled meeting with id %d not found", id)
+	}
+	if err != nil {
+		log.Printf("Failed to fetch rescheduled meeting: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to fetch rescheduled meeting: %v", err)
+	}
+	return &pb.RescheduledResponse{Data: item}, nil
+}
+
+// Row scanners — Scheduled / Rescheduled
+
+func scanScheduled(fn func(...any) error) (*pb.MeetingScheduled, error) {
+	var (
+		m           pb.MeetingScheduled
+		title       sql.NullString
+		description sql.NullString
+		stage       string
+		createdAt   time.Time
+	)
+	if err := fn(
+		&m.Id, &m.LeadId, &m.LeadName, &title, &description,
+		&m.MeetingDate, &m.Slot, &m.MeetingType, &stage, &createdAt,
+	); err != nil {
+		return nil, err
+	}
+	m.Title = title.String
+	m.Description = description.String
+	m.Stage = stageProtoValue(stage)
+	m.CreatedAt = fmtTime(createdAt)
+	return &m, nil
+}
+
+func scanRescheduled(fn func(...any) error) (*pb.MeetingRescheduled, error) {
+	var (
+		m           pb.MeetingRescheduled
+		title       sql.NullString
+		description sql.NullString
+		stage       string
+		reason      sql.NullString
+		createdAt   time.Time
+	)
+	if err := fn(
+		&m.Id, &m.LeadId, &m.LeadName, &title, &description,
+		&m.MeetingDate, &m.Slot, &m.MeetingType, &stage, &reason, &createdAt,
+	); err != nil {
+		return nil, err
+	}
+	m.Title = title.String
+	m.Description = description.String
+	m.Stage = stageProtoValue(stage)
+	m.Reason = reason.String
+	m.CreatedAt = fmtTime(createdAt)
+	return &m, nil
+}
