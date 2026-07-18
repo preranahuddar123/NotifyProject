@@ -1,10 +1,364 @@
-syntax =  "proto3";
+syntax = "proto3";
 
 package notify;
-option go_package  = "./protogen/notify";
 
+import "google/api/annotations.proto";
 
-message Meeting_schedule {
- string name = 1;
+option go_package = "./protogen/notify";
+
+enum MeetingStage {
+  STAGE_UNSPECIFIED       = 0;
+  STAGE_CONNECTION        = 1;
+  STAGE_EXPERIENCE_DESIGN = 2;
+}
+// Milestone = 'CANCELLED'
+message MeetingCancellation {
+  int32        meeting_id     = 1;
+  int32        lead_id        = 2;
+  string       lead_name      = 3;
+  string       reason         = 4;
+  MeetingStage stage          = 5;
+  string       event_datetime = 6;
+  string       created_at     = 7;
 }
 
+// successful
+message MeetingSuccess {
+  int32        lead_id              = 1;
+  string       lead_name            = 2;
+  string       description          = 3;
+  MeetingStage stage                = 4;
+  string       success_datetime     = 5;
+  string       next_action          = 6;
+  bool         quote_link_generated = 7;
+  string       created_at           = 8;
+}
+
+
+// Request messages — Cancellation
+message CreateCancellationRequest {
+  int32        lead_id        = 1;
+  string       lead_name      = 2;
+  string       reason         = 3;
+  MeetingStage stage          = 4;
+  string       event_datetime = 5;
+}
+
+message UpdateCancellationRequest {
+  int32        meeting_id     = 1;
+  string       reason         = 2;
+  MeetingStage stage          = 3;
+  string       event_datetime = 4;
+}
+
+message GetByMeetingIDRequest {
+  int32 meeting_id = 1;
+}
+
+message DeleteByMeetingIDRequest {
+  int32 meeting_id = 1;
+}
+
+// Request messages — Success
+
+message CreateSuccessRequest {
+  int32        lead_id              = 1;
+  string       description          = 2;
+  MeetingStage stage                = 3;
+  string       success_datetime     = 4;
+  string       next_action          = 5;
+  bool         quote_link_generated = 6;
+}
+
+message UpdateSuccessRequest {
+  int32        lead_id              = 1;
+  string       description          = 2;
+  MeetingStage stage                = 3;
+  string       success_datetime     = 4;
+  string       next_action          = 5;
+  bool         quote_link_generated = 6;
+}
+
+message GetByLeadIDRequest {
+  int32 lead_id = 1;
+}
+
+// Response messages
+
+message CancellationResponse {
+  MeetingCancellation data = 1;
+}
+
+message CancellationListResponse {
+  repeated MeetingCancellation data = 1;
+}
+
+message SuccessResponse {
+  MeetingSuccess data = 1;
+}
+
+message SuccessListResponse {
+  repeated MeetingSuccess data = 1;
+}
+
+message DeleteResponse {
+  string message = 1;
+}
+
+// Scheduled meeting
+message MeetingScheduled {
+  int32        id           = 1;
+  int32        lead_id      = 2;
+  string       lead_name    = 3;
+  string       title        = 4;
+  string       description  = 5;
+  string       meeting_date = 6;
+  string       slot         = 7;
+  string       meeting_type = 8;
+  MeetingStage stage        = 9;
+  string       created_at   = 10;
+}
+
+// Rescheduled meeting
+message MeetingRescheduled {
+  int32        id           = 1;
+  int32        lead_id      = 2;
+  string       lead_name    = 3;
+  string       title        = 4;
+  string       description  = 5;
+  string       meeting_date = 6;
+  string       slot         = 7;
+  string       meeting_type = 8;
+  MeetingStage stage        = 9;
+  string       reason       = 10;
+  string       created_at   = 11;
+}
+
+// Request messages — Scheduled
+message CreateScheduledRequest {
+  int32        lead_id      = 1;
+  string       lead_name    = 2;
+  string       title        = 3;
+  string       description  = 4;
+  string       meeting_date = 5;
+  string       slot         = 6;
+  string       meeting_type = 7;
+  MeetingStage stage        = 8;
+}
+
+message UpdateScheduledRequest {
+  int32        id           = 1;
+  string       title        = 2;
+  string       description  = 3;
+  string       meeting_date = 4;
+  string       slot         = 5;
+  string       meeting_type = 6;
+  MeetingStage stage        = 7;
+}
+
+message GetScheduledByIDRequest {
+  int32 id = 1;
+}
+
+message DeleteScheduledByIDRequest {
+  int32 id = 1;
+}
+
+message GetScheduledByLeadIDRequest {
+  int32 lead_id = 1;
+}
+
+// Request messages — Rescheduled
+message CreateRescheduledRequest {
+  int32        lead_id      = 1;
+  string       lead_name    = 2;
+  string       title        = 3;
+  string       description  = 4;
+  string       meeting_date = 5;
+  string       slot         = 6;
+  string       meeting_type = 7;
+  MeetingStage stage        = 8;
+  string       reason       = 9;
+}
+
+message UpdateRescheduledRequest {
+  int32        id           = 1;
+  string       title        = 2;
+  string       description  = 3;
+  string       meeting_date = 4;
+  string       slot         = 5;
+  string       meeting_type = 6;
+  MeetingStage stage        = 7;
+  string       reason       = 8;
+}
+
+message GetRescheduledByIDRequest {
+  int32 id = 1;
+}
+
+message DeleteRescheduledByIDRequest {
+  int32 id = 1;
+}
+
+message GetRescheduledByLeadIDRequest {
+  int32 lead_id = 1;
+}
+
+// Response messages — Scheduled
+message ScheduledResponse {
+  MeetingScheduled data = 1;
+}
+
+message ScheduledListResponse {
+  repeated MeetingScheduled data = 1;
+}
+
+// Response messages — Rescheduled
+message RescheduledResponse {
+  MeetingRescheduled data = 1;
+}
+
+message RescheduledListResponse {
+  repeated MeetingRescheduled data = 1;
+}
+
+// Service
+
+service NotifyService {
+
+  // Cancellation meeting
+
+  rpc CreateCancellation(CreateCancellationRequest) returns (CancellationResponse) {
+    option (google.api.http) = {
+      post: "/v1/meetings/cancellation"
+      body: "*"
+    };
+  }
+
+  rpc GetAllCancellations(GetByLeadIDRequest) returns (CancellationListResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/cancellation"
+    };
+  }
+
+  rpc GetCancellationByID(GetByMeetingIDRequest) returns (CancellationResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/cancellation/{meeting_id}"
+    };
+  }
+
+  rpc UpdateCancellation(UpdateCancellationRequest) returns (CancellationResponse) {
+    option (google.api.http) = {
+      put: "/v1/meetings/cancellation/{meeting_id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteCancellation(DeleteByMeetingIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/meetings/cancellation/{meeting_id}"
+    };
+  }
+
+  // Successful meetings
+
+  rpc CreateSuccess(CreateSuccessRequest) returns (SuccessResponse) {
+    option (google.api.http) = {
+      post: "/v1/meetings/success"
+      body: "*"
+    };
+  }
+
+  rpc GetAllSuccesses(GetByLeadIDRequest) returns (SuccessListResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/success"
+    };
+  }
+
+  rpc GetSuccessByLeadID(GetByLeadIDRequest) returns (SuccessResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/success/{lead_id}"
+    };
+  }
+
+  rpc UpdateSuccess(UpdateSuccessRequest) returns (SuccessResponse) {
+    option (google.api.http) = {
+      put: "/v1/meetings/success/{lead_id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteSuccess(GetByLeadIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/meetings/success/{lead_id}"
+    };
+  }
+
+  // Scheduled meetings
+
+  rpc CreateScheduled(CreateScheduledRequest) returns (ScheduledResponse) {
+    option (google.api.http) = {
+      post: "/v1/meetings/scheduled"
+      body: "*"
+    };
+  }
+
+  rpc GetAllScheduled(GetScheduledByLeadIDRequest) returns (ScheduledListResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/scheduled"
+    };
+  }
+
+  rpc GetScheduledByID(GetScheduledByIDRequest) returns (ScheduledResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/scheduled/{id}"
+    };
+  }
+
+  rpc UpdateScheduled(UpdateScheduledRequest) returns (ScheduledResponse) {
+    option (google.api.http) = {
+      put: "/v1/meetings/scheduled/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteScheduled(DeleteScheduledByIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/meetings/scheduled/{id}"
+    };
+  }
+
+  // Rescheduled meetings
+
+  rpc CreateRescheduled(CreateRescheduledRequest) returns (RescheduledResponse) {
+    option (google.api.http) = {
+      post: "/v1/meetings/rescheduled"
+      body: "*"
+    };
+  }
+
+  rpc GetAllRescheduled(GetRescheduledByLeadIDRequest) returns (RescheduledListResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/rescheduled"
+    };
+  }
+
+  rpc GetRescheduledByID(GetRescheduledByIDRequest) returns (RescheduledResponse) {
+    option (google.api.http) = {
+      get: "/v1/meetings/rescheduled/{id}"
+    };
+  }
+
+  rpc UpdateRescheduled(UpdateRescheduledRequest) returns (RescheduledResponse) {
+    option (google.api.http) = {
+      put: "/v1/meetings/rescheduled/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteRescheduled(DeleteRescheduledByIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/meetings/rescheduled/{id}"
+    };
+  }
+}
