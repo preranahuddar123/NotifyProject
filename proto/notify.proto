@@ -185,6 +185,91 @@ message DeleteResponse {
 }
 
 // -----------------------------------------------------------------------
+// Lead messages
+// -----------------------------------------------------------------------
+
+message Lead {
+  int32  lead_id    = 1;
+  string lead_name  = 2;
+  int64  mobile     = 3;
+  string lead_type  = 4;
+  string created_at = 5;
+}
+
+message CreateLeadRequest {
+  string lead_name = 1;
+  int64  mobile    = 2;
+  string lead_type = 3; // SALES_POOL | EXTERNAL_LEAD | GOOGLE_ADS | META_ADS |
+                        // ADD_LEAD | IVR_CALL | WEBSITE_LEAD | WALK_IN_LEAD | WHATSAPP
+}
+
+message LeadResponse {
+  Lead data = 1;
+}
+
+message LeadListResponse {
+  repeated Lead data = 1;
+}
+
+// -----------------------------------------------------------------------
+// Booking messages
+// -----------------------------------------------------------------------
+
+message Booking {
+  int32  booking_id     = 1;
+  int32  lead_id        = 2;
+  string lead_name      = 3;
+  string payment_type   = 4; // TOKEN | BOOKING
+  double paid_amount    = 5;
+  double remaining_amount = 6;
+  string payment_date   = 7; // RFC3339
+  string payment_status = 8; // PENDING | SUCCESS | FAILED
+  string remarks        = 9;
+  string created_at     = 10;
+}
+
+message CreateBookingRequest {
+  int32  lead_id        = 1;
+  string lead_name      = 2;
+  string payment_type   = 3; // TOKEN | BOOKING
+  double amount         = 4; // paid amount
+  string payment_date   = 5; // RFC3339
+  string payment_status = 6; // PENDING | SUCCESS | FAILED
+  string remarks        = 7;
+}
+
+message GetBookingByIDRequest {
+  int32 booking_id = 1;
+}
+
+message GetBookingByLeadIDRequest {
+  int32 lead_id = 1;
+}
+
+message BookingResponse {
+  Booking data = 1;
+}
+
+message BookingListResponse {
+  repeated Booking data = 1;
+}
+
+// -----------------------------------------------------------------------
+// Count messages
+// -----------------------------------------------------------------------
+
+message CountsRequest {}   // empty — returns global totals
+
+message CountsResponse {
+  int32 total_leads      = 1;
+  int32 total_scheduled  = 2;
+  int32 total_rescheduled = 3;
+  int32 total_cancelled  = 4;
+  int32 total_success    = 5;
+  int32 total_bookings   = 6;
+}
+
+// -----------------------------------------------------------------------
 // Service
 // -----------------------------------------------------------------------
 
@@ -267,6 +352,53 @@ service NotifyService {
   rpc GetRescheduledByID(GetRescheduledByIDRequest) returns (RescheduledResponse) {
     option (google.api.http) = {
       get: "/v1/meetings/rescheduled/{meeting_id}"
+    };
+  }
+
+  // Leads
+  rpc CreateLead(CreateLeadRequest) returns (LeadResponse) {
+    option (google.api.http) = {
+      post: "/v1/leads"
+      body: "*"
+    };
+  }
+
+  rpc GetAllLeads(CountsRequest) returns (LeadListResponse) {
+    option (google.api.http) = {
+      get: "/v1/leads"
+    };
+  }
+
+  rpc GetLeadByID(GetByLeadIDRequest) returns (LeadResponse) {
+    option (google.api.http) = {
+      get: "/v1/leads/{lead_id}"
+    };
+  }
+
+  // Booking
+  rpc CreateBooking(CreateBookingRequest) returns (BookingResponse) {
+    option (google.api.http) = {
+      post: "/v1/bookings"
+      body: "*"
+    };
+  }
+
+  rpc GetAllBookings(GetBookingByLeadIDRequest) returns (BookingListResponse) {
+    option (google.api.http) = {
+      get: "/v1/bookings"
+    };
+  }
+
+  rpc GetBookingByID(GetBookingByIDRequest) returns (BookingResponse) {
+    option (google.api.http) = {
+      get: "/v1/bookings/{booking_id}"
+    };
+  }
+
+  // Counts
+  rpc GetCounts(CountsRequest) returns (CountsResponse) {
+    option (google.api.http) = {
+      get: "/v1/counts"
     };
   }
 }

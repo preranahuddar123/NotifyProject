@@ -22,49 +22,54 @@ const (
 	NotifyService_CreateCancellation_FullMethodName  = "/notify.NotifyService/CreateCancellation"
 	NotifyService_GetAllCancellations_FullMethodName = "/notify.NotifyService/GetAllCancellations"
 	NotifyService_GetCancellationByID_FullMethodName = "/notify.NotifyService/GetCancellationByID"
-	NotifyService_UpdateCancellation_FullMethodName  = "/notify.NotifyService/UpdateCancellation"
-	NotifyService_DeleteCancellation_FullMethodName  = "/notify.NotifyService/DeleteCancellation"
 	NotifyService_CreateSuccess_FullMethodName       = "/notify.NotifyService/CreateSuccess"
 	NotifyService_GetAllSuccesses_FullMethodName     = "/notify.NotifyService/GetAllSuccesses"
 	NotifyService_GetSuccessByLeadID_FullMethodName  = "/notify.NotifyService/GetSuccessByLeadID"
-	NotifyService_UpdateSuccess_FullMethodName       = "/notify.NotifyService/UpdateSuccess"
-	NotifyService_DeleteSuccess_FullMethodName       = "/notify.NotifyService/DeleteSuccess"
 	NotifyService_CreateScheduled_FullMethodName     = "/notify.NotifyService/CreateScheduled"
 	NotifyService_GetAllScheduled_FullMethodName     = "/notify.NotifyService/GetAllScheduled"
 	NotifyService_GetScheduledByID_FullMethodName    = "/notify.NotifyService/GetScheduledByID"
-	NotifyService_UpdateScheduled_FullMethodName     = "/notify.NotifyService/UpdateScheduled"
-	NotifyService_DeleteScheduled_FullMethodName     = "/notify.NotifyService/DeleteScheduled"
 	NotifyService_CreateRescheduled_FullMethodName   = "/notify.NotifyService/CreateRescheduled"
 	NotifyService_GetAllRescheduled_FullMethodName   = "/notify.NotifyService/GetAllRescheduled"
 	NotifyService_GetRescheduledByID_FullMethodName  = "/notify.NotifyService/GetRescheduledByID"
-	NotifyService_UpdateRescheduled_FullMethodName   = "/notify.NotifyService/UpdateRescheduled"
-	NotifyService_DeleteRescheduled_FullMethodName   = "/notify.NotifyService/DeleteRescheduled"
+	NotifyService_CreateLead_FullMethodName          = "/notify.NotifyService/CreateLead"
+	NotifyService_GetAllLeads_FullMethodName         = "/notify.NotifyService/GetAllLeads"
+	NotifyService_GetLeadByID_FullMethodName         = "/notify.NotifyService/GetLeadByID"
+	NotifyService_CreateBooking_FullMethodName       = "/notify.NotifyService/CreateBooking"
+	NotifyService_GetAllBookings_FullMethodName      = "/notify.NotifyService/GetAllBookings"
+	NotifyService_GetBookingByID_FullMethodName      = "/notify.NotifyService/GetBookingByID"
+	NotifyService_GetCounts_FullMethodName           = "/notify.NotifyService/GetCounts"
 )
 
 // NotifyServiceClient is the client API for NotifyService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NotifyServiceClient interface {
+	// Cancellation
 	CreateCancellation(ctx context.Context, in *CreateCancellationRequest, opts ...grpc.CallOption) (*CancellationResponse, error)
 	GetAllCancellations(ctx context.Context, in *GetByLeadIDRequest, opts ...grpc.CallOption) (*CancellationListResponse, error)
 	GetCancellationByID(ctx context.Context, in *GetByMeetingIDRequest, opts ...grpc.CallOption) (*CancellationResponse, error)
-	UpdateCancellation(ctx context.Context, in *UpdateCancellationRequest, opts ...grpc.CallOption) (*CancellationResponse, error)
-	DeleteCancellation(ctx context.Context, in *DeleteByMeetingIDRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	// Success
 	CreateSuccess(ctx context.Context, in *CreateSuccessRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	GetAllSuccesses(ctx context.Context, in *GetByLeadIDRequest, opts ...grpc.CallOption) (*SuccessListResponse, error)
 	GetSuccessByLeadID(ctx context.Context, in *GetByLeadIDRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
-	UpdateSuccess(ctx context.Context, in *UpdateSuccessRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
-	DeleteSuccess(ctx context.Context, in *GetByLeadIDRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	// Scheduled
 	CreateScheduled(ctx context.Context, in *CreateScheduledRequest, opts ...grpc.CallOption) (*ScheduledResponse, error)
 	GetAllScheduled(ctx context.Context, in *GetScheduledByLeadIDRequest, opts ...grpc.CallOption) (*ScheduledListResponse, error)
 	GetScheduledByID(ctx context.Context, in *GetScheduledByIDRequest, opts ...grpc.CallOption) (*ScheduledResponse, error)
-	UpdateScheduled(ctx context.Context, in *UpdateScheduledRequest, opts ...grpc.CallOption) (*ScheduledResponse, error)
-	DeleteScheduled(ctx context.Context, in *DeleteScheduledByIDRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	// Rescheduled
 	CreateRescheduled(ctx context.Context, in *CreateRescheduledRequest, opts ...grpc.CallOption) (*RescheduledResponse, error)
 	GetAllRescheduled(ctx context.Context, in *GetRescheduledByLeadIDRequest, opts ...grpc.CallOption) (*RescheduledListResponse, error)
 	GetRescheduledByID(ctx context.Context, in *GetRescheduledByIDRequest, opts ...grpc.CallOption) (*RescheduledResponse, error)
-	UpdateRescheduled(ctx context.Context, in *UpdateRescheduledRequest, opts ...grpc.CallOption) (*RescheduledResponse, error)
-	DeleteRescheduled(ctx context.Context, in *DeleteRescheduledByIDRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	// Leads
+	CreateLead(ctx context.Context, in *CreateLeadRequest, opts ...grpc.CallOption) (*LeadResponse, error)
+	GetAllLeads(ctx context.Context, in *CountsRequest, opts ...grpc.CallOption) (*LeadListResponse, error)
+	GetLeadByID(ctx context.Context, in *GetByLeadIDRequest, opts ...grpc.CallOption) (*LeadResponse, error)
+	// Booking
+	CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*BookingResponse, error)
+	GetAllBookings(ctx context.Context, in *GetBookingByLeadIDRequest, opts ...grpc.CallOption) (*BookingListResponse, error)
+	GetBookingByID(ctx context.Context, in *GetBookingByIDRequest, opts ...grpc.CallOption) (*BookingResponse, error)
+	// Counts
+	GetCounts(ctx context.Context, in *CountsRequest, opts ...grpc.CallOption) (*CountsResponse, error)
 }
 
 type notifyServiceClient struct {
@@ -105,26 +110,6 @@ func (c *notifyServiceClient) GetCancellationByID(ctx context.Context, in *GetBy
 	return out, nil
 }
 
-func (c *notifyServiceClient) UpdateCancellation(ctx context.Context, in *UpdateCancellationRequest, opts ...grpc.CallOption) (*CancellationResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CancellationResponse)
-	err := c.cc.Invoke(ctx, NotifyService_UpdateCancellation_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *notifyServiceClient) DeleteCancellation(ctx context.Context, in *DeleteByMeetingIDRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, NotifyService_DeleteCancellation_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *notifyServiceClient) CreateSuccess(ctx context.Context, in *CreateSuccessRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SuccessResponse)
@@ -149,26 +134,6 @@ func (c *notifyServiceClient) GetSuccessByLeadID(ctx context.Context, in *GetByL
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SuccessResponse)
 	err := c.cc.Invoke(ctx, NotifyService_GetSuccessByLeadID_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *notifyServiceClient) UpdateSuccess(ctx context.Context, in *UpdateSuccessRequest, opts ...grpc.CallOption) (*SuccessResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SuccessResponse)
-	err := c.cc.Invoke(ctx, NotifyService_UpdateSuccess_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *notifyServiceClient) DeleteSuccess(ctx context.Context, in *GetByLeadIDRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, NotifyService_DeleteSuccess_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -205,26 +170,6 @@ func (c *notifyServiceClient) GetScheduledByID(ctx context.Context, in *GetSched
 	return out, nil
 }
 
-func (c *notifyServiceClient) UpdateScheduled(ctx context.Context, in *UpdateScheduledRequest, opts ...grpc.CallOption) (*ScheduledResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ScheduledResponse)
-	err := c.cc.Invoke(ctx, NotifyService_UpdateScheduled_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *notifyServiceClient) DeleteScheduled(ctx context.Context, in *DeleteScheduledByIDRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, NotifyService_DeleteScheduled_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *notifyServiceClient) CreateRescheduled(ctx context.Context, in *CreateRescheduledRequest, opts ...grpc.CallOption) (*RescheduledResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RescheduledResponse)
@@ -255,20 +200,70 @@ func (c *notifyServiceClient) GetRescheduledByID(ctx context.Context, in *GetRes
 	return out, nil
 }
 
-func (c *notifyServiceClient) UpdateRescheduled(ctx context.Context, in *UpdateRescheduledRequest, opts ...grpc.CallOption) (*RescheduledResponse, error) {
+func (c *notifyServiceClient) CreateLead(ctx context.Context, in *CreateLeadRequest, opts ...grpc.CallOption) (*LeadResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RescheduledResponse)
-	err := c.cc.Invoke(ctx, NotifyService_UpdateRescheduled_FullMethodName, in, out, cOpts...)
+	out := new(LeadResponse)
+	err := c.cc.Invoke(ctx, NotifyService_CreateLead_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *notifyServiceClient) DeleteRescheduled(ctx context.Context, in *DeleteRescheduledByIDRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+func (c *notifyServiceClient) GetAllLeads(ctx context.Context, in *CountsRequest, opts ...grpc.CallOption) (*LeadListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, NotifyService_DeleteRescheduled_FullMethodName, in, out, cOpts...)
+	out := new(LeadListResponse)
+	err := c.cc.Invoke(ctx, NotifyService_GetAllLeads_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notifyServiceClient) GetLeadByID(ctx context.Context, in *GetByLeadIDRequest, opts ...grpc.CallOption) (*LeadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LeadResponse)
+	err := c.cc.Invoke(ctx, NotifyService_GetLeadByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notifyServiceClient) CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*BookingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BookingResponse)
+	err := c.cc.Invoke(ctx, NotifyService_CreateBooking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notifyServiceClient) GetAllBookings(ctx context.Context, in *GetBookingByLeadIDRequest, opts ...grpc.CallOption) (*BookingListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BookingListResponse)
+	err := c.cc.Invoke(ctx, NotifyService_GetAllBookings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notifyServiceClient) GetBookingByID(ctx context.Context, in *GetBookingByIDRequest, opts ...grpc.CallOption) (*BookingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BookingResponse)
+	err := c.cc.Invoke(ctx, NotifyService_GetBookingByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notifyServiceClient) GetCounts(ctx context.Context, in *CountsRequest, opts ...grpc.CallOption) (*CountsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CountsResponse)
+	err := c.cc.Invoke(ctx, NotifyService_GetCounts_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -279,26 +274,32 @@ func (c *notifyServiceClient) DeleteRescheduled(ctx context.Context, in *DeleteR
 // All implementations must embed UnimplementedNotifyServiceServer
 // for forward compatibility.
 type NotifyServiceServer interface {
+	// Cancellation
 	CreateCancellation(context.Context, *CreateCancellationRequest) (*CancellationResponse, error)
 	GetAllCancellations(context.Context, *GetByLeadIDRequest) (*CancellationListResponse, error)
 	GetCancellationByID(context.Context, *GetByMeetingIDRequest) (*CancellationResponse, error)
-	UpdateCancellation(context.Context, *UpdateCancellationRequest) (*CancellationResponse, error)
-	DeleteCancellation(context.Context, *DeleteByMeetingIDRequest) (*DeleteResponse, error)
+	// Success
 	CreateSuccess(context.Context, *CreateSuccessRequest) (*SuccessResponse, error)
 	GetAllSuccesses(context.Context, *GetByLeadIDRequest) (*SuccessListResponse, error)
 	GetSuccessByLeadID(context.Context, *GetByLeadIDRequest) (*SuccessResponse, error)
-	UpdateSuccess(context.Context, *UpdateSuccessRequest) (*SuccessResponse, error)
-	DeleteSuccess(context.Context, *GetByLeadIDRequest) (*DeleteResponse, error)
+	// Scheduled
 	CreateScheduled(context.Context, *CreateScheduledRequest) (*ScheduledResponse, error)
 	GetAllScheduled(context.Context, *GetScheduledByLeadIDRequest) (*ScheduledListResponse, error)
 	GetScheduledByID(context.Context, *GetScheduledByIDRequest) (*ScheduledResponse, error)
-	UpdateScheduled(context.Context, *UpdateScheduledRequest) (*ScheduledResponse, error)
-	DeleteScheduled(context.Context, *DeleteScheduledByIDRequest) (*DeleteResponse, error)
+	// Rescheduled
 	CreateRescheduled(context.Context, *CreateRescheduledRequest) (*RescheduledResponse, error)
 	GetAllRescheduled(context.Context, *GetRescheduledByLeadIDRequest) (*RescheduledListResponse, error)
 	GetRescheduledByID(context.Context, *GetRescheduledByIDRequest) (*RescheduledResponse, error)
-	UpdateRescheduled(context.Context, *UpdateRescheduledRequest) (*RescheduledResponse, error)
-	DeleteRescheduled(context.Context, *DeleteRescheduledByIDRequest) (*DeleteResponse, error)
+	// Leads
+	CreateLead(context.Context, *CreateLeadRequest) (*LeadResponse, error)
+	GetAllLeads(context.Context, *CountsRequest) (*LeadListResponse, error)
+	GetLeadByID(context.Context, *GetByLeadIDRequest) (*LeadResponse, error)
+	// Booking
+	CreateBooking(context.Context, *CreateBookingRequest) (*BookingResponse, error)
+	GetAllBookings(context.Context, *GetBookingByLeadIDRequest) (*BookingListResponse, error)
+	GetBookingByID(context.Context, *GetBookingByIDRequest) (*BookingResponse, error)
+	// Counts
+	GetCounts(context.Context, *CountsRequest) (*CountsResponse, error)
 	mustEmbedUnimplementedNotifyServiceServer()
 }
 
@@ -318,12 +319,6 @@ func (UnimplementedNotifyServiceServer) GetAllCancellations(context.Context, *Ge
 func (UnimplementedNotifyServiceServer) GetCancellationByID(context.Context, *GetByMeetingIDRequest) (*CancellationResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCancellationByID not implemented")
 }
-func (UnimplementedNotifyServiceServer) UpdateCancellation(context.Context, *UpdateCancellationRequest) (*CancellationResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateCancellation not implemented")
-}
-func (UnimplementedNotifyServiceServer) DeleteCancellation(context.Context, *DeleteByMeetingIDRequest) (*DeleteResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteCancellation not implemented")
-}
 func (UnimplementedNotifyServiceServer) CreateSuccess(context.Context, *CreateSuccessRequest) (*SuccessResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateSuccess not implemented")
 }
@@ -332,12 +327,6 @@ func (UnimplementedNotifyServiceServer) GetAllSuccesses(context.Context, *GetByL
 }
 func (UnimplementedNotifyServiceServer) GetSuccessByLeadID(context.Context, *GetByLeadIDRequest) (*SuccessResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSuccessByLeadID not implemented")
-}
-func (UnimplementedNotifyServiceServer) UpdateSuccess(context.Context, *UpdateSuccessRequest) (*SuccessResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateSuccess not implemented")
-}
-func (UnimplementedNotifyServiceServer) DeleteSuccess(context.Context, *GetByLeadIDRequest) (*DeleteResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteSuccess not implemented")
 }
 func (UnimplementedNotifyServiceServer) CreateScheduled(context.Context, *CreateScheduledRequest) (*ScheduledResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateScheduled not implemented")
@@ -348,12 +337,6 @@ func (UnimplementedNotifyServiceServer) GetAllScheduled(context.Context, *GetSch
 func (UnimplementedNotifyServiceServer) GetScheduledByID(context.Context, *GetScheduledByIDRequest) (*ScheduledResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetScheduledByID not implemented")
 }
-func (UnimplementedNotifyServiceServer) UpdateScheduled(context.Context, *UpdateScheduledRequest) (*ScheduledResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateScheduled not implemented")
-}
-func (UnimplementedNotifyServiceServer) DeleteScheduled(context.Context, *DeleteScheduledByIDRequest) (*DeleteResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteScheduled not implemented")
-}
 func (UnimplementedNotifyServiceServer) CreateRescheduled(context.Context, *CreateRescheduledRequest) (*RescheduledResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateRescheduled not implemented")
 }
@@ -363,11 +346,26 @@ func (UnimplementedNotifyServiceServer) GetAllRescheduled(context.Context, *GetR
 func (UnimplementedNotifyServiceServer) GetRescheduledByID(context.Context, *GetRescheduledByIDRequest) (*RescheduledResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetRescheduledByID not implemented")
 }
-func (UnimplementedNotifyServiceServer) UpdateRescheduled(context.Context, *UpdateRescheduledRequest) (*RescheduledResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateRescheduled not implemented")
+func (UnimplementedNotifyServiceServer) CreateLead(context.Context, *CreateLeadRequest) (*LeadResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateLead not implemented")
 }
-func (UnimplementedNotifyServiceServer) DeleteRescheduled(context.Context, *DeleteRescheduledByIDRequest) (*DeleteResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteRescheduled not implemented")
+func (UnimplementedNotifyServiceServer) GetAllLeads(context.Context, *CountsRequest) (*LeadListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllLeads not implemented")
+}
+func (UnimplementedNotifyServiceServer) GetLeadByID(context.Context, *GetByLeadIDRequest) (*LeadResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLeadByID not implemented")
+}
+func (UnimplementedNotifyServiceServer) CreateBooking(context.Context, *CreateBookingRequest) (*BookingResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateBooking not implemented")
+}
+func (UnimplementedNotifyServiceServer) GetAllBookings(context.Context, *GetBookingByLeadIDRequest) (*BookingListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllBookings not implemented")
+}
+func (UnimplementedNotifyServiceServer) GetBookingByID(context.Context, *GetBookingByIDRequest) (*BookingResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBookingByID not implemented")
+}
+func (UnimplementedNotifyServiceServer) GetCounts(context.Context, *CountsRequest) (*CountsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCounts not implemented")
 }
 func (UnimplementedNotifyServiceServer) mustEmbedUnimplementedNotifyServiceServer() {}
 func (UnimplementedNotifyServiceServer) testEmbeddedByValue()                       {}
@@ -444,42 +442,6 @@ func _NotifyService_GetCancellationByID_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NotifyService_UpdateCancellation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateCancellationRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotifyServiceServer).UpdateCancellation(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NotifyService_UpdateCancellation_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotifyServiceServer).UpdateCancellation(ctx, req.(*UpdateCancellationRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NotifyService_DeleteCancellation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteByMeetingIDRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotifyServiceServer).DeleteCancellation(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NotifyService_DeleteCancellation_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotifyServiceServer).DeleteCancellation(ctx, req.(*DeleteByMeetingIDRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _NotifyService_CreateSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateSuccessRequest)
 	if err := dec(in); err != nil {
@@ -530,42 +492,6 @@ func _NotifyService_GetSuccessByLeadID_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NotifyServiceServer).GetSuccessByLeadID(ctx, req.(*GetByLeadIDRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NotifyService_UpdateSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateSuccessRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotifyServiceServer).UpdateSuccess(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NotifyService_UpdateSuccess_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotifyServiceServer).UpdateSuccess(ctx, req.(*UpdateSuccessRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NotifyService_DeleteSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByLeadIDRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotifyServiceServer).DeleteSuccess(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NotifyService_DeleteSuccess_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotifyServiceServer).DeleteSuccess(ctx, req.(*GetByLeadIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -624,42 +550,6 @@ func _NotifyService_GetScheduledByID_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NotifyService_UpdateScheduled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateScheduledRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotifyServiceServer).UpdateScheduled(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NotifyService_UpdateScheduled_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotifyServiceServer).UpdateScheduled(ctx, req.(*UpdateScheduledRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NotifyService_DeleteScheduled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteScheduledByIDRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotifyServiceServer).DeleteScheduled(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NotifyService_DeleteScheduled_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotifyServiceServer).DeleteScheduled(ctx, req.(*DeleteScheduledByIDRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _NotifyService_CreateRescheduled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateRescheduledRequest)
 	if err := dec(in); err != nil {
@@ -714,38 +604,128 @@ func _NotifyService_GetRescheduledByID_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NotifyService_UpdateRescheduled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateRescheduledRequest)
+func _NotifyService_CreateLead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateLeadRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NotifyServiceServer).UpdateRescheduled(ctx, in)
+		return srv.(NotifyServiceServer).CreateLead(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NotifyService_UpdateRescheduled_FullMethodName,
+		FullMethod: NotifyService_CreateLead_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotifyServiceServer).UpdateRescheduled(ctx, req.(*UpdateRescheduledRequest))
+		return srv.(NotifyServiceServer).CreateLead(ctx, req.(*CreateLeadRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NotifyService_DeleteRescheduled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteRescheduledByIDRequest)
+func _NotifyService_GetAllLeads_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NotifyServiceServer).DeleteRescheduled(ctx, in)
+		return srv.(NotifyServiceServer).GetAllLeads(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NotifyService_DeleteRescheduled_FullMethodName,
+		FullMethod: NotifyService_GetAllLeads_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotifyServiceServer).DeleteRescheduled(ctx, req.(*DeleteRescheduledByIDRequest))
+		return srv.(NotifyServiceServer).GetAllLeads(ctx, req.(*CountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotifyService_GetLeadByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByLeadIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotifyServiceServer).GetLeadByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotifyService_GetLeadByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotifyServiceServer).GetLeadByID(ctx, req.(*GetByLeadIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotifyService_CreateBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateBookingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotifyServiceServer).CreateBooking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotifyService_CreateBooking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotifyServiceServer).CreateBooking(ctx, req.(*CreateBookingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotifyService_GetAllBookings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookingByLeadIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotifyServiceServer).GetAllBookings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotifyService_GetAllBookings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotifyServiceServer).GetAllBookings(ctx, req.(*GetBookingByLeadIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotifyService_GetBookingByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookingByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotifyServiceServer).GetBookingByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotifyService_GetBookingByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotifyServiceServer).GetBookingByID(ctx, req.(*GetBookingByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotifyService_GetCounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotifyServiceServer).GetCounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotifyService_GetCounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotifyServiceServer).GetCounts(ctx, req.(*CountsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -770,14 +750,6 @@ var NotifyService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NotifyService_GetCancellationByID_Handler,
 		},
 		{
-			MethodName: "UpdateCancellation",
-			Handler:    _NotifyService_UpdateCancellation_Handler,
-		},
-		{
-			MethodName: "DeleteCancellation",
-			Handler:    _NotifyService_DeleteCancellation_Handler,
-		},
-		{
 			MethodName: "CreateSuccess",
 			Handler:    _NotifyService_CreateSuccess_Handler,
 		},
@@ -788,14 +760,6 @@ var NotifyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSuccessByLeadID",
 			Handler:    _NotifyService_GetSuccessByLeadID_Handler,
-		},
-		{
-			MethodName: "UpdateSuccess",
-			Handler:    _NotifyService_UpdateSuccess_Handler,
-		},
-		{
-			MethodName: "DeleteSuccess",
-			Handler:    _NotifyService_DeleteSuccess_Handler,
 		},
 		{
 			MethodName: "CreateScheduled",
@@ -810,14 +774,6 @@ var NotifyService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NotifyService_GetScheduledByID_Handler,
 		},
 		{
-			MethodName: "UpdateScheduled",
-			Handler:    _NotifyService_UpdateScheduled_Handler,
-		},
-		{
-			MethodName: "DeleteScheduled",
-			Handler:    _NotifyService_DeleteScheduled_Handler,
-		},
-		{
 			MethodName: "CreateRescheduled",
 			Handler:    _NotifyService_CreateRescheduled_Handler,
 		},
@@ -830,12 +786,32 @@ var NotifyService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NotifyService_GetRescheduledByID_Handler,
 		},
 		{
-			MethodName: "UpdateRescheduled",
-			Handler:    _NotifyService_UpdateRescheduled_Handler,
+			MethodName: "CreateLead",
+			Handler:    _NotifyService_CreateLead_Handler,
 		},
 		{
-			MethodName: "DeleteRescheduled",
-			Handler:    _NotifyService_DeleteRescheduled_Handler,
+			MethodName: "GetAllLeads",
+			Handler:    _NotifyService_GetAllLeads_Handler,
+		},
+		{
+			MethodName: "GetLeadByID",
+			Handler:    _NotifyService_GetLeadByID_Handler,
+		},
+		{
+			MethodName: "CreateBooking",
+			Handler:    _NotifyService_CreateBooking_Handler,
+		},
+		{
+			MethodName: "GetAllBookings",
+			Handler:    _NotifyService_GetAllBookings_Handler,
+		},
+		{
+			MethodName: "GetBookingByID",
+			Handler:    _NotifyService_GetBookingByID_Handler,
+		},
+		{
+			MethodName: "GetCounts",
+			Handler:    _NotifyService_GetCounts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
