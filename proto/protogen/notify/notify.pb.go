@@ -2087,89 +2087,82 @@ const file_notify_proto_rawDesc = "" +
 	"\x13SuccessListResponse\x12*\n" +
 	"\x04data\x18\x01 \x03(\v2\x16.notify.MeetingSuccessR\x04data\"*\n" +
 	"\x0eDeleteResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"\xd1\x02\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xb5\x02\n" +
 	"\x10MeetingScheduled\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
-	"\alead_id\x18\x02 \x01(\tR\x06leadId\x12\x1b\n" +
+	"\alead_id\x18\x02 \x01(\x05R\x06leadId\x12\x1b\n" +
 	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x14\n" +
 	"\x05title\x18\x04 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x05 \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_date\x18\x06 \x01(\tR\vmeetingDate\x12\x12\n" +
 	"\x04slot\x18\a \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\b \x01(\tR\vmeetingType\x120\n" +
-	"\x14assigned_designer_id\x18\t \x01(\tR\x12assignedDesignerId\x12\x14\n" +
-	"\x05stage\x18\n" +
-	" \x01(\tR\x05stage\x12\x1d\n" +
+	"\fmeeting_type\x18\b \x01(\tR\vmeetingType\x12*\n" +
+	"\x05stage\x18\t \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\v \x01(\tR\tcreatedAt\"\xeb\x02\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\"\xcf\x02\n" +
 	"\x12MeetingRescheduled\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
-	"\alead_id\x18\x02 \x01(\tR\x06leadId\x12\x1b\n" +
+	"\alead_id\x18\x02 \x01(\x05R\x06leadId\x12\x1b\n" +
 	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x14\n" +
 	"\x05title\x18\x04 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x05 \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_date\x18\x06 \x01(\tR\vmeetingDate\x12\x12\n" +
 	"\x04slot\x18\a \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\b \x01(\tR\vmeetingType\x120\n" +
-	"\x14assigned_designer_id\x18\t \x01(\tR\x12assignedDesignerId\x12\x14\n" +
-	"\x05stage\x18\n" +
-	" \x01(\tR\x05stage\x12\x16\n" +
-	"\x06reason\x18\v \x01(\tR\x06reason\x12\x1d\n" +
+	"\fmeeting_type\x18\b \x01(\tR\vmeetingType\x12*\n" +
+	"\x05stage\x18\t \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12\x16\n" +
+	"\x06reason\x18\n" +
+	" \x01(\tR\x06reason\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\f \x01(\tR\tcreatedAt\"\xa8\x02\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\"\x8c\x02\n" +
 	"\x16CreateScheduledRequest\x12\x17\n" +
-	"\alead_id\x18\x01 \x01(\tR\x06leadId\x12\x1b\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\x12\x1b\n" +
 	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_date\x18\x05 \x01(\tR\vmeetingDate\x12\x12\n" +
 	"\x04slot\x18\x06 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\a \x01(\tR\vmeetingType\x120\n" +
-	"\x14assigned_designer_id\x18\b \x01(\tR\x12assignedDesignerId\x12\x14\n" +
-	"\x05stage\x18\t \x01(\tR\x05stage\"\x82\x02\n" +
+	"\fmeeting_type\x18\a \x01(\tR\vmeetingType\x12*\n" +
+	"\x05stage\x18\b \x01(\x0e2\x14.notify.MeetingStageR\x05stage\"\xe6\x01\n" +
 	"\x16UpdateScheduledRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_date\x18\x04 \x01(\tR\vmeetingDate\x12\x12\n" +
 	"\x04slot\x18\x05 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x120\n" +
-	"\x14assigned_designer_id\x18\a \x01(\tR\x12assignedDesignerId\x12\x14\n" +
-	"\x05stage\x18\b \x01(\tR\x05stage\")\n" +
+	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x12*\n" +
+	"\x05stage\x18\a \x01(\x0e2\x14.notify.MeetingStageR\x05stage\")\n" +
 	"\x17GetScheduledByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\",\n" +
 	"\x1aDeleteScheduledByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"6\n" +
 	"\x1bGetScheduledByLeadIDRequest\x12\x17\n" +
-	"\alead_id\x18\x01 \x01(\tR\x06leadId\"\xc2\x02\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\"\xa6\x02\n" +
 	"\x18CreateRescheduledRequest\x12\x17\n" +
-	"\alead_id\x18\x01 \x01(\tR\x06leadId\x12\x1b\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\x12\x1b\n" +
 	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_date\x18\x05 \x01(\tR\vmeetingDate\x12\x12\n" +
 	"\x04slot\x18\x06 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\a \x01(\tR\vmeetingType\x120\n" +
-	"\x14assigned_designer_id\x18\b \x01(\tR\x12assignedDesignerId\x12\x14\n" +
-	"\x05stage\x18\t \x01(\tR\x05stage\x12\x16\n" +
-	"\x06reason\x18\n" +
-	" \x01(\tR\x06reason\"\x9c\x02\n" +
+	"\fmeeting_type\x18\a \x01(\tR\vmeetingType\x12*\n" +
+	"\x05stage\x18\b \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12\x16\n" +
+	"\x06reason\x18\t \x01(\tR\x06reason\"\x80\x02\n" +
 	"\x18UpdateRescheduledRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_date\x18\x04 \x01(\tR\vmeetingDate\x12\x12\n" +
 	"\x04slot\x18\x05 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x120\n" +
-	"\x14assigned_designer_id\x18\a \x01(\tR\x12assignedDesignerId\x12\x14\n" +
-	"\x05stage\x18\b \x01(\tR\x05stage\x12\x16\n" +
-	"\x06reason\x18\t \x01(\tR\x06reason\"+\n" +
+	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x12*\n" +
+	"\x05stage\x18\a \x01(\x0e2\x14.notify.MeetingStageR\x05stage\x12\x16\n" +
+	"\x06reason\x18\b \x01(\tR\x06reason\"+\n" +
 	"\x19GetRescheduledByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\".\n" +
 	"\x1cDeleteRescheduledByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"8\n" +
 	"\x1dGetRescheduledByLeadIDRequest\x12\x17\n" +
-	"\alead_id\x18\x01 \x01(\tR\x06leadId\"A\n" +
+	"\alead_id\x18\x01 \x01(\x05R\x06leadId\"A\n" +
 	"\x11ScheduledResponse\x12,\n" +
 	"\x04data\x18\x01 \x01(\v2\x18.notify.MeetingScheduledR\x04data\"E\n" +
 	"\x15ScheduledListResponse\x12,\n" +
@@ -2262,55 +2255,61 @@ var file_notify_proto_depIdxs = []int32{
 	1,  // 7: notify.CancellationListResponse.data:type_name -> notify.MeetingCancellation
 	2,  // 8: notify.SuccessResponse.data:type_name -> notify.MeetingSuccess
 	2,  // 9: notify.SuccessListResponse.data:type_name -> notify.MeetingSuccess
-	15, // 10: notify.ScheduledResponse.data:type_name -> notify.MeetingScheduled
-	15, // 11: notify.ScheduledListResponse.data:type_name -> notify.MeetingScheduled
-	16, // 12: notify.RescheduledResponse.data:type_name -> notify.MeetingRescheduled
-	16, // 13: notify.RescheduledListResponse.data:type_name -> notify.MeetingRescheduled
-	3,  // 14: notify.NotifyService.CreateCancellation:input_type -> notify.CreateCancellationRequest
-	9,  // 15: notify.NotifyService.GetAllCancellations:input_type -> notify.GetByLeadIDRequest
-	5,  // 16: notify.NotifyService.GetCancellationByID:input_type -> notify.GetByMeetingIDRequest
-	4,  // 17: notify.NotifyService.UpdateCancellation:input_type -> notify.UpdateCancellationRequest
-	6,  // 18: notify.NotifyService.DeleteCancellation:input_type -> notify.DeleteByMeetingIDRequest
-	7,  // 19: notify.NotifyService.CreateSuccess:input_type -> notify.CreateSuccessRequest
-	9,  // 20: notify.NotifyService.GetAllSuccesses:input_type -> notify.GetByLeadIDRequest
-	9,  // 21: notify.NotifyService.GetSuccessByLeadID:input_type -> notify.GetByLeadIDRequest
-	8,  // 22: notify.NotifyService.UpdateSuccess:input_type -> notify.UpdateSuccessRequest
-	9,  // 23: notify.NotifyService.DeleteSuccess:input_type -> notify.GetByLeadIDRequest
-	17, // 24: notify.NotifyService.CreateScheduled:input_type -> notify.CreateScheduledRequest
-	21, // 25: notify.NotifyService.GetAllScheduled:input_type -> notify.GetScheduledByLeadIDRequest
-	19, // 26: notify.NotifyService.GetScheduledByID:input_type -> notify.GetScheduledByIDRequest
-	18, // 27: notify.NotifyService.UpdateScheduled:input_type -> notify.UpdateScheduledRequest
-	20, // 28: notify.NotifyService.DeleteScheduled:input_type -> notify.DeleteScheduledByIDRequest
-	22, // 29: notify.NotifyService.CreateRescheduled:input_type -> notify.CreateRescheduledRequest
-	26, // 30: notify.NotifyService.GetAllRescheduled:input_type -> notify.GetRescheduledByLeadIDRequest
-	24, // 31: notify.NotifyService.GetRescheduledByID:input_type -> notify.GetRescheduledByIDRequest
-	23, // 32: notify.NotifyService.UpdateRescheduled:input_type -> notify.UpdateRescheduledRequest
-	25, // 33: notify.NotifyService.DeleteRescheduled:input_type -> notify.DeleteRescheduledByIDRequest
-	10, // 34: notify.NotifyService.CreateCancellation:output_type -> notify.CancellationResponse
-	11, // 35: notify.NotifyService.GetAllCancellations:output_type -> notify.CancellationListResponse
-	10, // 36: notify.NotifyService.GetCancellationByID:output_type -> notify.CancellationResponse
-	10, // 37: notify.NotifyService.UpdateCancellation:output_type -> notify.CancellationResponse
-	14, // 38: notify.NotifyService.DeleteCancellation:output_type -> notify.DeleteResponse
-	12, // 39: notify.NotifyService.CreateSuccess:output_type -> notify.SuccessResponse
-	13, // 40: notify.NotifyService.GetAllSuccesses:output_type -> notify.SuccessListResponse
-	12, // 41: notify.NotifyService.GetSuccessByLeadID:output_type -> notify.SuccessResponse
-	12, // 42: notify.NotifyService.UpdateSuccess:output_type -> notify.SuccessResponse
-	14, // 43: notify.NotifyService.DeleteSuccess:output_type -> notify.DeleteResponse
-	27, // 44: notify.NotifyService.CreateScheduled:output_type -> notify.ScheduledResponse
-	28, // 45: notify.NotifyService.GetAllScheduled:output_type -> notify.ScheduledListResponse
-	27, // 46: notify.NotifyService.GetScheduledByID:output_type -> notify.ScheduledResponse
-	27, // 47: notify.NotifyService.UpdateScheduled:output_type -> notify.ScheduledResponse
-	14, // 48: notify.NotifyService.DeleteScheduled:output_type -> notify.DeleteResponse
-	29, // 49: notify.NotifyService.CreateRescheduled:output_type -> notify.RescheduledResponse
-	30, // 50: notify.NotifyService.GetAllRescheduled:output_type -> notify.RescheduledListResponse
-	29, // 51: notify.NotifyService.GetRescheduledByID:output_type -> notify.RescheduledResponse
-	29, // 52: notify.NotifyService.UpdateRescheduled:output_type -> notify.RescheduledResponse
-	14, // 53: notify.NotifyService.DeleteRescheduled:output_type -> notify.DeleteResponse
-	34, // [34:54] is the sub-list for method output_type
-	14, // [14:34] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	0,  // 10: notify.MeetingScheduled.stage:type_name -> notify.MeetingStage
+	0,  // 11: notify.MeetingRescheduled.stage:type_name -> notify.MeetingStage
+	0,  // 12: notify.CreateScheduledRequest.stage:type_name -> notify.MeetingStage
+	0,  // 13: notify.UpdateScheduledRequest.stage:type_name -> notify.MeetingStage
+	0,  // 14: notify.CreateRescheduledRequest.stage:type_name -> notify.MeetingStage
+	0,  // 15: notify.UpdateRescheduledRequest.stage:type_name -> notify.MeetingStage
+	15, // 16: notify.ScheduledResponse.data:type_name -> notify.MeetingScheduled
+	15, // 17: notify.ScheduledListResponse.data:type_name -> notify.MeetingScheduled
+	16, // 18: notify.RescheduledResponse.data:type_name -> notify.MeetingRescheduled
+	16, // 19: notify.RescheduledListResponse.data:type_name -> notify.MeetingRescheduled
+	3,  // 20: notify.NotifyService.CreateCancellation:input_type -> notify.CreateCancellationRequest
+	9,  // 21: notify.NotifyService.GetAllCancellations:input_type -> notify.GetByLeadIDRequest
+	5,  // 22: notify.NotifyService.GetCancellationByID:input_type -> notify.GetByMeetingIDRequest
+	4,  // 23: notify.NotifyService.UpdateCancellation:input_type -> notify.UpdateCancellationRequest
+	6,  // 24: notify.NotifyService.DeleteCancellation:input_type -> notify.DeleteByMeetingIDRequest
+	7,  // 25: notify.NotifyService.CreateSuccess:input_type -> notify.CreateSuccessRequest
+	9,  // 26: notify.NotifyService.GetAllSuccesses:input_type -> notify.GetByLeadIDRequest
+	9,  // 27: notify.NotifyService.GetSuccessByLeadID:input_type -> notify.GetByLeadIDRequest
+	8,  // 28: notify.NotifyService.UpdateSuccess:input_type -> notify.UpdateSuccessRequest
+	9,  // 29: notify.NotifyService.DeleteSuccess:input_type -> notify.GetByLeadIDRequest
+	17, // 30: notify.NotifyService.CreateScheduled:input_type -> notify.CreateScheduledRequest
+	21, // 31: notify.NotifyService.GetAllScheduled:input_type -> notify.GetScheduledByLeadIDRequest
+	19, // 32: notify.NotifyService.GetScheduledByID:input_type -> notify.GetScheduledByIDRequest
+	18, // 33: notify.NotifyService.UpdateScheduled:input_type -> notify.UpdateScheduledRequest
+	20, // 34: notify.NotifyService.DeleteScheduled:input_type -> notify.DeleteScheduledByIDRequest
+	22, // 35: notify.NotifyService.CreateRescheduled:input_type -> notify.CreateRescheduledRequest
+	26, // 36: notify.NotifyService.GetAllRescheduled:input_type -> notify.GetRescheduledByLeadIDRequest
+	24, // 37: notify.NotifyService.GetRescheduledByID:input_type -> notify.GetRescheduledByIDRequest
+	23, // 38: notify.NotifyService.UpdateRescheduled:input_type -> notify.UpdateRescheduledRequest
+	25, // 39: notify.NotifyService.DeleteRescheduled:input_type -> notify.DeleteRescheduledByIDRequest
+	10, // 40: notify.NotifyService.CreateCancellation:output_type -> notify.CancellationResponse
+	11, // 41: notify.NotifyService.GetAllCancellations:output_type -> notify.CancellationListResponse
+	10, // 42: notify.NotifyService.GetCancellationByID:output_type -> notify.CancellationResponse
+	10, // 43: notify.NotifyService.UpdateCancellation:output_type -> notify.CancellationResponse
+	14, // 44: notify.NotifyService.DeleteCancellation:output_type -> notify.DeleteResponse
+	12, // 45: notify.NotifyService.CreateSuccess:output_type -> notify.SuccessResponse
+	13, // 46: notify.NotifyService.GetAllSuccesses:output_type -> notify.SuccessListResponse
+	12, // 47: notify.NotifyService.GetSuccessByLeadID:output_type -> notify.SuccessResponse
+	12, // 48: notify.NotifyService.UpdateSuccess:output_type -> notify.SuccessResponse
+	14, // 49: notify.NotifyService.DeleteSuccess:output_type -> notify.DeleteResponse
+	27, // 50: notify.NotifyService.CreateScheduled:output_type -> notify.ScheduledResponse
+	28, // 51: notify.NotifyService.GetAllScheduled:output_type -> notify.ScheduledListResponse
+	27, // 52: notify.NotifyService.GetScheduledByID:output_type -> notify.ScheduledResponse
+	27, // 53: notify.NotifyService.UpdateScheduled:output_type -> notify.ScheduledResponse
+	14, // 54: notify.NotifyService.DeleteScheduled:output_type -> notify.DeleteResponse
+	29, // 55: notify.NotifyService.CreateRescheduled:output_type -> notify.RescheduledResponse
+	30, // 56: notify.NotifyService.GetAllRescheduled:output_type -> notify.RescheduledListResponse
+	29, // 57: notify.NotifyService.GetRescheduledByID:output_type -> notify.RescheduledResponse
+	29, // 58: notify.NotifyService.UpdateRescheduled:output_type -> notify.RescheduledResponse
+	14, // 59: notify.NotifyService.DeleteRescheduled:output_type -> notify.DeleteResponse
+	40, // [40:60] is the sub-list for method output_type
+	20, // [20:40] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_notify_proto_init() }
