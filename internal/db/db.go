@@ -23,6 +23,16 @@ func NewMySQLDetailsSvc(cfg *config.Config) *MySQLDetailsSvc {
 	}
 }
 
+// dsnWithoutDB builds a connection string without the database name (used for DB creation).
+func (m *MySQLDetailsSvc) dsnWithoutDB() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8mb4&parseTime=True&loc=Local",
+		m.cfg.MySQLDetails.Username,
+		m.cfg.MySQLDetails.Password,
+		m.cfg.MySQLDetails.Address,
+		m.cfg.MySQLDetails.Port,
+	)
+}
+
 // dsn builds the MySQL connection string.
 func (m *MySQLDetailsSvc) dsn() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -34,9 +44,25 @@ func (m *MySQLDetailsSvc) dsn() string {
 	)
 }
 
-// AutoMigrate creates tables that don't exist yet.
-// It will NOT alter or touch tables that already exist in the DB.
+// ensureDatabase creates the database if it does not exist.
+func (m *MySQLDetailsSvc) ensureDatabase() {
+	gormDB, err := gorm.Open(mysqldriver.Open(m.dsnWithoutDB()), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+	if err != nil {
+		log.Fatalf("GORM: failed to connect to MySQL server: %v", err)
+	}
+	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci", m.cfg.MySQLDetails.DBName)
+	if err := gormDB.Exec(sql).Error; err != nil {
+		log.Fatalf("GORM: failed to create database %q: %v", m.cfg.MySQLDetails.DBName, err)
+	}
+	log.Printf("GORM: database %q ready", m.cfg.MySQLDetails.DBName)
+}
+
+// AutoMigrate creates the database if needed, then creates tables that don't exist yet.
 func (m *MySQLDetailsSvc) AutoMigrate() {
+	m.ensureDatabase()
+
 	gormDB, err := gorm.Open(mysqldriver.Open(m.dsn()), &gorm.Config{
 		Logger:                                   logger.Default.LogMode(logger.Info),
 		DisableForeignKeyConstraintWhenMigrating: true,

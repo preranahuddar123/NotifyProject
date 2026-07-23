@@ -29,16 +29,16 @@ func RegisterNotifyServiceHandler(ctx context.Context, mux *runtime.ServeMux, co
 
 	// ---- Cancellation ----
 
-	if err := mux.HandlePath("POST", "/v1/meetings/cancellation", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-		var req CreateCancellationRequest
+	if err := mux.HandlePath("PUT", "/v1/meetings/cancellation", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+		var req CancellationRequest
 		if err := codec.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, err.Error(), http.StatusBadRequest); return }
-		resp, err := client.CreateCancellation(ctx, &req)
+		resp, err := client.Cancellation(ctx, &req)
 		writeResponse(w, resp, err)
 	}); err != nil { return err }
 
 	if err := mux.HandlePath("GET", "/v1/meetings/cancellation", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-		var req GetByLeadIDRequest
-		if v := r.URL.Query().Get("lead_id"); v != "" { parseIntParam(v, &req.LeadId) }
+		var req GetByLeadIdentifierRequest
+		if v := r.URL.Query().Get("lead_identifier"); v != "" { req.LeadIdentifier = v }
 		resp, err := client.GetAllCancellations(ctx, &req)
 		writeResponse(w, resp, err)
 	}); err != nil { return err }
@@ -60,16 +60,16 @@ func RegisterNotifyServiceHandler(ctx context.Context, mux *runtime.ServeMux, co
 	}); err != nil { return err }
 
 	if err := mux.HandlePath("GET", "/v1/meetings/success", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-		var req GetByLeadIDRequest
-		if v := r.URL.Query().Get("lead_id"); v != "" { parseIntParam(v, &req.LeadId) }
+		var req GetByLeadIdentifierRequest
+		if v := r.URL.Query().Get("lead_identifier"); v != "" { req.LeadIdentifier = v }
 		resp, err := client.GetAllSuccesses(ctx, &req)
 		writeResponse(w, resp, err)
 	}); err != nil { return err }
 
-	if err := mux.HandlePath("GET", "/v1/meetings/success/{lead_id}", func(w http.ResponseWriter, r *http.Request, params map[string]string) {
-		var req GetByLeadIDRequest
-		parseIntParam(params["lead_id"], &req.LeadId)
-		resp, err := client.GetSuccessByLeadID(ctx, &req)
+	if err := mux.HandlePath("GET", "/v1/meetings/success/{lead_identifier}", func(w http.ResponseWriter, r *http.Request, params map[string]string) {
+		var req GetByLeadIdentifierRequest
+		req.LeadIdentifier = params["lead_identifier"]
+		resp, err := client.GetSuccessByLeadIdentifier(ctx, &req)
 		writeResponse(w, resp, err)
 	}); err != nil { return err }
 
@@ -83,8 +83,8 @@ func RegisterNotifyServiceHandler(ctx context.Context, mux *runtime.ServeMux, co
 	}); err != nil { return err }
 
 	if err := mux.HandlePath("GET", "/v1/meetings/scheduled", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-		var req GetScheduledByLeadIDRequest
-		if v := r.URL.Query().Get("lead_id"); v != "" { parseIntParam(v, &req.LeadId) }
+		var req GetScheduledByLeadIdentifierRequest
+		if v := r.URL.Query().Get("lead_identifier"); v != "" { req.LeadIdentifier = v }
 		resp, err := client.GetAllScheduled(ctx, &req)
 		writeResponse(w, resp, err)
 	}); err != nil { return err }
@@ -98,16 +98,16 @@ func RegisterNotifyServiceHandler(ctx context.Context, mux *runtime.ServeMux, co
 
 	// ---- Rescheduled ----
 
-	if err := mux.HandlePath("POST", "/v1/meetings/rescheduled", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-		var req CreateRescheduledRequest
+	if err := mux.HandlePath("PUT", "/v1/meetings/rescheduled", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+		var req RescheduledRequest
 		if err := codec.NewDecoder(r.Body).Decode(&req); err != nil { http.Error(w, err.Error(), http.StatusBadRequest); return }
-		resp, err := client.CreateRescheduled(ctx, &req)
+		resp, err := client.Rescheduled(ctx, &req)
 		writeResponse(w, resp, err)
 	}); err != nil { return err }
 
 	if err := mux.HandlePath("GET", "/v1/meetings/rescheduled", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-		var req GetRescheduledByLeadIDRequest
-		if v := r.URL.Query().Get("lead_id"); v != "" { parseIntParam(v, &req.LeadId) }
+		var req GetRescheduledByLeadIdentifierRequest
+		if v := r.URL.Query().Get("lead_identifier"); v != "" { req.LeadIdentifier = v }
 		resp, err := client.GetAllRescheduled(ctx, &req)
 		writeResponse(w, resp, err)
 	}); err != nil { return err }
@@ -133,10 +133,10 @@ func RegisterNotifyServiceHandler(ctx context.Context, mux *runtime.ServeMux, co
 		writeJSONResponse(w, resp, err)
 	}); err != nil { return err }
 
-	if err := mux.HandlePath("GET", "/v1/leads/{lead_id}", func(w http.ResponseWriter, r *http.Request, params map[string]string) {
-		var req GetByLeadIDRequest
-		parseIntParam(params["lead_id"], &req.LeadId)
-		resp, err := client.GetLeadByID(ctx, &req)
+	if err := mux.HandlePath("GET", "/v1/leads/{lead_identifier}", func(w http.ResponseWriter, r *http.Request, params map[string]string) {
+		var req GetByLeadIdentifierRequest
+		req.LeadIdentifier = params["lead_identifier"]
+		resp, err := client.GetLeadByIdentifier(ctx, &req)
 		writeJSONResponse(w, resp, err)
 	}); err != nil { return err }
 
@@ -150,8 +150,8 @@ func RegisterNotifyServiceHandler(ctx context.Context, mux *runtime.ServeMux, co
 	}); err != nil { return err }
 
 	if err := mux.HandlePath("GET", "/v1/bookings", func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-		var req GetBookingByLeadIDRequest
-		if v := r.URL.Query().Get("lead_id"); v != "" { parseIntParam(v, &req.LeadId) }
+		var req GetBookingByLeadIdentifierRequest
+		if v := r.URL.Query().Get("lead_identifier"); v != "" { req.LeadIdentifier = v }
 		resp, err := client.GetAllBookings(ctx, &req)
 		writeJSONResponse(w, resp, err)
 	}); err != nil { return err }

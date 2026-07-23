@@ -4,42 +4,35 @@ import "time"
 
 // leadDetails table
 type LeadDetails struct {
-	LeadID    int32     `gorm:"column:lead_id;primaryKey;autoIncrement"`
-	LeadName  string    `gorm:"column:lead_name;type:varchar(100);not null"`
-	Mobile    int64     `gorm:"column:mobile;uniqueIndex;not null"`
-	LeadType  string    `gorm:"column:lead_type;type:enum('SALES_POOL','EXTERNAL_LEAD','GOOGLE_ADS','META_ADS','ADD_LEAD','IVR_CALL','WEBSITE_LEAD','WALK_IN_LEAD','WHATSAPP');not null"`
-	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	LeadIdentifier string    `gorm:"column:lead_identifier;primaryKey;type:varchar(100)"`
+	LeadName       string    `gorm:"column:lead_name;type:varchar(100);not null"`
+	LeadType       string    `gorm:"column:lead_type;type:enum('SALES_POOL','EXTERNAL_LEAD','GOOGLE_ADS','META_ADS','ADD_LEAD','IVR_CALL','WEBSITE_LEAD','WALK_IN_LEAD','WHATSAPP');not null"`
+	AssignedTo     string    `gorm:"column:assigned_to;type:varchar(100)"`
+	CreatedAt      time.Time `gorm:"column:created_at;autoCreateTime"`
 }
 
 func (LeadDetails) TableName() string { return "leadDetails" }
 
-// meeting_details table
-// FK → leadDetails.lead_id
+// meeting_details table — standalone, no foreign key constraints
 type MeetingDetails struct {
-	MeetingID     int32     `gorm:"column:meeting_id;primaryKey;autoIncrement"`
-	LeadID        int32     `gorm:"column:lead_id;not null"`
-	LeadName      string    `gorm:"column:lead_name;type:varchar(100);not null"`
-	Milestone     string    `gorm:"column:milestone;type:enum('SCHEDULED','RESCHEDULED','CANCELLED');not null"`
-	Title         string    `gorm:"column:title;type:varchar(150)"`
-	Description   string    `gorm:"column:description;type:text"`
-	MeetingDate   time.Time `gorm:"column:meeting_date;type:date"`
-	Slot          string    `gorm:"column:slot;type:varchar(50)"`
-	MeetingType   string    `gorm:"column:meeting_type;type:enum('ONLINE','OFFLINE')"`
-	Reason        string    `gorm:"column:reason;type:text"`
-	Stage         string    `gorm:"column:stage;type:enum('CONNECTION','EXPERIENCE_AND_DESIGN')"`
-	EventDatetime time.Time `gorm:"column:event_datetime;type:datetime"`
-	CreatedAt     time.Time `gorm:"column:created_at;autoCreateTime"`
+	MeetingID      int32     `gorm:"column:meeting_id;primaryKey;autoIncrement"`
+	LeadIdentifier string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
+	LeadName       string    `gorm:"column:lead_name;type:varchar(100);not null"`
+	SubStage       string    `gorm:"column:sub_stage;type:enum('SCHEDULED','RESCHEDULED','CANCELLED');not null"`
+	Title          string    `gorm:"column:title;type:varchar(150)"`
+	MeetingDate    time.Time `gorm:"column:meeting_date;type:date"`
+	Slot           string    `gorm:"column:slot;type:varchar(50)"`
+	MeetingType    string    `gorm:"column:meeting_type;type:enum('VIRTUAL_MEETING','SHOWROOM_VISIT','SITE_VISIT');not null"`
+	Milestone      string    `gorm:"column:milestone;type:enum('CONNECTION','EXPERIENCE_AND_DESIGN')"`
+	CreatedAt      time.Time `gorm:"column:created_at;autoCreateTime"`
 }
+// Note: reason column has been removed; sub_stage replaces submilestone; milestone replaces stage
 
 func (MeetingDetails) TableName() string { return "meeting_details" }
 
-// successful table
-// FK → leadDetails.lead_id
+// successful table — standalone, no foreign key constraints
 type Successful struct {
-	LeadID             int32     `gorm:"column:lead_id;not null"`
-	Description        string    `gorm:"column:description;type:text"`
-	Stage              string    `gorm:"column:stage;type:varchar(50)"`
-	SuccessDatetime    time.Time `gorm:"column:success_datetime;type:datetime"`
+	LeadIdentifier     string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
 	NextAction         string    `gorm:"column:next_action;type:varchar(100)"`
 	QuoteLinkGenerated bool      `gorm:"column:quote_link_generated;default:false"`
 	CreatedAt          time.Time `gorm:"column:created_at;autoCreateTime"`
@@ -47,11 +40,10 @@ type Successful struct {
 
 func (Successful) TableName() string { return "successful" }
 
-// booking table
-// FK → leadDetails.lead_id
+// booking table — standalone, no foreign key constraints
 type Booking struct {
 	BookingID       int32     `gorm:"column:booking_id;primaryKey;autoIncrement"`
-	LeadID          int32     `gorm:"column:lead_id;not null"`
+	LeadIdentifier  string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
 	PaymentType     string    `gorm:"column:payment_type;type:enum('TOKEN','BOOKING FUll_10');not null"`
 	PaidAmount      float64   `gorm:"column:paid_amount;type:decimal(10,2);not null"`
 	RemainingAmount float64   `gorm:"column:Remaining_amount;type:decimal(10,2);not null"`
@@ -63,10 +55,10 @@ type Booking struct {
 
 func (Booking) TableName() string { return "booking" }
 
-// Notification maps to the `notification` table.
+// notification table — standalone, no foreign key constraints
 type Notification struct {
 	NotificationID int32     `gorm:"column:notification_id;primaryKey;autoIncrement"`
-	LeadID         int32     `gorm:"column:lead_id;not null"`
+	LeadIdentifier string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
 	SourceModule   string    `gorm:"column:source_module;type:enum('CRM');default:'CRM'"`
 	EventType      string    `gorm:"column:event_type;type:varchar(50);not null"`
 	RefTable       string    `gorm:"column:ref_table;type:varchar(50);not null"`
@@ -77,15 +69,14 @@ type Notification struct {
 
 func (Notification) TableName() string { return "notification" }
 
-// NotificationRecipient maps to the `notification_recipients` table.
+// notification_recipients table — standalone, no foreign key constraints
 type NotificationRecipient struct {
-	RecipientID         int32     `gorm:"column:recipient_id;primaryKey;autoIncrement"`
-	NotificationID      int32     `gorm:"column:notification_id;not null"`
-	LeadID              int32     `gorm:"column:lead_id;not null"`
-	RecipientType       string    `gorm:"column:recipient_type;type:varchar(50);not null"`
-	RecipientIdentifier string    `gorm:"column:recipient_identifier;type:varchar(100);not null"`
-	DeliveryStatus      string    `gorm:"column:delivery_status;type:varchar(20);default:'PENDING'"`
-	SentAt              time.Time `gorm:"column:sent_at;type:timestamp;default:null"`
+	RecipientID    int32     `gorm:"column:recipient_id;primaryKey;autoIncrement"`
+	NotificationID int32     `gorm:"column:notification_id;not null"`
+	UserID         int32     `gorm:"column:user_id;not null"`
+	RecipientType  string    `gorm:"column:recipient_type;type:varchar(50);not null"`
+	DeliveryStatus string    `gorm:"column:delivery_status;type:varchar(20);default:'PENDING'"`
+	SeenAt         time.Time `gorm:"column:seen_at;type:timestamp;default:null"`
 }
 
 func (NotificationRecipient) TableName() string { return "notification_recipients" }
