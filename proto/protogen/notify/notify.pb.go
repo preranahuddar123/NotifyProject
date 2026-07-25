@@ -1729,16 +1729,17 @@ func (x *Booking) GetCreatedAt() string {
 }
 
 type CreateBookingRequest struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	LeadIdentifier string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
-	LeadName       string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	PaymentType    string                 `protobuf:"bytes,3,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"`       // TOKEN | BOOKING
-	Amount         float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount,omitempty"`                                  // paid amount
-	PaymentDate    string                 `protobuf:"bytes,5,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
-	PaymentStatus  string                 `protobuf:"bytes,6,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
-	Remarks        string                 `protobuf:"bytes,7,opt,name=remarks,proto3" json:"remarks,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	LeadIdentifier  string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
+	LeadName        string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	PaymentType     string                 `protobuf:"bytes,3,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"`       // TOKEN | BOOKING
+	Amount          float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount,omitempty"`                                  // paid amount
+	PaymentDate     string                 `protobuf:"bytes,5,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
+	PaymentStatus   string                 `protobuf:"bytes,6,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
+	Remarks         string                 `protobuf:"bytes,7,opt,name=remarks,proto3" json:"remarks,omitempty"`
+	RemainingAmount float64                `protobuf:"fixed64,8,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CreateBookingRequest) Reset() {
@@ -1818,6 +1819,13 @@ func (x *CreateBookingRequest) GetRemarks() string {
 		return x.Remarks
 	}
 	return ""
+}
+
+func (x *CreateBookingRequest) GetRemainingAmount() float64 {
+	if x != nil {
+		return x.RemainingAmount
+	}
+	return 0
 }
 
 type GetBookingByIDRequest struct {
@@ -2246,7 +2254,7 @@ const file_notify_proto_rawDesc = "" +
 	"\aremarks\x18\t \x01(\tR\aremarks\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\n" +
-	" \x01(\tR\tcreatedAt\"\xfb\x01\n" +
+	" \x01(\tR\tcreatedAt\"\xa6\x02\n" +
 	"\x14CreateBookingRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
 	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12!\n" +
@@ -2254,7 +2262,8 @@ const file_notify_proto_rawDesc = "" +
 	"\x06amount\x18\x04 \x01(\x01R\x06amount\x12!\n" +
 	"\fpayment_date\x18\x05 \x01(\tR\vpaymentDate\x12%\n" +
 	"\x0epayment_status\x18\x06 \x01(\tR\rpaymentStatus\x12\x18\n" +
-	"\aremarks\x18\a \x01(\tR\aremarks\"6\n" +
+	"\aremarks\x18\a \x01(\tR\aremarks\x12)\n" +
+	"\x10remaining_amount\x18\b \x01(\x01R\x0fremainingAmount\"6\n" +
 	"\x15GetBookingByIDRequest\x12\x1d\n" +
 	"\n" +
 	"booking_id\x18\x01 \x01(\x05R\tbookingId\"L\n" +

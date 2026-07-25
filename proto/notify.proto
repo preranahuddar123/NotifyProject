@@ -218,6 +218,7 @@ message CreateBookingRequest {
   string payment_date    = 5; // RFC3339
   string payment_status  = 6; // PENDING | SUCCESS | FAILED
   string remarks         = 7;
+  double remaining_amount = 8;
 }
 
 message GetBookingByIDRequest {

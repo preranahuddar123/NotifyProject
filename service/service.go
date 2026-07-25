@@ -390,10 +390,19 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "payment_date must be RFC3339: %v", err)
 	}
-	var remaining float64
-	if req.PaymentType == "TOKEN" {
-		remaining = req.Amount
+
+	paymentType := req.PaymentType
+	if paymentType == "BOOKING" || paymentType == "FULL_10%" || paymentType == "BOOKING FUll_10" {
+		paymentType = "BOOKING FUll_10"
 	}
+
+	var remaining float64
+	if paymentType == "TOKEN" {
+		remaining = req.GetRemainingAmount()
+	} else {
+		remaining = 0.0
+	}
+
 	paymentStatus := req.PaymentStatus
 	if paymentStatus == "" {
 		paymentStatus = "PENDING"
@@ -401,7 +410,7 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 	res, err := s.db.Exec(
 		`INSERT INTO booking (lead_identifier, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks)
 		 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		req.LeadIdentifier, req.PaymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
+		req.LeadIdentifier, paymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
 	)
 	if err != nil {
 		log.Printf("Failed to create booking: %v", err)
