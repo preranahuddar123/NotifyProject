@@ -68,8 +68,8 @@ func (s *NotifyServiceServer) Cancellation(_ context.Context, req *pb.Cancellati
 	}
 	title := meetingTitle("CANCELLED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, milestone)
-		 VALUES (?, ?, 'CANCELLED', ?, ?)`,
+		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, milestone, created_at)
+		 VALUES (?, ?, 'CANCELLED', ?, ?, NOW())`,
 		req.LeadIdentifier, req.LeadName, title, milestoneDBValue(req.Milestone),
 	)
 	if err != nil {
@@ -129,7 +129,7 @@ func (s *NotifyServiceServer) CreateSuccess(_ context.Context, req *pb.CreateSuc
 		return nil, status.Errorf(codes.InvalidArgument, "next_action is required")
 	}
 	_, err := s.db.Exec(
-		`INSERT INTO successful (lead_identifier, next_action, quote_link_generated) VALUES (?, ?, ?)`,
+		`INSERT INTO successful (lead_identifier, next_action, quote_link_generated, created_at) VALUES (?, ?, ?, NOW())`,
 		req.LeadIdentifier, req.NextAction, req.QuoteLinkGenerated,
 	)
 	if err != nil {
@@ -194,8 +194,8 @@ func (s *NotifyServiceServer) CreateScheduled(_ context.Context, req *pb.CreateS
 	}
 	title := meetingTitle("SCHEDULED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, meeting_date, slot, meeting_type, milestone)
-		 VALUES (?, ?, 'SCHEDULED', ?, ?, ?, ?, ?)`,
+		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
+		 VALUES (?, ?, 'SCHEDULED', ?, ?, ?, ?, ?, NOW())`,
 		req.LeadIdentifier, req.LeadName, title,
 		req.MeetingDate, req.Slot, req.MeetingType, milestoneDBValue(req.Milestone),
 	)
@@ -266,8 +266,8 @@ func (s *NotifyServiceServer) Rescheduled(_ context.Context, req *pb.Rescheduled
 	}
 	title := meetingTitle("RESCHEDULED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, meeting_date, slot, meeting_type, milestone)
-		 VALUES (?, ?, 'RESCHEDULED', ?, ?, ?, ?, ?)`,
+		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
+		 VALUES (?, ?, 'RESCHEDULED', ?, ?, ?, ?, ?, NOW())`,
 		req.LeadIdentifier, req.LeadName, title,
 		req.MeetingDate, req.Slot, req.MeetingType, milestoneDBValue(req.Milestone),
 	)
@@ -408,8 +408,8 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 		paymentStatus = "PENDING"
 	}
 	res, err := s.db.Exec(
-		`INSERT INTO booking (lead_identifier, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks)
-		 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		`INSERT INTO booking (lead_identifier, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
 		req.LeadIdentifier, paymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
 	)
 	if err != nil {
