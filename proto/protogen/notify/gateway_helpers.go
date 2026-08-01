@@ -1,6 +1,7 @@
 package notify
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,16 +12,34 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// writeResponse marshals a proto message (or gRPC error) to the HTTP response.
+// writeResponse marshals a proto.Message to JSON and writes to the response.
+// Used for all protoc-generated types.
 func writeResponse(w http.ResponseWriter, msg proto.Message, err error) {
 	if err != nil {
 		st, _ := status.FromError(err)
-		httpCode := runtime.HTTPStatusFromCode(st.Code())
-		http.Error(w, st.Message(), httpCode)
+		http.Error(w, st.Message(), runtime.HTTPStatusFromCode(st.Code()))
 		return
 	}
 	codec := new(runtime.JSONPb)
 	b, merr := codec.Marshal(msg)
+	if merr != nil {
+		http.Error(w, merr.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
+}
+
+// writeJSONResponse marshals any value to JSON and writes to the response.
+// Used for hand-written types (Lead, Booking, Counts) that don't implement proto.Message.
+func writeJSONResponse(w http.ResponseWriter, v interface{}, err error) {
+	if err != nil {
+		st, _ := status.FromError(err)
+		http.Error(w, st.Message(), runtime.HTTPStatusFromCode(st.Code()))
+		return
+	}
+	b, merr := json.Marshal(v)
 	if merr != nil {
 		http.Error(w, merr.Error(), http.StatusInternalServerError)
 		return

@@ -12,7 +12,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"gopkg.in/yaml.v2"
 
 	"NotifyProject/config"
@@ -39,8 +38,9 @@ func main() {
 		log.Fatalf("Error unmarshaling YAML: %v", err)
 	}
 
-	// Connect to MySQL
+	// Connect to MySQL and run AutoMigrate (only creates missing tables)
 	mysqlSvc := db.NewMySQLDetailsSvc(&cfg)
+	mysqlSvc.AutoMigrate()
 	conn := mysqlSvc.ConnectMySQL()
 	defer conn.Close()
 
@@ -50,7 +50,6 @@ func main() {
 	// Start the gRPC server
 	grpcServer := grpc.NewServer()
 	pb.RegisterNotifyServiceServer(grpcServer, notifyService)
-	reflection.Register(grpcServer)
 
 	lis, err := net.Listen(cfg.GrpcDetails.Network, cfg.GrpcDetails.Address)
 	if err != nil {

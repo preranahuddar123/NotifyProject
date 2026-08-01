@@ -1,0 +1,19 @@
+# Compiled binaries
+*.exe
+*.out
+*.bin
+
+# Build output
+/bin/
+/dist/
+
+# Environment files with secrets
+conf/config.env
+
+# IDE
+.idea/
+.vscode/
+
+# Go test cache
+*.test
+*.prof

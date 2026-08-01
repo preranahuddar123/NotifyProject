@@ -1,0 +1,496 @@
+================================================================================
+                        NOTIFYPROJECT — API DOCUMENTATION
+================================================================================
+Project   : NotifyProject
+Protocol  : gRPC (port 50051) + HTTP/REST via gRPC-Gateway (port 8080)
+Database  : MySQL — notify_db
+Service   : NotifyService
+Author    : NotifyProject Team
+================================================================================
+
+
+STAGE VALUES (MeetingStage Enum)
+--------------------------------------------------------------------------------
+Use the string name when calling via gRPC (Postman gRPC tab):
+
+  Value                   Integer   DB Value
+  ----------------------  -------   --------------------
+  STAGE_UNSPECIFIED       0         (invalid — do not use)
+  STAGE_CONNECTION        1         CONNECTION
+  STAGE_EXPERIENCE_DESIGN 2         EXPERIENCE_AND_DESIGN
+
+
+MEETING TYPE VALUES
+--------------------------------------------------------------------------------
+  ONLINE
+  OFFLINE
+
+
+PREREQUISITES
+--------------------------------------------------------------------------------
+Before calling any meeting API, the lead_id must exist in the leadDetails table.
+
+Insert a lead first:
+  INSERT INTO leadDetails (lead_name, mobile, lead_type)
+  VALUES ('John Doe', 9876543210, 'ADD_LEAD');
+
+lead_type allowed values:
+  SALES_POOL, EXTERNAL_LEAD, GOOGLE_ADS, META_ADS, ADD_LEAD,
+  IVR_CALL, WEBSITE_LEAD, WALK_IN_LEAD, WHATSAPP
+
+
+================================================================================
+  SECTION 1 — SCHEDULED MEETINGS
+  DB Table  : meeting_details (milestone = 'SCHEDULED')
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+1.1  CreateScheduled
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/CreateScheduled
+HTTP         : POST /v1/meetings/scheduled
+
+Description  : Creates a new scheduled meeting for a lead.
+
+Request Fields:
+  Field         Type    Required  Description
+  ----------    ------  --------  ------------------------------------
+  lead_id       int32   YES       FK to leadDetails.lead_id
+  lead_name     string  YES       Name of the lead
+  title         string  NO        Meeting title
+  description   string  NO        Meeting description / agenda
+  meeting_date  string  YES       Date in YYYY-MM-DD format
+  slot          string  YES       Time slot (e.g. "10:00 AM - 11:00 AM")
+  meeting_type  string  YES       ONLINE or OFFLINE
+  stage         enum    YES       STAGE_CONNECTION or STAGE_EXPERIENCE_DESIGN
+
+Postman Message Body:
+{
+    "lead_id": 1,
+    "lead_name": "John Doe",
+    "title": "Initial Connection Call",
+    "description": "First meeting with the lead to understand requirements",
+    "meeting_date": "2026-07-25",
+    "slot": "10:00 AM - 11:00 AM",
+    "meeting_type": "ONLINE",
+    "stage": "STAGE_CONNECTION"
+}
+
+Success Response:
+{
+    "data": {
+        "id": 1,
+        "lead_id": 1,
+        "lead_name": "John Doe",
+        "title": "Initial Connection Call",
+        "description": "First meeting with the lead to understand requirements",
+        "meeting_date": "2026-07-25",
+        "slot": "10:00 AM - 11:00 AM",
+        "meeting_type": "ONLINE",
+        "stage": "STAGE_CONNECTION",
+        "created_at": "2026-07-25T10:00:00+05:30"
+    }
+}
+
+────────────────────────────────────────────────────────────────────────────────
+1.2  GetAllScheduled
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/GetAllScheduled
+HTTP         : GET /v1/meetings/scheduled
+
+Description  : Returns all scheduled meetings. Pass lead_id to filter by lead.
+
+Request Fields:
+  Field    Type   Required  Description
+  -------  -----  --------  -----------------------------------
+  lead_id  int32  NO        Filter by lead. Send 0 or omit for all records.
+
+Postman Message Body (filter by lead):
+{
+    "lead_id": 1
+}
+
+Postman Message Body (all records):
+{}
+
+Success Response:
+{
+    "data": [
+        {
+            "id": 1,
+            "lead_id": 1,
+            "lead_name": "John Doe",
+            "title": "Initial Connection Call",
+            "description": "First meeting with the lead",
+            "meeting_date": "2026-07-25",
+            "slot": "10:00 AM - 11:00 AM",
+            "meeting_type": "ONLINE",
+            "stage": "STAGE_CONNECTION",
+            "created_at": "2026-07-25T10:00:00+05:30"
+        }
+    ]
+}
+
+────────────────────────────────────────────────────────────────────────────────
+1.3  GetScheduledByID
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/GetScheduledByID
+HTTP         : GET /v1/meetings/scheduled/{meeting_id}
+
+Description  : Returns a single scheduled meeting by its meeting_id.
+
+Request Fields:
+  Field       Type   Required  Description
+  ----------  -----  --------  ---------------------------------
+  meeting_id  int32  YES       Primary key of the meeting record
+
+Postman Message Body:
+{
+    "meeting_id": 1
+}
+
+Success Response:
+{
+    "data": {
+        "id": 1,
+        "lead_id": 1,
+        "lead_name": "John Doe",
+        "title": "Initial Connection Call",
+        "description": "First meeting with the lead",
+        "meeting_date": "2026-07-25",
+        "slot": "10:00 AM - 11:00 AM",
+        "meeting_type": "ONLINE",
+        "stage": "STAGE_CONNECTION",
+        "created_at": "2026-07-25T10:00:00+05:30"
+    }
+}
+
+
+================================================================================
+  SECTION 2 — RESCHEDULED MEETINGS
+  DB Table  : meeting_details (milestone = 'RESCHEDULED')
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+2.1  CreateRescheduled
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/CreateRescheduled
+HTTP         : POST /v1/meetings/rescheduled
+
+Description  : Creates a rescheduled meeting entry for a lead.
+               Reason is mandatory to explain why the meeting was rescheduled.
+
+Request Fields:
+  Field         Type    Required  Description
+  ----------    ------  --------  ------------------------------------
+  lead_id       int32   YES       FK to leadDetails.lead_id
+  lead_name     string  YES       Name of the lead
+  title         string  NO        Meeting title
+  description   string  NO        Meeting description
+  meeting_date  string  YES       New date in YYYY-MM-DD format
+  slot          string  YES       New time slot
+  meeting_type  string  YES       ONLINE or OFFLINE
+  stage         enum    YES       STAGE_CONNECTION or STAGE_EXPERIENCE_DESIGN
+  reason        string  YES       Reason for rescheduling
+
+Postman Message Body:
+{
+    "lead_id": 1,
+    "lead_name": "John Doe",
+    "title": "Rescheduled Connection Call",
+    "description": "Meeting rescheduled due to lead request",
+    "meeting_date": "2026-07-28",
+    "slot": "02:00 PM - 03:00 PM",
+    "meeting_type": "ONLINE",
+    "stage": "STAGE_CONNECTION",
+    "reason": "Lead was unavailable on original date"
+}
+
+Success Response:
+{
+    "data": {
+        "id": 2,
+        "lead_id": 1,
+        "lead_name": "John Doe",
+        "title": "Rescheduled Connection Call",
+        "description": "Meeting rescheduled due to lead request",
+        "meeting_date": "2026-07-28",
+        "slot": "02:00 PM - 03:00 PM",
+        "meeting_type": "ONLINE",
+        "stage": "STAGE_CONNECTION",
+        "reason": "Lead was unavailable on original date",
+        "created_at": "2026-07-20T14:00:00+05:30"
+    }
+}
+
+────────────────────────────────────────────────────────────────────────────────
+2.2  GetAllRescheduled
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/GetAllRescheduled
+HTTP         : GET /v1/meetings/rescheduled
+
+Description  : Returns all rescheduled meetings. Pass lead_id to filter by lead.
+
+Request Fields:
+  Field    Type   Required  Description
+  -------  -----  --------  ---------------------------------
+  lead_id  int32  NO        Filter by lead. Send 0 or omit for all.
+
+Postman Message Body (filter by lead):
+{
+    "lead_id": 1
+}
+
+Postman Message Body (all records):
+{}
+
+────────────────────────────────────────────────────────────────────────────────
+2.3  GetRescheduledByID
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/GetRescheduledByID
+HTTP         : GET /v1/meetings/rescheduled/{meeting_id}
+
+Description  : Returns a single rescheduled meeting by meeting_id.
+
+Request Fields:
+  Field       Type   Required  Description
+  ----------  -----  --------  ---------------------------------
+  meeting_id  int32  YES       Primary key of the meeting record
+
+Postman Message Body:
+{
+    "meeting_id": 2
+}
+
+
+================================================================================
+  SECTION 3 — CANCELLED MEETINGS
+  DB Table  : meeting_details (milestone = 'CANCELLED')
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+3.1  CreateCancellation
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/CreateCancellation
+HTTP         : POST /v1/meetings/cancellation
+
+Description  : Records a cancelled meeting for a lead.
+
+Request Fields:
+  Field           Type    Required  Description
+  -----------     ------  --------  ------------------------------------
+  lead_id         int32   YES       FK to leadDetails.lead_id
+  lead_name       string  YES       Name of the lead
+  reason          string  NO        Reason for cancellation
+  stage           enum    YES       STAGE_CONNECTION or STAGE_EXPERIENCE_DESIGN
+  event_datetime  string  YES       RFC3339 datetime (e.g. 2026-07-25T10:00:00Z)
+
+Postman Message Body:
+{
+    "lead_id": 1,
+    "lead_name": "John Doe",
+    "reason": "Client was not available and did not respond",
+    "stage": "STAGE_CONNECTION",
+    "event_datetime": "2026-07-25T10:30:00Z"
+}
+
+Success Response:
+{
+    "data": {
+        "meeting_id": 3,
+        "lead_id": 1,
+        "lead_name": "John Doe",
+        "reason": "Client was not available and did not respond",
+        "stage": "STAGE_CONNECTION",
+        "event_datetime": "2026-07-25T10:30:00Z",
+        "created_at": "2026-07-20T15:00:00+05:30"
+    }
+}
+
+────────────────────────────────────────────────────────────────────────────────
+3.2  GetAllCancellations
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/GetAllCancellations
+HTTP         : GET /v1/meetings/cancellation
+
+Description  : Returns all cancelled meetings. Pass lead_id to filter by lead.
+
+Request Fields:
+  Field    Type   Required  Description
+  -------  -----  --------  ---------------------------------
+  lead_id  int32  NO        Filter by lead. Send 0 or omit for all.
+
+Postman Message Body (filter by lead):
+{
+    "lead_id": 1
+}
+
+Postman Message Body (all records):
+{}
+
+────────────────────────────────────────────────────────────────────────────────
+3.3  GetCancellationByID
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/GetCancellationByID
+HTTP         : GET /v1/meetings/cancellation/{meeting_id}
+
+Description  : Returns a single cancellation record by meeting_id.
+
+Request Fields:
+  Field       Type   Required  Description
+  ----------  -----  --------  ---------------------------------
+  meeting_id  int32  YES       Primary key of the meeting record
+
+Postman Message Body:
+{
+    "meeting_id": 3
+}
+
+
+================================================================================
+  SECTION 4 — SUCCESSFUL MEETINGS
+  DB Table  : successful
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+4.1  CreateSuccess
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/CreateSuccess
+HTTP         : POST /v1/meetings/success
+
+Description  : Records a successfully completed meeting outcome for a lead.
+
+Request Fields:
+  Field                 Type    Required  Description
+  -------------------   ------  --------  ------------------------------------
+  lead_id               int32   YES       FK to leadDetails.lead_id
+  description           string  NO        Remarks / notes from the meeting
+  stage                 enum    YES       STAGE_CONNECTION or STAGE_EXPERIENCE_DESIGN
+  success_datetime      string  YES       RFC3339 datetime of the successful meeting
+  next_action           string  YES       Next stage or action to be taken
+  quote_link_generated  bool    NO        true if a quote link was generated
+
+Postman Message Body:
+{
+    "lead_id": 1,
+    "description": "Client showed strong interest and agreed to proceed",
+    "stage": "STAGE_CONNECTION",
+    "success_datetime": "2026-07-25T14:00:00Z",
+    "next_action": "Move to Experience & Design stage",
+    "quote_link_generated": true
+}
+
+Success Response:
+{
+    "data": {
+        "lead_id": 1,
+        "lead_name": "John Doe",
+        "description": "Client showed strong interest and agreed to proceed",
+        "stage": "STAGE_CONNECTION",
+        "success_datetime": "2026-07-25T14:00:00Z",
+        "next_action": "Move to Experience & Design stage",
+        "quote_link_generated": true,
+        "created_at": "2026-07-20T16:00:00+05:30"
+    }
+}
+
+────────────────────────────────────────────────────────────────────────────────
+4.2  GetAllSuccesses
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/GetAllSuccesses
+HTTP         : GET /v1/meetings/success
+
+Description  : Returns all successful meeting records. Filter by lead_id optionally.
+
+Request Fields:
+  Field    Type   Required  Description
+  -------  -----  --------  ---------------------------------
+  lead_id  int32  NO        Filter by lead. Send 0 or omit for all.
+
+Postman Message Body (filter by lead):
+{
+    "lead_id": 1
+}
+
+Postman Message Body (all records):
+{}
+
+────────────────────────────────────────────────────────────────────────────────
+4.3  GetSuccessByLeadID
+────────────────────────────────────────────────────────────────────────────────
+gRPC Method  : NotifyService/GetSuccessByLeadID
+HTTP         : GET /v1/meetings/success/{lead_id}
+
+Description  : Returns the success record for a specific lead.
+
+Request Fields:
+  Field    Type   Required  Description
+  -------  -----  --------  ---------------------------------
+  lead_id  int32  YES       FK to leadDetails.lead_id
+
+Postman Message Body:
+{
+    "lead_id": 1
+}
+
+
+================================================================================
+  API SUMMARY TABLE
+================================================================================
+
+  #   RPC Name               gRPC Method                     HTTP Method  HTTP Path
+  --  --------------------   ----------------------------    -----------  ------------------------------------------
+  1   CreateScheduled        NotifyService/CreateScheduled   POST         /v1/meetings/scheduled
+  2   GetAllScheduled        NotifyService/GetAllScheduled   GET          /v1/meetings/scheduled
+  3   GetScheduledByID       NotifyService/GetScheduledByID  GET          /v1/meetings/scheduled/{meeting_id}
+  4   CreateRescheduled      NotifyService/CreateRescheduled POST         /v1/meetings/rescheduled
+  5   GetAllRescheduled      NotifyService/GetAllRescheduled GET          /v1/meetings/rescheduled
+  6   GetRescheduledByID     NotifyService/GetRescheduled... GET          /v1/meetings/rescheduled/{meeting_id}
+  7   CreateCancellation     NotifyService/CreateCancella... POST         /v1/meetings/cancellation
+  8   GetAllCancellations    NotifyService/GetAllCancella... GET          /v1/meetings/cancellation
+  9   GetCancellationByID    NotifyService/GetCancellation.. GET          /v1/meetings/cancellation/{meeting_id}
+  10  CreateSuccess          NotifyService/CreateSuccess     POST         /v1/meetings/success
+  11  GetAllSuccesses        NotifyService/GetAllSuccesses   GET          /v1/meetings/success
+  12  GetSuccessByLeadID     NotifyService/GetSuccessByL...  GET          /v1/meetings/success/{lead_id}
+
+
+================================================================================
+  SERVER DETAILS
+================================================================================
+
+  gRPC Server   : localhost:50051
+  HTTP Gateway  : localhost:8080
+  Database      : MySQL — notify_db @ localhost:3306
+  Config file   : conf/config.yaml
+
+  Run server:
+    cd E:\HUB\NotifyProject\cmd
+    go run main.go
+
+
+================================================================================
+  DATETIME FORMAT
+================================================================================
+
+  All datetime fields must be in RFC3339 format:
+    Format  : YYYY-MM-DDTHH:MM:SSZ  (UTC)
+              YYYY-MM-DDTHH:MM:SS+05:30  (IST)
+    Example : 2026-07-25T10:30:00Z
+              2026-07-25T16:00:00+05:30
+
+
+================================================================================
+  ERROR CODES
+================================================================================
+
+  gRPC Code          HTTP Status  Description
+  -----------------  -----------  ----------------------------------------------
+  InvalidArgument    400          Required field missing or invalid value
+  NotFound           404          Record not found for given ID
+  Internal           500          Database error or unexpected server failure
+  Unimplemented      501          RPC method not yet implemented
+
+
+================================================================================
+  END OF DOCUMENTATION
+================================================================================
