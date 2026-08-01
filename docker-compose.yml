@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: notify-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root@root
+      MYSQL_DATABASE: notify_db
+      MYSQL_USER: notify
+      MYSQL_PASSWORD: notify@pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot@root"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    container_name: notify-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      # host:container — host 8082 because 8081 is used by another backend on this EC2
+      - "8082:8081"
+      - "50051:50051"
+    volumes:
+      - ./conf/config.docker.yaml:/app/conf/config.yaml:ro
+      - ./conf/config.docker.env:/app/conf/config.env:ro
+
+volumes:
+  mysql_data:

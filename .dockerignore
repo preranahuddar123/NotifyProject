@@ -1,0 +1,8 @@
+.git
+.idea
+.postman
+cmd/*.exe
+**/*.exe
+**/*_test.go
+README*
+*.md

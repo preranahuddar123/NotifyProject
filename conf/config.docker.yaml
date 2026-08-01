@@ -1,0 +1,14 @@
+mysql_details:
+  username: "notify"
+  password: "notify@pass"
+  address: "mysql"
+  port: "3306"
+  db_name: "notify_db"
+
+grpc_details:
+  network: "tcp"
+  address: ":50051"
+  endpoint: "localhost:50051"
+
+http_details:
+  port: ":8080"
