@@ -593,13 +593,13 @@ func (s *NotifyServiceServer) getBookingByID(bookingID int32) (*pb.BookingRespon
 func scanCancellation(fn func(...any) error) (*pb.MeetingCancellation, error) {
 	var (
 		m         pb.MeetingCancellation
-		milestone string
+		milestone sql.NullString
 		createdAt sql.NullTime
 	)
 	if err := fn(&m.MeetingId, &m.LeadIdentifier, &m.LeadName, &milestone, &createdAt); err != nil {
 		return nil, err
 	}
-	m.Milestone = milestoneProtoValue(milestone)
+	m.Milestone = milestoneProtoValue(milestone.String)
 	if createdAt.Valid {
 		m.CreatedAt = fmtTime(createdAt.Time)
 	}
@@ -629,7 +629,7 @@ func scanScheduled(fn func(...any) error) (*pb.MeetingScheduled, error) {
 		meetingDate sql.NullString
 		slot        sql.NullString
 		meetingType sql.NullString
-		milestone   string
+		milestone   sql.NullString
 		createdAt   sql.NullTime
 	)
 	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
@@ -639,7 +639,7 @@ func scanScheduled(fn func(...any) error) (*pb.MeetingScheduled, error) {
 	m.MeetingDate = meetingDate.String
 	m.Slot = slot.String
 	m.MeetingType = meetingType.String
-	m.Milestone = milestoneProtoValue(milestone)
+	m.Milestone = milestoneProtoValue(milestone.String)
 	if createdAt.Valid {
 		m.CreatedAt = fmtTime(createdAt.Time)
 	}
@@ -653,7 +653,7 @@ func scanRescheduled(fn func(...any) error) (*pb.MeetingRescheduled, error) {
 		meetingDate sql.NullString
 		slot        sql.NullString
 		meetingType sql.NullString
-		milestone   string
+		milestone   sql.NullString
 		createdAt   sql.NullTime
 	)
 	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
@@ -663,7 +663,7 @@ func scanRescheduled(fn func(...any) error) (*pb.MeetingRescheduled, error) {
 	m.MeetingDate = meetingDate.String
 	m.Slot = slot.String
 	m.MeetingType = meetingType.String
-	m.Milestone = milestoneProtoValue(milestone)
+	m.Milestone = milestoneProtoValue(milestone.String)
 	if createdAt.Valid {
 		m.CreatedAt = fmtTime(createdAt.Time)
 	}
