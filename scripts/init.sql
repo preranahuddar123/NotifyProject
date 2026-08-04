@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS notification_recipients (
   delivery_status  VARCHAR(20) DEFAULT 'PENDING',
   seen_at          TIMESTAMP NULL DEFAULT NULL
 );
+
 CREATE TABLE IF NOT EXISTS booking (
     booking_id        INT AUTO_INCREMENT PRIMARY KEY,
     lead_identifier   VARCHAR(100) NOT NULL,

@@ -407,6 +407,18 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 	if paymentStatus == "" {
 		paymentStatus = "PENDING"
 	}
+
+	// getBookingByID JOINs leadDetails — ensure the lead row exists first
+	if _, err := s.db.Exec(
+		`INSERT INTO leadDetails (lead_identifier, lead_name, lead_type, assigned_to, created_at)
+		 VALUES (?, ?, 'ADD_LEAD', '', NOW())
+		 ON DUPLICATE KEY UPDATE lead_name = VALUES(lead_name)`,
+		req.LeadIdentifier, req.LeadName,
+	); err != nil {
+		log.Printf("Failed to upsert lead for booking: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to ensure lead exists: %v", err)
+	}
+
 	res, err := s.db.Exec(
 		`INSERT INTO booking (lead_identifier, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at)
 		 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,

@@ -1,14 +1,14 @@
-  mysql_details:
-    username: "root"
-    password: "root@root"
-    address: "localhost"
-    port: "3306"
-    db_name: "notify_db"
+mysql_details:
+  username: "admin"
+  password: "Hubinterior2019"
+  address: "database-1.cl002gu0o5ft.ap-south-2.rds.amazonaws.com"
+  port: "3306"
+  db_name: "notify_db"
 
-  grpc_details:
-    network: "tcp"
-    address: ":50051"
-    endpoint: "localhost:50051"
+grpc_details:
+  network: "tcp"
+  address: ":50051"
+  endpoint: "localhost:50051"
 
-  http_details:
-    port: ":8080"
+http_details:
+  port: ":8083"
