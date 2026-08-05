@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS successful (
 CREATE TABLE IF NOT EXISTS booking (
   booking_id        INT AUTO_INCREMENT PRIMARY KEY,
   lead_identifier   VARCHAR(100) NOT NULL,
+  lead_name         VARCHAR(255),
   payment_type      ENUM('TOKEN', 'BOOKING FUll_10') NOT NULL,
   paid_amount       DECIMAL(10, 2) NOT NULL,
   Remaining_amount  DECIMAL(10, 2) NOT NULL,
@@ -67,17 +68,4 @@ CREATE TABLE IF NOT EXISTS notification_recipients (
   recipient_type   VARCHAR(50) NOT NULL,
   delivery_status  VARCHAR(20) DEFAULT 'PENDING',
   seen_at          TIMESTAMP NULL DEFAULT NULL
-);
-
-CREATE TABLE IF NOT EXISTS booking (
-    booking_id        INT AUTO_INCREMENT PRIMARY KEY,
-    lead_identifier   VARCHAR(100) NOT NULL,
-    lead_name         VARCHAR(255) NOT NULL,
-    payment_type      ENUM('TOKEN', 'BOOKING') NOT NULL,
-    paid_amount       DECIMAL(10,2) NOT NULL,
-    remaining_amount  DECIMAL(10,2) NOT NULL,
-    payment_date      DATETIME NOT NULL,
-    payment_status    ENUM('PENDING', 'SUCCESS', 'FAILED') DEFAULT 'PENDING',
-    remarks           TEXT,
-    created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
