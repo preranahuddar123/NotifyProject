@@ -43,6 +43,7 @@ func (Successful) TableName() string { return "successful" }
 // booking table — standalone, no foreign key constraints
 type Booking struct {
 	BookingID       int32     `gorm:"column:booking_id;primaryKey;autoIncrement"`
+	LeadName	    string    `gorm:"column:lead_name;type:varchar(100);not null"`
 	LeadIdentifier  string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
 	PaymentType     string    `gorm:"column:payment_type;type:enum('TOKEN','BOOKING FUll_10');not null"`
 	PaidAmount      float64   `gorm:"column:paid_amount;type:decimal(10,2);not null"`

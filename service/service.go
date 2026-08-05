@@ -420,9 +420,9 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 	}
 
 	res, err := s.db.Exec(
-		`INSERT INTO booking (lead_identifier, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
-		req.LeadIdentifier, paymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
+		`INSERT INTO booking (lead_identifier, lead_name, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, paymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
 	)
 	if err != nil {
 		log.Printf("Failed to create booking: %v", err)
@@ -433,17 +433,17 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 }
 
 func (s *NotifyServiceServer) GetAllBookings(_ context.Context, req *pb.GetBookingByLeadIdentifierRequest) (*pb.BookingListResponse, error) {
-	const base = `SELECT b.booking_id, b.lead_identifier, l.lead_name, b.payment_type,
-		b.paid_amount, b.Remaining_amount, b.payment_date, b.payment_status, b.remarks, b.created_at
-		FROM booking b JOIN leadDetails l ON l.lead_identifier = b.lead_identifier`
+	const base = `SELECT booking_id, lead_identifier, lead_name, payment_type,
+		paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at
+		FROM booking`
 	var (
 		rows *sql.Rows
 		err  error
 	)
 	if req.LeadIdentifier != "" {
-		rows, err = s.db.Query(base+` WHERE b.lead_identifier = ? ORDER BY b.created_at DESC`, req.LeadIdentifier)
+		rows, err = s.db.Query(base+` WHERE lead_identifier = ? ORDER BY created_at DESC`, req.LeadIdentifier)
 	} else {
-		rows, err = s.db.Query(base + ` ORDER BY b.created_at DESC`)
+		rows, err = s.db.Query(base + ` ORDER BY created_at DESC`)
 	}
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to fetch bookings: %v", err)
@@ -572,10 +572,9 @@ func (s *NotifyServiceServer) getLeadByIdentifier(leadIdentifier string) (*pb.Le
 
 func (s *NotifyServiceServer) getBookingByID(bookingID int32) (*pb.BookingResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT b.booking_id, b.lead_identifier, l.lead_name, b.payment_type,
-		        b.paid_amount, b.Remaining_amount, b.payment_date, b.payment_status, b.remarks, b.created_at
-		 FROM booking b JOIN leadDetails l ON l.lead_identifier = b.lead_identifier
-		 WHERE b.booking_id = ?`, bookingID)
+		`SELECT booking_id, lead_identifier, lead_name, payment_type,
+		        paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at
+		 FROM booking WHERE booking_id = ?`, bookingID)
 	item, err := scanBooking(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, status.Errorf(codes.NotFound, "Booking with booking_id %d not found", bookingID)
