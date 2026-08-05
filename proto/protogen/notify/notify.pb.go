@@ -150,9 +150,10 @@ func (x *MeetingCancellation) GetCreatedAt() string {
 type MeetingSuccess struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier     string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
-	NextAction         string                 `protobuf:"bytes,2,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
-	QuoteLinkGenerated bool                   `protobuf:"varint,3,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
-	CreatedAt          string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	NextAction         string                 `protobuf:"bytes,3,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,4,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -190,6 +191,13 @@ func (*MeetingSuccess) Descriptor() ([]byte, []int) {
 func (x *MeetingSuccess) GetLeadIdentifier() string {
 	if x != nil {
 		return x.LeadIdentifier
+	}
+	return ""
+}
+
+func (x *MeetingSuccess) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
 	}
 	return ""
 }
@@ -582,8 +590,9 @@ func (x *GetByLeadIdentifierRequest) GetLeadIdentifier() string {
 type CreateSuccessRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier     string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
-	NextAction         string                 `protobuf:"bytes,2,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
-	QuoteLinkGenerated bool                   `protobuf:"varint,3,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	NextAction         string                 `protobuf:"bytes,3,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,4,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -621,6 +630,13 @@ func (*CreateSuccessRequest) Descriptor() ([]byte, []int) {
 func (x *CreateSuccessRequest) GetLeadIdentifier() string {
 	if x != nil {
 		return x.LeadIdentifier
+	}
+	return ""
+}
+
+func (x *CreateSuccessRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
 	}
 	return ""
 }
@@ -2136,14 +2152,15 @@ const file_notify_proto_rawDesc = "" +
 	"\tlead_name\x18\x03 \x01(\tR\bleadName\x126\n" +
 	"\tmilestone\x18\x04 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\"\xab\x01\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\"\xc8\x01\n" +
 	"\x0eMeetingSuccess\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1f\n" +
-	"\vnext_action\x18\x02 \x01(\tR\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vnext_action\x18\x03 \x01(\tR\n" +
 	"nextAction\x120\n" +
-	"\x14quote_link_generated\x18\x03 \x01(\bR\x12quoteLinkGenerated\x12\x1d\n" +
+	"\x14quote_link_generated\x18\x04 \x01(\bR\x12quoteLinkGenerated\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\tR\tcreatedAt\"\xaf\x02\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\"\xaf\x02\n" +
 	"\x10MeetingScheduled\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
@@ -2174,12 +2191,13 @@ const file_notify_proto_rawDesc = "" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"E\n" +
 	"\x1aGetByLeadIdentifierRequest\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\x92\x01\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\xaf\x01\n" +
 	"\x14CreateSuccessRequest\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1f\n" +
-	"\vnext_action\x18\x02 \x01(\tR\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vnext_action\x18\x03 \x01(\tR\n" +
 	"nextAction\x120\n" +
-	"\x14quote_link_generated\x18\x03 \x01(\bR\x12quoteLinkGenerated\"\xf0\x01\n" +
+	"\x14quote_link_generated\x18\x04 \x01(\bR\x12quoteLinkGenerated\"\xf0\x01\n" +
 	"\x16CreateScheduledRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
 	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12!\n" +

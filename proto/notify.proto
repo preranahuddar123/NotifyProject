@@ -26,9 +26,10 @@ message MeetingCancellation {
 
 message MeetingSuccess {
   string lead_identifier      = 1;
-  string next_action          = 2;
-  bool   quote_link_generated = 3;
-  string created_at           = 4;
+  string lead_name            = 2;
+  string next_action          = 3;
+  bool   quote_link_generated = 4;
+  string created_at           = 5;
 }
 
 message MeetingScheduled {
@@ -79,8 +80,9 @@ message GetByLeadIdentifierRequest {
 
 message CreateSuccessRequest {
   string lead_identifier      = 1;
-  string next_action          = 2;
-  bool   quote_link_generated = 3;
+  string lead_name            = 2;
+  string next_action          = 3;
+  bool   quote_link_generated = 4;
 }
 
 // -----------------------------------------------------------------------

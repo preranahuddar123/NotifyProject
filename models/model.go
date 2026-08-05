@@ -26,6 +26,7 @@ type MeetingDetails struct {
 	Milestone      string    `gorm:"column:milestone;type:enum('CONNECTION','EXPERIENCE_AND_DESIGN')"`
 	CreatedAt      time.Time `gorm:"column:created_at;autoCreateTime"`
 }
+
 // Note: reason column has been removed; sub_stage replaces submilestone; milestone replaces stage
 
 func (MeetingDetails) TableName() string { return "meeting_details" }
@@ -33,6 +34,7 @@ func (MeetingDetails) TableName() string { return "meeting_details" }
 // successful table — standalone, no foreign key constraints
 type Successful struct {
 	LeadIdentifier     string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
+	LeadName           string    `gorm:"column:lead_name;type:varchar(100);not null"`
 	NextAction         string    `gorm:"column:next_action;type:varchar(100)"`
 	QuoteLinkGenerated bool      `gorm:"column:quote_link_generated;default:false"`
 	CreatedAt          time.Time `gorm:"column:created_at;autoCreateTime"`

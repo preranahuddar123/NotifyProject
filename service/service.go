@@ -125,12 +125,15 @@ func (s *NotifyServiceServer) CreateSuccess(_ context.Context, req *pb.CreateSuc
 	if req.LeadIdentifier == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "lead_identifier is required")
 	}
+	if req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "lead_name is required")
+	}
 	if req.NextAction == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "next_action is required")
 	}
 	_, err := s.db.Exec(
-		`INSERT INTO successful (lead_identifier, next_action, quote_link_generated, created_at) VALUES (?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.NextAction, req.QuoteLinkGenerated,
+		`INSERT INTO successful (lead_identifier, lead_name, next_action, quote_link_generated, created_at) VALUES (?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.NextAction, req.QuoteLinkGenerated,
 	)
 	if err != nil {
 		log.Printf("Failed to create success record: %v", err)
@@ -140,7 +143,7 @@ func (s *NotifyServiceServer) CreateSuccess(_ context.Context, req *pb.CreateSuc
 }
 
 func (s *NotifyServiceServer) GetAllSuccesses(_ context.Context, req *pb.GetByLeadIdentifierRequest) (*pb.SuccessListResponse, error) {
-	const base = `SELECT lead_identifier, next_action, quote_link_generated, created_at FROM successful`
+	const base = `SELECT lead_identifier, lead_name, next_action, quote_link_generated, created_at FROM successful`
 	var (
 		rows *sql.Rows
 		err  error
@@ -516,7 +519,7 @@ func (s *NotifyServiceServer) getCancellationByID(meetingID int32) (*pb.Cancella
 
 func (s *NotifyServiceServer) getSuccessByLeadIdentifier(leadIdentifier string) (*pb.SuccessResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT lead_identifier, next_action, quote_link_generated, created_at
+		`SELECT lead_identifier, lead_name, next_action, quote_link_generated, created_at
 		 FROM successful WHERE lead_identifier = ? ORDER BY created_at DESC LIMIT 1`, leadIdentifier)
 	item, err := scanSuccess(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -611,7 +614,7 @@ func scanSuccess(fn func(...any) error) (*pb.MeetingSuccess, error) {
 		nextAction sql.NullString
 		createdAt  sql.NullTime
 	)
-	if err := fn(&m.LeadIdentifier, &nextAction, &m.QuoteLinkGenerated, &createdAt); err != nil {
+	if err := fn(&m.LeadIdentifier, &m.LeadName, &nextAction, &m.QuoteLinkGenerated, &createdAt); err != nil {
 		return nil, err
 	}
 	m.NextAction = nextAction.String
