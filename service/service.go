@@ -689,6 +689,8 @@ func scanLead(fn func(...any) error) (*pb.Lead, error) {
 func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 	var (
 		m             pb.Booking
+		leadName      sql.NullString
+		paymentType   sql.NullString
 		remarks       sql.NullString
 		paymentStatus sql.NullString
 		paymentDate   sql.NullTime
@@ -701,6 +703,8 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 	); err != nil {
 		return nil, err
 	}
+	m.LeadName = leadName.String
+	m.PaymentType = paymentType.String
 	m.PaymentStatus = paymentStatus.String
 	m.Remarks = remarks.String
 	if paymentDate.Valid {
