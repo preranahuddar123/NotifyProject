@@ -76,8 +76,9 @@ type MeetingCancellation struct {
 	MeetingId      int32                  `protobuf:"varint,1,opt,name=meeting_id,json=meetingId,proto3" json:"meeting_id,omitempty"`
 	LeadIdentifier string                 `protobuf:"bytes,2,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	Milestone      MeetingMilestone       `protobuf:"varint,4,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,4,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Milestone      MeetingMilestone       `protobuf:"varint,5,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -133,6 +134,13 @@ func (x *MeetingCancellation) GetLeadName() string {
 	return ""
 }
 
+func (x *MeetingCancellation) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *MeetingCancellation) GetMilestone() MeetingMilestone {
 	if x != nil {
 		return x.Milestone
@@ -151,9 +159,10 @@ type MeetingSuccess struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier     string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	NextAction         string                 `protobuf:"bytes,3,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
-	QuoteLinkGenerated bool                   `protobuf:"varint,4,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
-	CreatedAt          string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo         string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	NextAction         string                 `protobuf:"bytes,4,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,5,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -202,6 +211,13 @@ func (x *MeetingSuccess) GetLeadName() string {
 	return ""
 }
 
+func (x *MeetingSuccess) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *MeetingSuccess) GetNextAction() string {
 	if x != nil {
 		return x.NextAction
@@ -228,12 +244,13 @@ type MeetingScheduled struct {
 	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	LeadIdentifier string                 `protobuf:"bytes,2,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	Title          string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	MeetingDate    string                 `protobuf:"bytes,5,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
-	Slot           string                 `protobuf:"bytes,6,opt,name=slot,proto3" json:"slot,omitempty"`
-	MeetingType    string                 `protobuf:"bytes,7,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-	Milestone      MeetingMilestone       `protobuf:"varint,8,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,4,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Title          string                 `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
+	MeetingDate    string                 `protobuf:"bytes,6,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
+	Slot           string                 `protobuf:"bytes,7,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType    string                 `protobuf:"bytes,8,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+	Milestone      MeetingMilestone       `protobuf:"varint,9,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -289,6 +306,13 @@ func (x *MeetingScheduled) GetLeadName() string {
 	return ""
 }
 
+func (x *MeetingScheduled) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *MeetingScheduled) GetTitle() string {
 	if x != nil {
 		return x.Title
@@ -336,12 +360,13 @@ type MeetingRescheduled struct {
 	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	LeadIdentifier string                 `protobuf:"bytes,2,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	Title          string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	MeetingDate    string                 `protobuf:"bytes,5,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
-	Slot           string                 `protobuf:"bytes,6,opt,name=slot,proto3" json:"slot,omitempty"`
-	MeetingType    string                 `protobuf:"bytes,7,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-	Milestone      MeetingMilestone       `protobuf:"varint,8,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,4,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Title          string                 `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
+	MeetingDate    string                 `protobuf:"bytes,6,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
+	Slot           string                 `protobuf:"bytes,7,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType    string                 `protobuf:"bytes,8,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+	Milestone      MeetingMilestone       `protobuf:"varint,9,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -397,6 +422,13 @@ func (x *MeetingRescheduled) GetLeadName() string {
 	return ""
 }
 
+func (x *MeetingRescheduled) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *MeetingRescheduled) GetTitle() string {
 	if x != nil {
 		return x.Title
@@ -443,7 +475,8 @@ type CancellationRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	Milestone      MeetingMilestone       `protobuf:"varint,3,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Milestone      MeetingMilestone       `protobuf:"varint,4,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -488,6 +521,13 @@ func (x *CancellationRequest) GetLeadIdentifier() string {
 func (x *CancellationRequest) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *CancellationRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -591,8 +631,9 @@ type CreateSuccessRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier     string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	NextAction         string                 `protobuf:"bytes,3,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
-	QuoteLinkGenerated bool                   `protobuf:"varint,4,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	AssignedTo         string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	NextAction         string                 `protobuf:"bytes,4,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,5,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -641,6 +682,13 @@ func (x *CreateSuccessRequest) GetLeadName() string {
 	return ""
 }
 
+func (x *CreateSuccessRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *CreateSuccessRequest) GetNextAction() string {
 	if x != nil {
 		return x.NextAction
@@ -659,10 +707,11 @@ type CreateScheduledRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	MeetingDate    string                 `protobuf:"bytes,3,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
-	Slot           string                 `protobuf:"bytes,4,opt,name=slot,proto3" json:"slot,omitempty"`
-	MeetingType    string                 `protobuf:"bytes,5,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-	Milestone      MeetingMilestone       `protobuf:"varint,6,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	MeetingDate    string                 `protobuf:"bytes,4,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
+	Slot           string                 `protobuf:"bytes,5,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType    string                 `protobuf:"bytes,6,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+	Milestone      MeetingMilestone       `protobuf:"varint,7,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -707,6 +756,13 @@ func (x *CreateScheduledRequest) GetLeadIdentifier() string {
 func (x *CreateScheduledRequest) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *CreateScheduledRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -831,10 +887,11 @@ type RescheduledRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	MeetingDate    string                 `protobuf:"bytes,3,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
-	Slot           string                 `protobuf:"bytes,4,opt,name=slot,proto3" json:"slot,omitempty"`
-	MeetingType    string                 `protobuf:"bytes,5,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-	Milestone      MeetingMilestone       `protobuf:"varint,6,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	MeetingDate    string                 `protobuf:"bytes,4,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
+	Slot           string                 `protobuf:"bytes,5,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType    string                 `protobuf:"bytes,6,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+	Milestone      MeetingMilestone       `protobuf:"varint,7,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -879,6 +936,13 @@ func (x *RescheduledRequest) GetLeadIdentifier() string {
 func (x *RescheduledRequest) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *RescheduledRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -1633,13 +1697,14 @@ type Booking struct {
 	BookingId       int32                  `protobuf:"varint,1,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
 	LeadIdentifier  string                 `protobuf:"bytes,2,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName        string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	PaymentType     string                 `protobuf:"bytes,4,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"` // TOKEN | BOOKING
-	PaidAmount      float64                `protobuf:"fixed64,5,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
-	RemainingAmount float64                `protobuf:"fixed64,6,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
-	PaymentDate     string                 `protobuf:"bytes,7,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
-	PaymentStatus   string                 `protobuf:"bytes,8,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
-	Remarks         string                 `protobuf:"bytes,9,opt,name=remarks,proto3" json:"remarks,omitempty"`
-	CreatedAt       string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo      string                 `protobuf:"bytes,4,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	PaymentType     string                 `protobuf:"bytes,5,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"` // TOKEN | BOOKING
+	PaidAmount      float64                `protobuf:"fixed64,6,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
+	RemainingAmount float64                `protobuf:"fixed64,7,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
+	PaymentDate     string                 `protobuf:"bytes,8,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
+	PaymentStatus   string                 `protobuf:"bytes,9,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
+	Remarks         string                 `protobuf:"bytes,10,opt,name=remarks,proto3" json:"remarks,omitempty"`
+	CreatedAt       string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1691,6 +1756,13 @@ func (x *Booking) GetLeadIdentifier() string {
 func (x *Booking) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *Booking) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -1748,12 +1820,13 @@ type CreateBookingRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier  string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName        string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	PaymentType     string                 `protobuf:"bytes,3,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"`       // TOKEN | BOOKING
-	Amount          float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount,omitempty"`                                  // paid amount
-	PaymentDate     string                 `protobuf:"bytes,5,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
-	PaymentStatus   string                 `protobuf:"bytes,6,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
-	Remarks         string                 `protobuf:"bytes,7,opt,name=remarks,proto3" json:"remarks,omitempty"`
-	RemainingAmount float64                `protobuf:"fixed64,8,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
+	AssignedTo      string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	PaymentType     string                 `protobuf:"bytes,4,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"`       // TOKEN | BOOKING
+	Amount          float64                `protobuf:"fixed64,5,opt,name=amount,proto3" json:"amount,omitempty"`                                  // paid amount
+	PaymentDate     string                 `protobuf:"bytes,6,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
+	PaymentStatus   string                 `protobuf:"bytes,7,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
+	Remarks         string                 `protobuf:"bytes,8,opt,name=remarks,proto3" json:"remarks,omitempty"`
+	RemainingAmount float64                `protobuf:"fixed64,9,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1798,6 +1871,13 @@ func (x *CreateBookingRequest) GetLeadIdentifier() string {
 func (x *CreateBookingRequest) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *CreateBookingRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -2144,79 +2224,97 @@ var File_notify_proto protoreflect.FileDescriptor
 
 const file_notify_proto_rawDesc = "" +
 	"\n" +
-	"\fnotify.proto\x12\x06notify\x1a\x1cgoogle/api/annotations.proto\"\xd1\x01\n" +
+	"\fnotify.proto\x12\x06notify\x1a\x1cgoogle/api/annotations.proto\"\xf2\x01\n" +
 	"\x13MeetingCancellation\x12\x1d\n" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x03 \x01(\tR\bleadName\x126\n" +
-	"\tmilestone\x18\x04 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x04 \x01(\tR\n" +
+	"assignedTo\x126\n" +
+	"\tmilestone\x18\x05 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\"\xc8\x01\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\"\xe9\x01\n" +
 	"\x0eMeetingSuccess\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
 	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
-	"\vnext_action\x18\x03 \x01(\tR\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12\x1f\n" +
+	"\vnext_action\x18\x04 \x01(\tR\n" +
 	"nextAction\x120\n" +
-	"\x14quote_link_generated\x18\x04 \x01(\bR\x12quoteLinkGenerated\x12\x1d\n" +
+	"\x14quote_link_generated\x18\x05 \x01(\bR\x12quoteLinkGenerated\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\"\xaf\x02\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\"\xd0\x02\n" +
 	"\x10MeetingScheduled\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x14\n" +
-	"\x05title\x18\x04 \x01(\tR\x05title\x12!\n" +
-	"\fmeeting_date\x18\x05 \x01(\tR\vmeetingDate\x12\x12\n" +
-	"\x04slot\x18\x06 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\a \x01(\tR\vmeetingType\x126\n" +
-	"\tmilestone\x18\b \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x04 \x01(\tR\n" +
+	"assignedTo\x12\x14\n" +
+	"\x05title\x18\x05 \x01(\tR\x05title\x12!\n" +
+	"\fmeeting_date\x18\x06 \x01(\tR\vmeetingDate\x12\x12\n" +
+	"\x04slot\x18\a \x01(\tR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\b \x01(\tR\vmeetingType\x126\n" +
+	"\tmilestone\x18\t \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\t \x01(\tR\tcreatedAt\"\xb1\x02\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\"\xd2\x02\n" +
 	"\x12MeetingRescheduled\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x14\n" +
-	"\x05title\x18\x04 \x01(\tR\x05title\x12!\n" +
-	"\fmeeting_date\x18\x05 \x01(\tR\vmeetingDate\x12\x12\n" +
-	"\x04slot\x18\x06 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\a \x01(\tR\vmeetingType\x126\n" +
-	"\tmilestone\x18\b \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x04 \x01(\tR\n" +
+	"assignedTo\x12\x14\n" +
+	"\x05title\x18\x05 \x01(\tR\x05title\x12!\n" +
+	"\fmeeting_date\x18\x06 \x01(\tR\vmeetingDate\x12\x12\n" +
+	"\x04slot\x18\a \x01(\tR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\b \x01(\tR\vmeetingType\x126\n" +
+	"\tmilestone\x18\t \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\t \x01(\tR\tcreatedAt\"\x93\x01\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\"\xb4\x01\n" +
 	"\x13CancellationRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x02 \x01(\tR\bleadName\x126\n" +
-	"\tmilestone\x18\x03 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\"6\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x126\n" +
+	"\tmilestone\x18\x04 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\"6\n" +
 	"\x15GetByMeetingIDRequest\x12\x1d\n" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"E\n" +
 	"\x1aGetByLeadIdentifierRequest\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\xaf\x01\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\xd0\x01\n" +
 	"\x14CreateSuccessRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
 	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
-	"\vnext_action\x18\x03 \x01(\tR\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12\x1f\n" +
+	"\vnext_action\x18\x04 \x01(\tR\n" +
 	"nextAction\x120\n" +
-	"\x14quote_link_generated\x18\x04 \x01(\bR\x12quoteLinkGenerated\"\xf0\x01\n" +
+	"\x14quote_link_generated\x18\x05 \x01(\bR\x12quoteLinkGenerated\"\x91\x02\n" +
 	"\x16CreateScheduledRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12!\n" +
-	"\fmeeting_date\x18\x03 \x01(\tR\vmeetingDate\x12\x12\n" +
-	"\x04slot\x18\x04 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\x05 \x01(\tR\vmeetingType\x126\n" +
-	"\tmilestone\x18\x06 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\"8\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12!\n" +
+	"\fmeeting_date\x18\x04 \x01(\tR\vmeetingDate\x12\x12\n" +
+	"\x04slot\x18\x05 \x01(\tR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x126\n" +
+	"\tmilestone\x18\a \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\"8\n" +
 	"\x17GetScheduledByIDRequest\x12\x1d\n" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"N\n" +
 	"#GetScheduledByLeadIdentifierRequest\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\xec\x01\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\x8d\x02\n" +
 	"\x12RescheduledRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12!\n" +
-	"\fmeeting_date\x18\x03 \x01(\tR\vmeetingDate\x12\x12\n" +
-	"\x04slot\x18\x04 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\x05 \x01(\tR\vmeetingType\x126\n" +
-	"\tmilestone\x18\x06 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\":\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12!\n" +
+	"\fmeeting_date\x18\x04 \x01(\tR\vmeetingDate\x12\x12\n" +
+	"\x04slot\x18\x05 \x01(\tR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x126\n" +
+	"\tmilestone\x18\a \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\":\n" +
 	"\x19GetRescheduledByIDRequest\x12\x1d\n" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"P\n" +
@@ -2257,31 +2355,35 @@ const file_notify_proto_rawDesc = "" +
 	"\fLeadResponse\x12 \n" +
 	"\x04data\x18\x01 \x01(\v2\f.notify.LeadR\x04data\"4\n" +
 	"\x10LeadListResponse\x12 \n" +
-	"\x04data\x18\x01 \x03(\v2\f.notify.LeadR\x04data\"\xe0\x02\n" +
+	"\x04data\x18\x01 \x03(\v2\f.notify.LeadR\x04data\"\x81\x03\n" +
 	"\aBooking\x12\x1d\n" +
 	"\n" +
 	"booking_id\x18\x01 \x01(\x05R\tbookingId\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12!\n" +
-	"\fpayment_type\x18\x04 \x01(\tR\vpaymentType\x12\x1f\n" +
-	"\vpaid_amount\x18\x05 \x01(\x01R\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x04 \x01(\tR\n" +
+	"assignedTo\x12!\n" +
+	"\fpayment_type\x18\x05 \x01(\tR\vpaymentType\x12\x1f\n" +
+	"\vpaid_amount\x18\x06 \x01(\x01R\n" +
 	"paidAmount\x12)\n" +
-	"\x10remaining_amount\x18\x06 \x01(\x01R\x0fremainingAmount\x12!\n" +
-	"\fpayment_date\x18\a \x01(\tR\vpaymentDate\x12%\n" +
-	"\x0epayment_status\x18\b \x01(\tR\rpaymentStatus\x12\x18\n" +
-	"\aremarks\x18\t \x01(\tR\aremarks\x12\x1d\n" +
+	"\x10remaining_amount\x18\a \x01(\x01R\x0fremainingAmount\x12!\n" +
+	"\fpayment_date\x18\b \x01(\tR\vpaymentDate\x12%\n" +
+	"\x0epayment_status\x18\t \x01(\tR\rpaymentStatus\x12\x18\n" +
+	"\aremarks\x18\n" +
+	" \x01(\tR\aremarks\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\n" +
-	" \x01(\tR\tcreatedAt\"\xa6\x02\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\"\xc7\x02\n" +
 	"\x14CreateBookingRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12!\n" +
-	"\fpayment_type\x18\x03 \x01(\tR\vpaymentType\x12\x16\n" +
-	"\x06amount\x18\x04 \x01(\x01R\x06amount\x12!\n" +
-	"\fpayment_date\x18\x05 \x01(\tR\vpaymentDate\x12%\n" +
-	"\x0epayment_status\x18\x06 \x01(\tR\rpaymentStatus\x12\x18\n" +
-	"\aremarks\x18\a \x01(\tR\aremarks\x12)\n" +
-	"\x10remaining_amount\x18\b \x01(\x01R\x0fremainingAmount\"6\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12!\n" +
+	"\fpayment_type\x18\x04 \x01(\tR\vpaymentType\x12\x16\n" +
+	"\x06amount\x18\x05 \x01(\x01R\x06amount\x12!\n" +
+	"\fpayment_date\x18\x06 \x01(\tR\vpaymentDate\x12%\n" +
+	"\x0epayment_status\x18\a \x01(\tR\rpaymentStatus\x12\x18\n" +
+	"\aremarks\x18\b \x01(\tR\aremarks\x12)\n" +
+	"\x10remaining_amount\x18\t \x01(\x01R\x0fremainingAmount\"6\n" +
 	"\x15GetBookingByIDRequest\x12\x1d\n" +
 	"\n" +
 	"booking_id\x18\x01 \x01(\x05R\tbookingId\"L\n" +

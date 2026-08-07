@@ -11,4 +11,4 @@ grpc_details:
   endpoint: "localhost:50051"
 
 http_details:
-  port: ":8083"
+  port: ":8080"

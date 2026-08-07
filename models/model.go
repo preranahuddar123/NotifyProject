@@ -18,6 +18,7 @@ type MeetingDetails struct {
 	MeetingID      int32     `gorm:"column:meeting_id;primaryKey;autoIncrement"`
 	LeadIdentifier string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
 	LeadName       string    `gorm:"column:lead_name;type:varchar(100);not null"`
+	AssignedTo     string    `gorm:"column:assigned_to;type:varchar(100)"`
 	SubStage       string    `gorm:"column:sub_stage;type:enum('SCHEDULED','RESCHEDULED','CANCELLED');not null"`
 	Title          string    `gorm:"column:title;type:varchar(150)"`
 	MeetingDate    time.Time `gorm:"column:meeting_date;type:date"`
@@ -35,6 +36,7 @@ func (MeetingDetails) TableName() string { return "meeting_details" }
 type Successful struct {
 	LeadIdentifier     string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
 	LeadName           string    `gorm:"column:lead_name;type:varchar(100);not null"`
+	AssignedTo         string    `gorm:"column:assigned_to;type:varchar(100)"`
 	NextAction         string    `gorm:"column:next_action;type:varchar(100)"`
 	QuoteLinkGenerated bool      `gorm:"column:quote_link_generated;default:false"`
 	CreatedAt          time.Time `gorm:"column:created_at;autoCreateTime"`
@@ -45,8 +47,9 @@ func (Successful) TableName() string { return "successful" }
 // booking table — standalone, no foreign key constraints
 type Booking struct {
 	BookingID       int32     `gorm:"column:booking_id;primaryKey;autoIncrement"`
-	LeadName	    string    `gorm:"column:lead_name;type:varchar(100);not null"`
+	LeadName        string    `gorm:"column:lead_name;type:varchar(100);not null"`
 	LeadIdentifier  string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
+	AssignedTo      string    `gorm:"column:assigned_to;type:varchar(100)"`
 	PaymentType     string    `gorm:"column:payment_type;type:enum('TOKEN','BOOKING FUll_10');not null"`
 	PaidAmount      float64   `gorm:"column:paid_amount;type:decimal(10,2);not null"`
 	RemainingAmount float64   `gorm:"column:Remaining_amount;type:decimal(10,2);not null"`

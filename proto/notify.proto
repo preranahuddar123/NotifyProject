@@ -20,40 +20,44 @@ message MeetingCancellation {
   int32            meeting_id      = 1;
   string           lead_identifier = 2;
   string           lead_name       = 3;
-  MeetingMilestone milestone       = 4;
-  string           created_at      = 5;
+  string           assigned_to     = 4;
+  MeetingMilestone milestone       = 5;
+  string           created_at      = 6;
 }
 
 message MeetingSuccess {
   string lead_identifier      = 1;
   string lead_name            = 2;
-  string next_action          = 3;
-  bool   quote_link_generated = 4;
-  string created_at           = 5;
+  string assigned_to          = 3;
+  string next_action          = 4;
+  bool   quote_link_generated = 5;
+  string created_at           = 6;
 }
 
 message MeetingScheduled {
   int32            id              = 1;
   string           lead_identifier = 2;
   string           lead_name       = 3;
-  string           title           = 4;
-  string           meeting_date    = 5;
-  string           slot            = 6;
-  string           meeting_type    = 7; // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-  MeetingMilestone milestone       = 8;
-  string           created_at      = 9;
+  string           assigned_to     = 4;
+  string           title           = 5;
+  string           meeting_date    = 6;
+  string           slot            = 7;
+  string           meeting_type    = 8; // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+  MeetingMilestone milestone       = 9;
+  string           created_at      = 10;
 }
 
 message MeetingRescheduled {
   int32            id              = 1;
   string           lead_identifier = 2;
   string           lead_name       = 3;
-  string           title           = 4;
-  string           meeting_date    = 5;
-  string           slot            = 6;
-  string           meeting_type    = 7; // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-  MeetingMilestone milestone       = 8;
-  string           created_at      = 9;
+  string           assigned_to     = 4;
+  string           title           = 5;
+  string           meeting_date    = 6;
+  string           slot            = 7;
+  string           meeting_type    = 8; // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+  MeetingMilestone milestone       = 9;
+  string           created_at      = 10;
 }
 
 // -----------------------------------------------------------------------
@@ -63,7 +67,8 @@ message MeetingRescheduled {
 message CancellationRequest {
   string           lead_identifier = 1;
   string           lead_name       = 2;
-  MeetingMilestone milestone       = 3;
+  string           assigned_to     = 3;
+  MeetingMilestone milestone       = 4;
 }
 
 message GetByMeetingIDRequest {
@@ -81,8 +86,9 @@ message GetByLeadIdentifierRequest {
 message CreateSuccessRequest {
   string lead_identifier      = 1;
   string lead_name            = 2;
-  string next_action          = 3;
-  bool   quote_link_generated = 4;
+  string assigned_to          = 3;
+  string next_action          = 4;
+  bool   quote_link_generated = 5;
 }
 
 // -----------------------------------------------------------------------
@@ -92,10 +98,11 @@ message CreateSuccessRequest {
 message CreateScheduledRequest {
   string           lead_identifier = 1;
   string           lead_name       = 2;
-  string           meeting_date    = 3;
-  string           slot            = 4;
-  string           meeting_type    = 5; // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-  MeetingMilestone milestone       = 6;
+  string           assigned_to     = 3;
+  string           meeting_date    = 4;
+  string           slot            = 5;
+  string           meeting_type    = 6; // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+  MeetingMilestone milestone       = 7;
 }
 
 message GetScheduledByIDRequest {
@@ -113,10 +120,11 @@ message GetScheduledByLeadIdentifierRequest {
 message RescheduledRequest {
   string           lead_identifier = 1;
   string           lead_name       = 2;
-  string           meeting_date    = 3;
-  string           slot            = 4;
-  string           meeting_type    = 5; // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-  MeetingMilestone milestone       = 6;
+  string           assigned_to     = 3;
+  string           meeting_date    = 4;
+  string           slot            = 5;
+  string           meeting_type    = 6; // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+  MeetingMilestone milestone       = 7;
 }
 
 message GetRescheduledByIDRequest {
@@ -203,24 +211,26 @@ message Booking {
   int32  booking_id        = 1;
   string lead_identifier   = 2;
   string lead_name         = 3;
-  string payment_type      = 4; // TOKEN | BOOKING
-  double paid_amount       = 5;
-  double remaining_amount  = 6;
-  string payment_date      = 7; // RFC3339
-  string payment_status    = 8; // PENDING | SUCCESS | FAILED
-  string remarks           = 9;
-  string created_at        = 10;
+  string assigned_to       = 4;
+  string payment_type      = 5; // TOKEN | BOOKING
+  double paid_amount       = 6;
+  double remaining_amount  = 7;
+  string payment_date      = 8; // RFC3339
+  string payment_status    = 9; // PENDING | SUCCESS | FAILED
+  string remarks           = 10;
+  string created_at        = 11;
 }
 
 message CreateBookingRequest {
   string lead_identifier = 1;
   string lead_name       = 2;
-  string payment_type    = 3; // TOKEN | BOOKING
-  double amount          = 4; // paid amount
-  string payment_date    = 5; // RFC3339
-  string payment_status  = 6; // PENDING | SUCCESS | FAILED
-  string remarks         = 7;
-  double remaining_amount = 8;
+  string assigned_to     = 3;
+  string payment_type    = 4; // TOKEN | BOOKING
+  double amount          = 5; // paid amount
+  string payment_date    = 6; // RFC3339
+  string payment_status  = 7; // PENDING | SUCCESS | FAILED
+  string remarks         = 8;
+  double remaining_amount = 9;
 }
 
 message GetBookingByIDRequest {

@@ -68,9 +68,9 @@ func (s *NotifyServiceServer) Cancellation(_ context.Context, req *pb.Cancellati
 	}
 	title := meetingTitle("CANCELLED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, milestone, created_at)
-		 VALUES (?, ?, 'CANCELLED', ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, title, milestoneDBValue(req.Milestone),
+		`INSERT INTO meeting_details (lead_identifier, lead_name, assigned_to, sub_stage, title, milestone, created_at)
+		 VALUES (?, ?, ?, 'CANCELLED', ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, title, milestoneDBValue(req.Milestone),
 	)
 	if err != nil {
 		log.Printf("Failed to create cancellation: %v", err)
@@ -87,12 +87,12 @@ func (s *NotifyServiceServer) GetAllCancellations(_ context.Context, req *pb.Get
 	)
 	if req.LeadIdentifier != "" {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'CANCELLED' AND lead_identifier = ?
 			 ORDER BY created_at DESC`, req.LeadIdentifier)
 	} else {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'CANCELLED' ORDER BY created_at DESC`)
 	}
 	if err != nil {
@@ -132,8 +132,8 @@ func (s *NotifyServiceServer) CreateSuccess(_ context.Context, req *pb.CreateSuc
 		return nil, status.Errorf(codes.InvalidArgument, "next_action is required")
 	}
 	_, err := s.db.Exec(
-		`INSERT INTO successful (lead_identifier, lead_name, next_action, quote_link_generated, created_at) VALUES (?, ?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, req.NextAction, req.QuoteLinkGenerated,
+		`INSERT INTO successful (lead_identifier, lead_name, assigned_to, next_action, quote_link_generated, created_at) VALUES (?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, req.NextAction, req.QuoteLinkGenerated,
 	)
 	if err != nil {
 		log.Printf("Failed to create success record: %v", err)
@@ -143,7 +143,7 @@ func (s *NotifyServiceServer) CreateSuccess(_ context.Context, req *pb.CreateSuc
 }
 
 func (s *NotifyServiceServer) GetAllSuccesses(_ context.Context, req *pb.GetByLeadIdentifierRequest) (*pb.SuccessListResponse, error) {
-	const base = `SELECT lead_identifier, lead_name, next_action, quote_link_generated, created_at FROM successful`
+	const base = `SELECT lead_identifier, lead_name, assigned_to, next_action, quote_link_generated, created_at FROM successful`
 	var (
 		rows *sql.Rows
 		err  error
@@ -197,9 +197,9 @@ func (s *NotifyServiceServer) CreateScheduled(_ context.Context, req *pb.CreateS
 	}
 	title := meetingTitle("SCHEDULED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
-		 VALUES (?, ?, 'SCHEDULED', ?, ?, ?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, title,
+		`INSERT INTO meeting_details (lead_identifier, lead_name,  assigned_to, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
+		 VALUES (?, ?, ?, 'SCHEDULED', ?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, title,
 		req.MeetingDate, req.Slot, req.MeetingType, milestoneDBValue(req.Milestone),
 	)
 	if err != nil {
@@ -217,12 +217,12 @@ func (s *NotifyServiceServer) GetAllScheduled(_ context.Context, req *pb.GetSche
 	)
 	if req.LeadIdentifier != "" {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'SCHEDULED' AND lead_identifier = ?
 			 ORDER BY created_at DESC`, req.LeadIdentifier)
 	} else {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'SCHEDULED' ORDER BY created_at DESC`)
 	}
 	if err != nil {
@@ -269,9 +269,9 @@ func (s *NotifyServiceServer) Rescheduled(_ context.Context, req *pb.Rescheduled
 	}
 	title := meetingTitle("RESCHEDULED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
-		 VALUES (?, ?, 'RESCHEDULED', ?, ?, ?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, title,
+		`INSERT INTO meeting_details (lead_identifier, lead_name,  assigned_to, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
+		 VALUES (?, ?, ?, 'RESCHEDULED', ?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, title,
 		req.MeetingDate, req.Slot, req.MeetingType, milestoneDBValue(req.Milestone),
 	)
 	if err != nil {
@@ -289,12 +289,12 @@ func (s *NotifyServiceServer) GetAllRescheduled(_ context.Context, req *pb.GetRe
 	)
 	if req.LeadIdentifier != "" {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'RESCHEDULED' AND lead_identifier = ?
 			 ORDER BY created_at DESC`, req.LeadIdentifier)
 	} else {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name, assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'RESCHEDULED' ORDER BY created_at DESC`)
 	}
 	if err != nil {
@@ -423,9 +423,9 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 	}
 
 	res, err := s.db.Exec(
-		`INSERT INTO booking (lead_identifier, lead_name, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, paymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
+		`INSERT INTO booking (lead_identifier, lead_name, assigned_to, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, paymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
 	)
 	if err != nil {
 		log.Printf("Failed to create booking: %v", err)
@@ -436,7 +436,7 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 }
 
 func (s *NotifyServiceServer) GetAllBookings(_ context.Context, req *pb.GetBookingByLeadIdentifierRequest) (*pb.BookingListResponse, error) {
-	const base = `SELECT booking_id, lead_identifier, lead_name, payment_type,
+	const base = `SELECT booking_id, lead_identifier, lead_name, assigned_to, payment_type,
 		paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at
 		FROM booking`
 	var (
@@ -505,7 +505,7 @@ func (s *NotifyServiceServer) GetCounts(_ context.Context, _ *pb.CountsRequest) 
 
 func (s *NotifyServiceServer) getCancellationByID(meetingID int32) (*pb.CancellationResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT meeting_id, lead_identifier, lead_name, milestone, created_at
+		`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, milestone, created_at
 		 FROM meeting_details WHERE meeting_id = ? AND sub_stage = 'CANCELLED'`, meetingID)
 	item, err := scanCancellation(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -519,7 +519,7 @@ func (s *NotifyServiceServer) getCancellationByID(meetingID int32) (*pb.Cancella
 
 func (s *NotifyServiceServer) getSuccessByLeadIdentifier(leadIdentifier string) (*pb.SuccessResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT lead_identifier, lead_name, next_action, quote_link_generated, created_at
+		`SELECT lead_identifier, lead_name,  assigned_to, next_action, quote_link_generated, created_at
 		 FROM successful WHERE lead_identifier = ? ORDER BY created_at DESC LIMIT 1`, leadIdentifier)
 	item, err := scanSuccess(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -533,7 +533,7 @@ func (s *NotifyServiceServer) getSuccessByLeadIdentifier(leadIdentifier string) 
 
 func (s *NotifyServiceServer) getScheduledByID(id int32) (*pb.ScheduledResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+		`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 		 FROM meeting_details WHERE meeting_id = ? AND sub_stage = 'SCHEDULED'`, id)
 	item, err := scanScheduled(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -547,7 +547,7 @@ func (s *NotifyServiceServer) getScheduledByID(id int32) (*pb.ScheduledResponse,
 
 func (s *NotifyServiceServer) getRescheduledByID(id int32) (*pb.RescheduledResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+		`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 		 FROM meeting_details WHERE meeting_id = ? AND sub_stage = 'RESCHEDULED'`, id)
 	item, err := scanRescheduled(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -575,7 +575,7 @@ func (s *NotifyServiceServer) getLeadByIdentifier(leadIdentifier string) (*pb.Le
 
 func (s *NotifyServiceServer) getBookingByID(bookingID int32) (*pb.BookingResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT booking_id, lead_identifier, lead_name, payment_type,
+		`SELECT booking_id, lead_identifier, lead_name,  assigned_to, payment_type,
 		        paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at
 		 FROM booking WHERE booking_id = ?`, bookingID)
 	item, err := scanBooking(row.Scan)
@@ -598,7 +598,7 @@ func scanCancellation(fn func(...any) error) (*pb.MeetingCancellation, error) {
 		milestone sql.NullString
 		createdAt sql.NullTime
 	)
-	if err := fn(&m.MeetingId, &m.LeadIdentifier, &m.LeadName, &milestone, &createdAt); err != nil {
+	if err := fn(&m.MeetingId, &m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &milestone, &createdAt); err != nil {
 		return nil, err
 	}
 	m.Milestone = milestoneProtoValue(milestone.String)
@@ -614,7 +614,7 @@ func scanSuccess(fn func(...any) error) (*pb.MeetingSuccess, error) {
 		nextAction sql.NullString
 		createdAt  sql.NullTime
 	)
-	if err := fn(&m.LeadIdentifier, &m.LeadName, &nextAction, &m.QuoteLinkGenerated, &createdAt); err != nil {
+	if err := fn(&m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &nextAction, &m.QuoteLinkGenerated, &createdAt); err != nil {
 		return nil, err
 	}
 	m.NextAction = nextAction.String
@@ -634,7 +634,7 @@ func scanScheduled(fn func(...any) error) (*pb.MeetingScheduled, error) {
 		milestone   sql.NullString
 		createdAt   sql.NullTime
 	)
-	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
+	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
 		return nil, err
 	}
 	m.Title = title.String
@@ -658,7 +658,7 @@ func scanRescheduled(fn func(...any) error) (*pb.MeetingRescheduled, error) {
 		milestone   sql.NullString
 		createdAt   sql.NullTime
 	)
-	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
+	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
 		return nil, err
 	}
 	m.Title = title.String
@@ -674,14 +674,12 @@ func scanRescheduled(fn func(...any) error) (*pb.MeetingRescheduled, error) {
 
 func scanLead(fn func(...any) error) (*pb.Lead, error) {
 	var (
-		m          pb.Lead
-		assignedTo sql.NullString
-		createdAt  sql.NullTime
+		m         pb.Lead
+		createdAt sql.NullTime
 	)
-	if err := fn(&m.LeadIdentifier, &m.LeadName, &m.LeadType, &assignedTo, &createdAt); err != nil {
+	if err := fn(&m.LeadIdentifier, &m.LeadName, &m.LeadType, &m.AssignedTo, &createdAt); err != nil {
 		return nil, err
 	}
-	m.AssignedTo = assignedTo.String
 	if createdAt.Valid {
 		m.CreatedAt = fmtTime(createdAt.Time)
 	}
@@ -697,7 +695,7 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 		createdAt     sql.NullTime
 	)
 	if err := fn(
-		&m.BookingId, &m.LeadIdentifier, &m.LeadName, &m.PaymentType,
+		&m.BookingId, &m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &m.PaymentType,
 		&m.PaidAmount, &m.RemainingAmount, &paymentDate,
 		&paymentStatus, &remarks, &createdAt,
 	); err != nil {
