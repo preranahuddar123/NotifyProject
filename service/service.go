@@ -411,12 +411,13 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 		paymentStatus = "PENDING"
 	}
 
-	// getBookingByID JOINs leadDetails — ensure the lead row exists first
+	// Ensure the lead row exists so foreign key / joins work.
+	// Booking requests don't carry lead_type, so we pass '' and only upsert the name.
 	if _, err := s.db.Exec(
 		`INSERT INTO leadDetails (lead_identifier, lead_name, lead_type, assigned_to, created_at)
-		 VALUES (?, ?, 'ADD_LEAD', '', NOW())
+		 VALUES (?, ?, '', ?, NOW())
 		 ON DUPLICATE KEY UPDATE lead_name = VALUES(lead_name)`,
-		req.LeadIdentifier, req.LeadName,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo,
 	); err != nil {
 		log.Printf("Failed to upsert lead for booking: %v", err)
 		return nil, status.Errorf(codes.Internal, "Failed to ensure lead exists: %v", err)
@@ -690,6 +691,7 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 	var (
 		m             pb.Booking
 		leadName      sql.NullString
+		assignedTo    sql.NullString
 		paymentType   sql.NullString
 		remarks       sql.NullString
 		paymentStatus sql.NullString
@@ -697,13 +699,14 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 		createdAt     sql.NullTime
 	)
 	if err := fn(
-		&m.BookingId, &m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &m.PaymentType,
+		&m.BookingId, &m.LeadIdentifier, &leadName, &assignedTo, &paymentType,
 		&m.PaidAmount, &m.RemainingAmount, &paymentDate,
 		&paymentStatus, &remarks, &createdAt,
 	); err != nil {
 		return nil, err
 	}
 	m.LeadName = leadName.String
+	m.AssignedTo = assignedTo.String
 	m.PaymentType = paymentType.String
 	m.PaymentStatus = paymentStatus.String
 	m.Remarks = remarks.String
