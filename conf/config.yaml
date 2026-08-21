@@ -1,6 +1,6 @@
 mysql_details:
   username: "root"
-  password: "root@00"
+  password: "Root@123"
   address: "localhost"
   port: "3306"
   db_name: "notify_db"

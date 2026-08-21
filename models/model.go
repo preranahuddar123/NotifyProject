@@ -86,3 +86,22 @@ type NotificationRecipient struct {
 }
 
 func (NotificationRecipient) TableName() string { return "notification_recipients" }
+
+// DesignUserNotification is one inbox row per person (fan-out on write).
+type DesignUserNotification struct {
+	ID                 int64      `gorm:"column:id;primaryKey;autoIncrement"`
+	EventID            string     `gorm:"column:event_id;type:varchar(255);uniqueIndex:uk_design_inbox_event_user;not null"`
+	UserID             int32      `gorm:"column:user_id;uniqueIndex:uk_design_inbox_event_user;index:idx_design_inbox_user_created;not null"`
+	RecipientRole      string     `gorm:"column:recipient_role;type:varchar(50)"`
+	LeadID             int32      `gorm:"column:lead_id"`
+	ProjectID          string     `gorm:"column:project_id;type:varchar(100)"`
+	LeadName           string     `gorm:"column:lead_name;type:varchar(255)"`
+	DesignerID         int32      `gorm:"column:designer_id"`
+	NotificationType   string     `gorm:"column:notification_type;type:varchar(30);not null"`
+	NotificationAction string     `gorm:"column:notification_action;type:varchar(30);not null"`
+	Payload            string     `gorm:"column:payload;type:json"`
+	ReadAt             *time.Time `gorm:"column:read_at;index:idx_design_inbox_read_at"`
+	CreatedAt          time.Time  `gorm:"column:created_at;autoCreateTime;index:idx_design_inbox_user_created"`
+}
+
+func (DesignUserNotification) TableName() string { return "design_user_notifications" }
