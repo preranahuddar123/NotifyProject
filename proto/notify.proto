@@ -769,7 +769,40 @@ message DesignP2PResponse {
   Payload payload = 4;
 }
 
-// 16 — Notification Feed
+// 16 — PM Approve / Reject (after DQC2)
+message DesignPMStatusRequest {
+  string project_id = 1;
+  string lead_name = 2;
+  int32 designer_id = 3;
+  string notification_type = 4;
+  string notification_action = 5;
+  string status = 6;
+  string decision_type = 7;
+  string dqc_round = 8;
+  string designer_name = 9;
+  string approver_name = 10;
+  string created_at = 11;
+  string rejection_reason = 12;
+}
+
+message DesignPMStatusResponse {
+  string project_id = 1;
+  string lead_name = 2;
+  int32 designer_id = 3;
+
+  message Payload {
+    string status = 1;
+    string decision_type = 2;
+    string dqc_round = 3;
+    string designer_name = 4;
+    string approver_name = 5;
+    string rejection_reason = 6;
+  }
+
+  Payload payload = 4;
+}
+
+// 17 — Notification Feed
 message DesignNotificationFeedRequest {
   string since = 1;
   int32 limit = 2;
@@ -1118,7 +1151,17 @@ rpc CreateDesignP2P(
   };
 }
 
-// 16 — Notification Feed
+// 16 — PM Approve / Reject (after DQC2)
+rpc CreateDesignPMStatus(
+    DesignPMStatusRequest
+) returns (DesignPMStatusResponse) {
+  option (google.api.http) = {
+    post: "/v1/design/notifications/pm/status"
+    body: "*"
+  };
+}
+
+// 17 — Notification Feed
 rpc GetDesignNotificationFeed(
     DesignNotificationFeedRequest
 ) returns (DesignNotificationFeedResponse) {
