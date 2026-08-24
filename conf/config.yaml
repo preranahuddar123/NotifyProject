@@ -1,7 +1,7 @@
 mysql_details:
-  username: "admin"
-  password: "Hubinterior2019"
-  address: "database-1.cl002gu0o5ft.ap-south-2.rds.amazonaws.com"
+  username: "root"
+  password: "Root@123"
+  address: "localhost"
   port: "3306"
   db_name: "notify_db"
 
@@ -11,4 +11,4 @@ grpc_details:
   endpoint: "localhost:50051"
 
 http_details:
-  port: ":8083"
+  port: ":8080"

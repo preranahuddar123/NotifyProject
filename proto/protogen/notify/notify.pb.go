@@ -71,13 +71,66 @@ func (MeetingMilestone) EnumDescriptor() ([]byte, []int) {
 	return file_notify_proto_rawDescGZIP(), []int{0}
 }
 
+type PaymentType int32
+
+const (
+	PaymentType_PAYMENT_TYPE_UNSPECIFIED PaymentType = 0
+	PaymentType_PRE_10_PERCENT           PaymentType = 1
+	PaymentType_MILESTONE_10_PERCENT     PaymentType = 2
+	PaymentType_MILESTONE_40_PERCENT     PaymentType = 3
+)
+
+// Enum value maps for PaymentType.
+var (
+	PaymentType_name = map[int32]string{
+		0: "PAYMENT_TYPE_UNSPECIFIED",
+		1: "PRE_10_PERCENT",
+		2: "MILESTONE_10_PERCENT",
+		3: "MILESTONE_40_PERCENT",
+	}
+	PaymentType_value = map[string]int32{
+		"PAYMENT_TYPE_UNSPECIFIED": 0,
+		"PRE_10_PERCENT":           1,
+		"MILESTONE_10_PERCENT":     2,
+		"MILESTONE_40_PERCENT":     3,
+	}
+)
+
+func (x PaymentType) Enum() *PaymentType {
+	p := new(PaymentType)
+	*p = x
+	return p
+}
+
+func (x PaymentType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PaymentType) Descriptor() protoreflect.EnumDescriptor {
+	return file_notify_proto_enumTypes[1].Descriptor()
+}
+
+func (PaymentType) Type() protoreflect.EnumType {
+	return &file_notify_proto_enumTypes[1]
+}
+
+func (x PaymentType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PaymentType.Descriptor instead.
+func (PaymentType) EnumDescriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{1}
+}
+
 type MeetingCancellation struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	MeetingId      int32                  `protobuf:"varint,1,opt,name=meeting_id,json=meetingId,proto3" json:"meeting_id,omitempty"`
 	LeadIdentifier string                 `protobuf:"bytes,2,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	Milestone      MeetingMilestone       `protobuf:"varint,4,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,4,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Milestone      MeetingMilestone       `protobuf:"varint,5,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -133,6 +186,13 @@ func (x *MeetingCancellation) GetLeadName() string {
 	return ""
 }
 
+func (x *MeetingCancellation) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *MeetingCancellation) GetMilestone() MeetingMilestone {
 	if x != nil {
 		return x.Milestone
@@ -150,9 +210,11 @@ func (x *MeetingCancellation) GetCreatedAt() string {
 type MeetingSuccess struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier     string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
-	NextAction         string                 `protobuf:"bytes,2,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
-	QuoteLinkGenerated bool                   `protobuf:"varint,3,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
-	CreatedAt          string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	AssignedTo         string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	NextAction         string                 `protobuf:"bytes,4,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,5,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -194,6 +256,20 @@ func (x *MeetingSuccess) GetLeadIdentifier() string {
 	return ""
 }
 
+func (x *MeetingSuccess) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *MeetingSuccess) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *MeetingSuccess) GetNextAction() string {
 	if x != nil {
 		return x.NextAction
@@ -220,12 +296,13 @@ type MeetingScheduled struct {
 	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	LeadIdentifier string                 `protobuf:"bytes,2,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	Title          string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	MeetingDate    string                 `protobuf:"bytes,5,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
-	Slot           string                 `protobuf:"bytes,6,opt,name=slot,proto3" json:"slot,omitempty"`
-	MeetingType    string                 `protobuf:"bytes,7,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-	Milestone      MeetingMilestone       `protobuf:"varint,8,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,4,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Title          string                 `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
+	MeetingDate    string                 `protobuf:"bytes,6,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
+	Slot           string                 `protobuf:"bytes,7,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType    string                 `protobuf:"bytes,8,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+	Milestone      MeetingMilestone       `protobuf:"varint,9,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -281,6 +358,13 @@ func (x *MeetingScheduled) GetLeadName() string {
 	return ""
 }
 
+func (x *MeetingScheduled) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *MeetingScheduled) GetTitle() string {
 	if x != nil {
 		return x.Title
@@ -328,12 +412,13 @@ type MeetingRescheduled struct {
 	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	LeadIdentifier string                 `protobuf:"bytes,2,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	Title          string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	MeetingDate    string                 `protobuf:"bytes,5,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
-	Slot           string                 `protobuf:"bytes,6,opt,name=slot,proto3" json:"slot,omitempty"`
-	MeetingType    string                 `protobuf:"bytes,7,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-	Milestone      MeetingMilestone       `protobuf:"varint,8,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,4,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Title          string                 `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
+	MeetingDate    string                 `protobuf:"bytes,6,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
+	Slot           string                 `protobuf:"bytes,7,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType    string                 `protobuf:"bytes,8,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+	Milestone      MeetingMilestone       `protobuf:"varint,9,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -389,6 +474,13 @@ func (x *MeetingRescheduled) GetLeadName() string {
 	return ""
 }
 
+func (x *MeetingRescheduled) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *MeetingRescheduled) GetTitle() string {
 	if x != nil {
 		return x.Title
@@ -435,7 +527,8 @@ type CancellationRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	Milestone      MeetingMilestone       `protobuf:"varint,3,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Milestone      MeetingMilestone       `protobuf:"varint,4,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -480,6 +573,13 @@ func (x *CancellationRequest) GetLeadIdentifier() string {
 func (x *CancellationRequest) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *CancellationRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -582,8 +682,10 @@ func (x *GetByLeadIdentifierRequest) GetLeadIdentifier() string {
 type CreateSuccessRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier     string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
-	NextAction         string                 `protobuf:"bytes,2,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
-	QuoteLinkGenerated bool                   `protobuf:"varint,3,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	AssignedTo         string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	NextAction         string                 `protobuf:"bytes,4,opt,name=next_action,json=nextAction,proto3" json:"next_action,omitempty"`
+	QuoteLinkGenerated bool                   `protobuf:"varint,5,opt,name=quote_link_generated,json=quoteLinkGenerated,proto3" json:"quote_link_generated,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -625,6 +727,20 @@ func (x *CreateSuccessRequest) GetLeadIdentifier() string {
 	return ""
 }
 
+func (x *CreateSuccessRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *CreateSuccessRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
 func (x *CreateSuccessRequest) GetNextAction() string {
 	if x != nil {
 		return x.NextAction
@@ -643,10 +759,11 @@ type CreateScheduledRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	MeetingDate    string                 `protobuf:"bytes,3,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
-	Slot           string                 `protobuf:"bytes,4,opt,name=slot,proto3" json:"slot,omitempty"`
-	MeetingType    string                 `protobuf:"bytes,5,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-	Milestone      MeetingMilestone       `protobuf:"varint,6,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	MeetingDate    string                 `protobuf:"bytes,4,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
+	Slot           string                 `protobuf:"bytes,5,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType    string                 `protobuf:"bytes,6,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+	Milestone      MeetingMilestone       `protobuf:"varint,7,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -691,6 +808,13 @@ func (x *CreateScheduledRequest) GetLeadIdentifier() string {
 func (x *CreateScheduledRequest) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *CreateScheduledRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -815,10 +939,11 @@ type RescheduledRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName       string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	MeetingDate    string                 `protobuf:"bytes,3,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
-	Slot           string                 `protobuf:"bytes,4,opt,name=slot,proto3" json:"slot,omitempty"`
-	MeetingType    string                 `protobuf:"bytes,5,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
-	Milestone      MeetingMilestone       `protobuf:"varint,6,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
+	AssignedTo     string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	MeetingDate    string                 `protobuf:"bytes,4,opt,name=meeting_date,json=meetingDate,proto3" json:"meeting_date,omitempty"`
+	Slot           string                 `protobuf:"bytes,5,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType    string                 `protobuf:"bytes,6,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"` // VIRTUAL_MEETING | SHOWROOM_VISIT | SITE_VISIT
+	Milestone      MeetingMilestone       `protobuf:"varint,7,opt,name=milestone,proto3,enum=notify.MeetingMilestone" json:"milestone,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -863,6 +988,13 @@ func (x *RescheduledRequest) GetLeadIdentifier() string {
 func (x *RescheduledRequest) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *RescheduledRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -1617,13 +1749,14 @@ type Booking struct {
 	BookingId       int32                  `protobuf:"varint,1,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
 	LeadIdentifier  string                 `protobuf:"bytes,2,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName        string                 `protobuf:"bytes,3,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	PaymentType     string                 `protobuf:"bytes,4,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"` // TOKEN | BOOKING
-	PaidAmount      float64                `protobuf:"fixed64,5,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
-	RemainingAmount float64                `protobuf:"fixed64,6,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
-	PaymentDate     string                 `protobuf:"bytes,7,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
-	PaymentStatus   string                 `protobuf:"bytes,8,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
-	Remarks         string                 `protobuf:"bytes,9,opt,name=remarks,proto3" json:"remarks,omitempty"`
-	CreatedAt       string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AssignedTo      string                 `protobuf:"bytes,4,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	PaymentType     string                 `protobuf:"bytes,5,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"` // TOKEN | BOOKING
+	PaidAmount      float64                `protobuf:"fixed64,6,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
+	RemainingAmount float64                `protobuf:"fixed64,7,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
+	PaymentDate     string                 `protobuf:"bytes,8,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
+	PaymentStatus   string                 `protobuf:"bytes,9,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
+	Remarks         string                 `protobuf:"bytes,10,opt,name=remarks,proto3" json:"remarks,omitempty"`
+	CreatedAt       string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1675,6 +1808,13 @@ func (x *Booking) GetLeadIdentifier() string {
 func (x *Booking) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *Booking) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -1732,12 +1872,13 @@ type CreateBookingRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	LeadIdentifier  string                 `protobuf:"bytes,1,opt,name=lead_identifier,json=leadIdentifier,proto3" json:"lead_identifier,omitempty"`
 	LeadName        string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
-	PaymentType     string                 `protobuf:"bytes,3,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"`       // TOKEN | BOOKING
-	Amount          float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount,omitempty"`                                  // paid amount
-	PaymentDate     string                 `protobuf:"bytes,5,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
-	PaymentStatus   string                 `protobuf:"bytes,6,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
-	Remarks         string                 `protobuf:"bytes,7,opt,name=remarks,proto3" json:"remarks,omitempty"`
-	RemainingAmount float64                `protobuf:"fixed64,8,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
+	AssignedTo      string                 `protobuf:"bytes,3,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	PaymentType     string                 `protobuf:"bytes,4,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"`       // TOKEN | BOOKING
+	Amount          float64                `protobuf:"fixed64,5,opt,name=amount,proto3" json:"amount,omitempty"`                                  // paid amount
+	PaymentDate     string                 `protobuf:"bytes,6,opt,name=payment_date,json=paymentDate,proto3" json:"payment_date,omitempty"`       // RFC3339
+	PaymentStatus   string                 `protobuf:"bytes,7,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"` // PENDING | SUCCESS | FAILED
+	Remarks         string                 `protobuf:"bytes,8,opt,name=remarks,proto3" json:"remarks,omitempty"`
+	RemainingAmount float64                `protobuf:"fixed64,9,opt,name=remaining_amount,json=remainingAmount,proto3" json:"remaining_amount,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1782,6 +1923,13 @@ func (x *CreateBookingRequest) GetLeadIdentifier() string {
 func (x *CreateBookingRequest) GetLeadName() string {
 	if x != nil {
 		return x.LeadName
+	}
+	return ""
+}
+
+func (x *CreateBookingRequest) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
 	}
 	return ""
 }
@@ -2124,81 +2272,5097 @@ func (x *CountsResponse) GetTotalBookings() int32 {
 	return 0
 }
 
+type DesignLeadPre10Request struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	ProjectId     string                          `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                          `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                           `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignLeadPre10Request_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignLeadPre10Request) Reset() {
+	*x = DesignLeadPre10Request{}
+	mi := &file_notify_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLeadPre10Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLeadPre10Request) ProtoMessage() {}
+
+func (x *DesignLeadPre10Request) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLeadPre10Request.ProtoReflect.Descriptor instead.
+func (*DesignLeadPre10Request) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *DesignLeadPre10Request) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Request) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Request) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignLeadPre10Request) GetPayload() *DesignLeadPre10Request_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+type DesignLeadPre10Response struct {
+	state              protoimpl.MessageState           `protogen:"open.v1"`
+	ProjectId          string                           `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                           `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                            `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                           `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                           `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Payload            *DesignLeadPre10Response_Payload `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                           `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignLeadPre10Response) Reset() {
+	*x = DesignLeadPre10Response{}
+	mi := &file_notify_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLeadPre10Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLeadPre10Response) ProtoMessage() {}
+
+func (x *DesignLeadPre10Response) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLeadPre10Response.ProtoReflect.Descriptor instead.
+func (*DesignLeadPre10Response) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *DesignLeadPre10Response) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Response) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Response) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignLeadPre10Response) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Response) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Response) GetPayload() *DesignLeadPre10Response_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *DesignLeadPre10Response) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+// 02 — 10–20% Phase Entered
+type DesignLead1020Request struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	ProjectId     string                         `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                         `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                          `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignLead1020Request_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignLead1020Request) Reset() {
+	*x = DesignLead1020Request{}
+	mi := &file_notify_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLead1020Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLead1020Request) ProtoMessage() {}
+
+func (x *DesignLead1020Request) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLead1020Request.ProtoReflect.Descriptor instead.
+func (*DesignLead1020Request) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *DesignLead1020Request) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignLead1020Request) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignLead1020Request) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignLead1020Request) GetPayload() *DesignLead1020Request_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+type DesignLead1020Response struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Data          *DesignLead1020Response_Data `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignLead1020Response) Reset() {
+	*x = DesignLead1020Response{}
+	mi := &file_notify_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLead1020Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLead1020Response) ProtoMessage() {}
+
+func (x *DesignLead1020Response) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLead1020Response.ProtoReflect.Descriptor instead.
+func (*DesignLead1020Response) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *DesignLead1020Response) GetData() *DesignLead1020Response_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// 03 — Milestone Completed
+type DesignMilestoneRequest struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	ProjectId     string                          `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                          `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                           `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignMilestoneRequest_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMilestoneRequest) Reset() {
+	*x = DesignMilestoneRequest{}
+	mi := &file_notify_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMilestoneRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMilestoneRequest) ProtoMessage() {}
+
+func (x *DesignMilestoneRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMilestoneRequest.ProtoReflect.Descriptor instead.
+func (*DesignMilestoneRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *DesignMilestoneRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMilestoneRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMilestoneRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignMilestoneRequest) GetPayload() *DesignMilestoneRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+type DesignMilestoneResponse struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Data          *DesignMilestoneResponse_Data `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMilestoneResponse) Reset() {
+	*x = DesignMilestoneResponse{}
+	mi := &file_notify_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMilestoneResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMilestoneResponse) ProtoMessage() {}
+
+func (x *DesignMilestoneResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMilestoneResponse.ProtoReflect.Descriptor instead.
+func (*DesignMilestoneResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *DesignMilestoneResponse) GetData() *DesignMilestoneResponse_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// 04 — Payment Requested
+type DesignPaymentRequestRequest struct {
+	state         protoimpl.MessageState               `protogen:"open.v1"`
+	ProjectId     string                               `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                               `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                                `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignPaymentRequestRequest_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignPaymentRequestRequest) Reset() {
+	*x = DesignPaymentRequestRequest{}
+	mi := &file_notify_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignPaymentRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignPaymentRequestRequest) ProtoMessage() {}
+
+func (x *DesignPaymentRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignPaymentRequestRequest.ProtoReflect.Descriptor instead.
+func (*DesignPaymentRequestRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *DesignPaymentRequestRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignPaymentRequestRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignPaymentRequestRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignPaymentRequestRequest) GetPayload() *DesignPaymentRequestRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+type DesignPaymentRequestResponse struct {
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	Data          *DesignPaymentRequestResponse_Data `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignPaymentRequestResponse) Reset() {
+	*x = DesignPaymentRequestResponse{}
+	mi := &file_notify_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignPaymentRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignPaymentRequestResponse) ProtoMessage() {}
+
+func (x *DesignPaymentRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignPaymentRequestResponse.ProtoReflect.Descriptor instead.
+func (*DesignPaymentRequestResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *DesignPaymentRequestResponse) GetData() *DesignPaymentRequestResponse_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// 05 — Payment / Sales Closure Status
+type DesignPaymentStatusRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Status             string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	DecisionType       string                 `protobuf:"bytes,7,opt,name=decision_type,json=decisionType,proto3" json:"decision_type,omitempty"`
+	PaymentType        string                 `protobuf:"bytes,8,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"`
+	MilestoneContext   string                 `protobuf:"bytes,9,opt,name=milestone_context,json=milestoneContext,proto3" json:"milestone_context,omitempty"`
+	ApproverName       string                 `protobuf:"bytes,10,opt,name=approver_name,json=approverName,proto3" json:"approver_name,omitempty"`
+	Amount             float64                `protobuf:"fixed64,11,opt,name=amount,proto3" json:"amount,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	RejectionReason    string                 `protobuf:"bytes,13,opt,name=rejection_reason,json=rejectionReason,proto3" json:"rejection_reason,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignPaymentStatusRequest) Reset() {
+	*x = DesignPaymentStatusRequest{}
+	mi := &file_notify_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignPaymentStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignPaymentStatusRequest) ProtoMessage() {}
+
+func (x *DesignPaymentStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignPaymentStatusRequest.ProtoReflect.Descriptor instead.
+func (*DesignPaymentStatusRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *DesignPaymentStatusRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignPaymentStatusRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetDecisionType() string {
+	if x != nil {
+		return x.DecisionType
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetPaymentType() string {
+	if x != nil {
+		return x.PaymentType
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetMilestoneContext() string {
+	if x != nil {
+		return x.MilestoneContext
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetApproverName() string {
+	if x != nil {
+		return x.ApproverName
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *DesignPaymentStatusRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusRequest) GetRejectionReason() string {
+	if x != nil {
+		return x.RejectionReason
+	}
+	return ""
+}
+
+type DesignPaymentStatusResponse struct {
+	state         protoimpl.MessageState               `protogen:"open.v1"`
+	ProjectId     string                               `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                               `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                                `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignPaymentStatusResponse_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignPaymentStatusResponse) Reset() {
+	*x = DesignPaymentStatusResponse{}
+	mi := &file_notify_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignPaymentStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignPaymentStatusResponse) ProtoMessage() {}
+
+func (x *DesignPaymentStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignPaymentStatusResponse.ProtoReflect.Descriptor instead.
+func (*DesignPaymentStatusResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *DesignPaymentStatusResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusResponse) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignPaymentStatusResponse) GetPayload() *DesignPaymentStatusResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+type DesignDQCRequestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                  `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	DqcRound      string                 `protobuf:"bytes,4,opt,name=dqc_round,json=dqcRound,proto3" json:"dqc_round,omitempty"`
+	ReviewId      int32                  `protobuf:"varint,5,opt,name=review_id,json=reviewId,proto3" json:"review_id,omitempty"`
+	DesignerName  string                 `protobuf:"bytes,6,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignDQCRequestRequest) Reset() {
+	*x = DesignDQCRequestRequest{}
+	mi := &file_notify_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignDQCRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignDQCRequestRequest) ProtoMessage() {}
+
+func (x *DesignDQCRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignDQCRequestRequest.ProtoReflect.Descriptor instead.
+func (*DesignDQCRequestRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *DesignDQCRequestRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignDQCRequestRequest) GetDqcRound() string {
+	if x != nil {
+		return x.DqcRound
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestRequest) GetReviewId() int32 {
+	if x != nil {
+		return x.ReviewId
+	}
+	return 0
+}
+
+func (x *DesignDQCRequestRequest) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+type DesignDQCRequestResponse struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	Data          *DesignDQCRequestResponse_Data `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignDQCRequestResponse) Reset() {
+	*x = DesignDQCRequestResponse{}
+	mi := &file_notify_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignDQCRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignDQCRequestResponse) ProtoMessage() {}
+
+func (x *DesignDQCRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignDQCRequestResponse.ProtoReflect.Descriptor instead.
+func (*DesignDQCRequestResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *DesignDQCRequestResponse) GetData() *DesignDQCRequestResponse_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// 07 — DQC Status
+type DesignDQCStatusRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Status             string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	DecisionType       string                 `protobuf:"bytes,7,opt,name=decision_type,json=decisionType,proto3" json:"decision_type,omitempty"`
+	DqcRound           string                 `protobuf:"bytes,8,opt,name=dqc_round,json=dqcRound,proto3" json:"dqc_round,omitempty"`
+	DesignerName       string                 `protobuf:"bytes,9,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	RejectionReason    string                 `protobuf:"bytes,11,opt,name=rejection_reason,json=rejectionReason,proto3" json:"rejection_reason,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignDQCStatusRequest) Reset() {
+	*x = DesignDQCStatusRequest{}
+	mi := &file_notify_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignDQCStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignDQCStatusRequest) ProtoMessage() {}
+
+func (x *DesignDQCStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignDQCStatusRequest.ProtoReflect.Descriptor instead.
+func (*DesignDQCStatusRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *DesignDQCStatusRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignDQCStatusRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetDecisionType() string {
+	if x != nil {
+		return x.DecisionType
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetDqcRound() string {
+	if x != nil {
+		return x.DqcRound
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusRequest) GetRejectionReason() string {
+	if x != nil {
+		return x.RejectionReason
+	}
+	return ""
+}
+
+type DesignDQCStatusResponse struct {
+	state         protoimpl.MessageState           `protogen:"open.v1"`
+	ProjectId     string                           `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                           `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                            `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignDQCStatusResponse_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignDQCStatusResponse) Reset() {
+	*x = DesignDQCStatusResponse{}
+	mi := &file_notify_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignDQCStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignDQCStatusResponse) ProtoMessage() {}
+
+func (x *DesignDQCStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignDQCStatusResponse.ProtoReflect.Descriptor instead.
+func (*DesignDQCStatusResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *DesignDQCStatusResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusResponse) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignDQCStatusResponse) GetPayload() *DesignDQCStatusResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 08 — MMT Visit Requested
+type DesignMMTRequestRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	MmtScope           string                 `protobuf:"bytes,6,opt,name=mmt_scope,json=mmtScope,proto3" json:"mmt_scope,omitempty"`
+	VisitDate          string                 `protobuf:"bytes,7,opt,name=visit_date,json=visitDate,proto3" json:"visit_date,omitempty"`
+	VisitTime          string                 `protobuf:"bytes,8,opt,name=visit_time,json=visitTime,proto3" json:"visit_time,omitempty"`
+	MmtManagerId       int32                  `protobuf:"varint,9,opt,name=mmt_manager_id,json=mmtManagerId,proto3" json:"mmt_manager_id,omitempty"`
+	DesignerName       string                 `protobuf:"bytes,10,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	MmtManagerName     string                 `protobuf:"bytes,11,opt,name=mmt_manager_name,json=mmtManagerName,proto3" json:"mmt_manager_name,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignMMTRequestRequest) Reset() {
+	*x = DesignMMTRequestRequest{}
+	mi := &file_notify_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTRequestRequest) ProtoMessage() {}
+
+func (x *DesignMMTRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTRequestRequest.ProtoReflect.Descriptor instead.
+func (*DesignMMTRequestRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *DesignMMTRequestRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignMMTRequestRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetMmtScope() string {
+	if x != nil {
+		return x.MmtScope
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetVisitDate() string {
+	if x != nil {
+		return x.VisitDate
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetVisitTime() string {
+	if x != nil {
+		return x.VisitTime
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetMmtManagerId() int32 {
+	if x != nil {
+		return x.MmtManagerId
+	}
+	return 0
+}
+
+func (x *DesignMMTRequestRequest) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetMmtManagerName() string {
+	if x != nil {
+		return x.MmtManagerName
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignMMTRequestResponse struct {
+	state         protoimpl.MessageState            `protogen:"open.v1"`
+	ProjectId     string                            `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                            `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                             `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignMMTRequestResponse_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMMTRequestResponse) Reset() {
+	*x = DesignMMTRequestResponse{}
+	mi := &file_notify_proto_msgTypes[50]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTRequestResponse) ProtoMessage() {}
+
+func (x *DesignMMTRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[50]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTRequestResponse.ProtoReflect.Descriptor instead.
+func (*DesignMMTRequestResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{50}
+}
+
+func (x *DesignMMTRequestResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestResponse) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignMMTRequestResponse) GetPayload() *DesignMMTRequestResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 09 — MMT Executive Assigned
+type DesignMMTAssignRequest struct {
+	state              protoimpl.MessageState          `protogen:"open.v1"`
+	ProjectId          string                          `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                          `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                           `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                          `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                          `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Payload            *DesignMMTAssignRequest_Payload `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                          `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignMMTAssignRequest) Reset() {
+	*x = DesignMMTAssignRequest{}
+	mi := &file_notify_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTAssignRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTAssignRequest) ProtoMessage() {}
+
+func (x *DesignMMTAssignRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTAssignRequest.ProtoReflect.Descriptor instead.
+func (*DesignMMTAssignRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{51}
+}
+
+func (x *DesignMMTAssignRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignMMTAssignRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignRequest) GetPayload() *DesignMMTAssignRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *DesignMMTAssignRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignMMTAssignResponse struct {
+	state         protoimpl.MessageState           `protogen:"open.v1"`
+	ProjectId     string                           `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                           `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                            `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignMMTAssignResponse_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMMTAssignResponse) Reset() {
+	*x = DesignMMTAssignResponse{}
+	mi := &file_notify_proto_msgTypes[52]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTAssignResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTAssignResponse) ProtoMessage() {}
+
+func (x *DesignMMTAssignResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[52]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTAssignResponse.ProtoReflect.Descriptor instead.
+func (*DesignMMTAssignResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{52}
+}
+
+func (x *DesignMMTAssignResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignResponse) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignMMTAssignResponse) GetPayload() *DesignMMTAssignResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 10 — MMT Documents Ready
+type DesignMMTDocReadyRequest struct {
+	state              protoimpl.MessageState            `protogen:"open.v1"`
+	ProjectId          string                            `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                            `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                             `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                            `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                            `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Payload            *DesignMMTDocReadyRequest_Payload `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                            `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignMMTDocReadyRequest) Reset() {
+	*x = DesignMMTDocReadyRequest{}
+	mi := &file_notify_proto_msgTypes[53]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTDocReadyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTDocReadyRequest) ProtoMessage() {}
+
+func (x *DesignMMTDocReadyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[53]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTDocReadyRequest.ProtoReflect.Descriptor instead.
+func (*DesignMMTDocReadyRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{53}
+}
+
+func (x *DesignMMTDocReadyRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignMMTDocReadyRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyRequest) GetPayload() *DesignMMTDocReadyRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *DesignMMTDocReadyRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignMMTDocReadyResponse struct {
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	ProjectId     string                             `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                             `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	Payload       *DesignMMTDocReadyResponse_Payload `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMMTDocReadyResponse) Reset() {
+	*x = DesignMMTDocReadyResponse{}
+	mi := &file_notify_proto_msgTypes[54]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTDocReadyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTDocReadyResponse) ProtoMessage() {}
+
+func (x *DesignMMTDocReadyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[54]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTDocReadyResponse.ProtoReflect.Descriptor instead.
+func (*DesignMMTDocReadyResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{54}
+}
+
+func (x *DesignMMTDocReadyResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyResponse) GetPayload() *DesignMMTDocReadyResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 11 — Design Meeting Scheduled
+type DesignMeetingRequest struct {
+	state              protoimpl.MessageState     `protogen:"open.v1"`
+	ProjectId          string                     `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                     `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                      `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                     `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                     `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	MeetingType        string                     `protobuf:"bytes,6,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"`
+	Mod                string                     `protobuf:"bytes,7,opt,name=mod,proto3" json:"mod,omitempty"`
+	Slot               *DesignMeetingRequest_Slot `protobuf:"bytes,8,opt,name=slot,proto3" json:"slot,omitempty"`
+	CreatedAt          string                     `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignMeetingRequest) Reset() {
+	*x = DesignMeetingRequest{}
+	mi := &file_notify_proto_msgTypes[55]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMeetingRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMeetingRequest) ProtoMessage() {}
+
+func (x *DesignMeetingRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[55]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMeetingRequest.ProtoReflect.Descriptor instead.
+func (*DesignMeetingRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{55}
+}
+
+func (x *DesignMeetingRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMeetingRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMeetingRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignMeetingRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignMeetingRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignMeetingRequest) GetMeetingType() string {
+	if x != nil {
+		return x.MeetingType
+	}
+	return ""
+}
+
+func (x *DesignMeetingRequest) GetMod() string {
+	if x != nil {
+		return x.Mod
+	}
+	return ""
+}
+
+func (x *DesignMeetingRequest) GetSlot() *DesignMeetingRequest_Slot {
+	if x != nil {
+		return x.Slot
+	}
+	return nil
+}
+
+func (x *DesignMeetingRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignMeetingResponse struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	ProjectId     string                         `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                         `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	Payload       *DesignMeetingResponse_Payload `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMeetingResponse) Reset() {
+	*x = DesignMeetingResponse{}
+	mi := &file_notify_proto_msgTypes[56]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMeetingResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMeetingResponse) ProtoMessage() {}
+
+func (x *DesignMeetingResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[56]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMeetingResponse.ProtoReflect.Descriptor instead.
+func (*DesignMeetingResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{56}
+}
+
+func (x *DesignMeetingResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMeetingResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMeetingResponse) GetPayload() *DesignMeetingResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 12 — Designer Reassignment
+type DesignAssignDesignerRequest struct {
+	state              protoimpl.MessageState               `protogen:"open.v1"`
+	ProjectId          string                               `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                               `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	NotificationType   string                               `protobuf:"bytes,3,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                               `protobuf:"bytes,4,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Payload            *DesignAssignDesignerRequest_Payload `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                               `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignAssignDesignerRequest) Reset() {
+	*x = DesignAssignDesignerRequest{}
+	mi := &file_notify_proto_msgTypes[57]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignAssignDesignerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignAssignDesignerRequest) ProtoMessage() {}
+
+func (x *DesignAssignDesignerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[57]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignAssignDesignerRequest.ProtoReflect.Descriptor instead.
+func (*DesignAssignDesignerRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{57}
+}
+
+func (x *DesignAssignDesignerRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerRequest) GetPayload() *DesignAssignDesignerRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *DesignAssignDesignerRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignAssignDesignerResponse struct {
+	state         protoimpl.MessageState                `protogen:"open.v1"`
+	ProjectId     string                                `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                                `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	Payload       *DesignAssignDesignerResponse_Payload `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignAssignDesignerResponse) Reset() {
+	*x = DesignAssignDesignerResponse{}
+	mi := &file_notify_proto_msgTypes[58]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignAssignDesignerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignAssignDesignerResponse) ProtoMessage() {}
+
+func (x *DesignAssignDesignerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[58]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignAssignDesignerResponse.ProtoReflect.Descriptor instead.
+func (*DesignAssignDesignerResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{58}
+}
+
+func (x *DesignAssignDesignerResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerResponse) GetPayload() *DesignAssignDesignerResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 13 — PM Assignment
+type DesignAssignPMRequest struct {
+	state              protoimpl.MessageState         `protogen:"open.v1"`
+	ProjectId          string                         `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                         `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                          `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                         `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                         `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Payload            *DesignAssignPMRequest_Payload `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                         `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignAssignPMRequest) Reset() {
+	*x = DesignAssignPMRequest{}
+	mi := &file_notify_proto_msgTypes[59]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignAssignPMRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignAssignPMRequest) ProtoMessage() {}
+
+func (x *DesignAssignPMRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[59]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignAssignPMRequest.ProtoReflect.Descriptor instead.
+func (*DesignAssignPMRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{59}
+}
+
+func (x *DesignAssignPMRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignAssignPMRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignAssignPMRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignAssignPMRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignAssignPMRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignAssignPMRequest) GetPayload() *DesignAssignPMRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *DesignAssignPMRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignAssignPMResponse struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	ProjectId     string                          `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                          `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                           `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignAssignPMResponse_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignAssignPMResponse) Reset() {
+	*x = DesignAssignPMResponse{}
+	mi := &file_notify_proto_msgTypes[60]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignAssignPMResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignAssignPMResponse) ProtoMessage() {}
+
+func (x *DesignAssignPMResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[60]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignAssignPMResponse.ProtoReflect.Descriptor instead.
+func (*DesignAssignPMResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{60}
+}
+
+func (x *DesignAssignPMResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignAssignPMResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignAssignPMResponse) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignAssignPMResponse) GetPayload() *DesignAssignPMResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 14 — New Quote
+type DesignQuoteRequest struct {
+	state              protoimpl.MessageState      `protogen:"open.v1"`
+	ProjectId          string                      `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                      `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                       `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                      `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                      `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Payload            *DesignQuoteRequest_Payload `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                      `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignQuoteRequest) Reset() {
+	*x = DesignQuoteRequest{}
+	mi := &file_notify_proto_msgTypes[61]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignQuoteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignQuoteRequest) ProtoMessage() {}
+
+func (x *DesignQuoteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[61]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignQuoteRequest.ProtoReflect.Descriptor instead.
+func (*DesignQuoteRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{61}
+}
+
+func (x *DesignQuoteRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignQuoteRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignQuoteRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignQuoteRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignQuoteRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignQuoteRequest) GetPayload() *DesignQuoteRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *DesignQuoteRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignQuoteResponse struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	ProjectId     string                       `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                       `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	Payload       *DesignQuoteResponse_Payload `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignQuoteResponse) Reset() {
+	*x = DesignQuoteResponse{}
+	mi := &file_notify_proto_msgTypes[62]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignQuoteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignQuoteResponse) ProtoMessage() {}
+
+func (x *DesignQuoteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[62]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignQuoteResponse.ProtoReflect.Descriptor instead.
+func (*DesignQuoteResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{62}
+}
+
+func (x *DesignQuoteResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignQuoteResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignQuoteResponse) GetPayload() *DesignQuoteResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 15 — P2P Completed
+type DesignP2PRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	DesignerName       string                 `protobuf:"bytes,6,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignP2PRequest) Reset() {
+	*x = DesignP2PRequest{}
+	mi := &file_notify_proto_msgTypes[63]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignP2PRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignP2PRequest) ProtoMessage() {}
+
+func (x *DesignP2PRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[63]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignP2PRequest.ProtoReflect.Descriptor instead.
+func (*DesignP2PRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{63}
+}
+
+func (x *DesignP2PRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignP2PRequest) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignP2PRequest) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignP2PRequest) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignP2PRequest) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignP2PRequest) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignP2PRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignP2PResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	ProjectId     string                     `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName      string                     `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId    int32                      `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload       *DesignP2PResponse_Payload `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignP2PResponse) Reset() {
+	*x = DesignP2PResponse{}
+	mi := &file_notify_proto_msgTypes[64]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignP2PResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignP2PResponse) ProtoMessage() {}
+
+func (x *DesignP2PResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[64]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignP2PResponse.ProtoReflect.Descriptor instead.
+func (*DesignP2PResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{64}
+}
+
+func (x *DesignP2PResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignP2PResponse) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignP2PResponse) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignP2PResponse) GetPayload() *DesignP2PResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+// 16 — Notification Feed
+type DesignNotificationFeedRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Since         string                 `protobuf:"bytes,1,opt,name=since,proto3" json:"since,omitempty"`
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,3,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignNotificationFeedRequest) Reset() {
+	*x = DesignNotificationFeedRequest{}
+	mi := &file_notify_proto_msgTypes[65]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationFeedRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationFeedRequest) ProtoMessage() {}
+
+func (x *DesignNotificationFeedRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[65]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationFeedRequest.ProtoReflect.Descriptor instead.
+func (*DesignNotificationFeedRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{65}
+}
+
+func (x *DesignNotificationFeedRequest) GetSince() string {
+	if x != nil {
+		return x.Since
+	}
+	return ""
+}
+
+func (x *DesignNotificationFeedRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *DesignNotificationFeedRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+type DesignNotificationFeedResponse struct {
+	state         protoimpl.MessageState                 `protogen:"open.v1"`
+	Data          []*DesignNotificationFeedResponse_Data `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignNotificationFeedResponse) Reset() {
+	*x = DesignNotificationFeedResponse{}
+	mi := &file_notify_proto_msgTypes[66]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationFeedResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationFeedResponse) ProtoMessage() {}
+
+func (x *DesignNotificationFeedResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[66]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationFeedResponse.ProtoReflect.Descriptor instead.
+func (*DesignNotificationFeedResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{66}
+}
+
+func (x *DesignNotificationFeedResponse) GetData() []*DesignNotificationFeedResponse_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// 17 — Notification Counts
+type DesignNotificationCountsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Since         string                 `protobuf:"bytes,1,opt,name=since,proto3" json:"since,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignNotificationCountsRequest) Reset() {
+	*x = DesignNotificationCountsRequest{}
+	mi := &file_notify_proto_msgTypes[67]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationCountsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationCountsRequest) ProtoMessage() {}
+
+func (x *DesignNotificationCountsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[67]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationCountsRequest.ProtoReflect.Descriptor instead.
+func (*DesignNotificationCountsRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{67}
+}
+
+func (x *DesignNotificationCountsRequest) GetSince() string {
+	if x != nil {
+		return x.Since
+	}
+	return ""
+}
+
+type DesignNotificationCountsResponse struct {
+	state         protoimpl.MessageState                 `protogen:"open.v1"`
+	Data          *DesignNotificationCountsResponse_Data `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignNotificationCountsResponse) Reset() {
+	*x = DesignNotificationCountsResponse{}
+	mi := &file_notify_proto_msgTypes[68]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationCountsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationCountsResponse) ProtoMessage() {}
+
+func (x *DesignNotificationCountsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[68]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationCountsResponse.ProtoReflect.Descriptor instead.
+func (*DesignNotificationCountsResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{68}
+}
+
+func (x *DesignNotificationCountsResponse) GetData() *DesignNotificationCountsResponse_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// 18 — Notification Details
+type DesignNotificationDetailsRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	NotificationId int32                  `protobuf:"varint,1,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignNotificationDetailsRequest) Reset() {
+	*x = DesignNotificationDetailsRequest{}
+	mi := &file_notify_proto_msgTypes[69]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationDetailsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationDetailsRequest) ProtoMessage() {}
+
+func (x *DesignNotificationDetailsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[69]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationDetailsRequest.ProtoReflect.Descriptor instead.
+func (*DesignNotificationDetailsRequest) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{69}
+}
+
+func (x *DesignNotificationDetailsRequest) GetNotificationId() int32 {
+	if x != nil {
+		return x.NotificationId
+	}
+	return 0
+}
+
+type DesignNotificationDetailsResponse struct {
+	state         protoimpl.MessageState                  `protogen:"open.v1"`
+	Data          *DesignNotificationDetailsResponse_Data `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignNotificationDetailsResponse) Reset() {
+	*x = DesignNotificationDetailsResponse{}
+	mi := &file_notify_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationDetailsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationDetailsResponse) ProtoMessage() {}
+
+func (x *DesignNotificationDetailsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationDetailsResponse.ProtoReflect.Descriptor instead.
+func (*DesignNotificationDetailsResponse) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *DesignNotificationDetailsResponse) GetData() *DesignNotificationDetailsResponse_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type DesignLeadPre10Request_Payload struct {
+	state              protoimpl.MessageState               `protogen:"open.v1"`
+	CurrentPhase       string                               `protobuf:"bytes,1,opt,name=current_phase,json=currentPhase,proto3" json:"current_phase,omitempty"`
+	DesignerName       string                               `protobuf:"bytes,2,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	SalesExecutiveName string                               `protobuf:"bytes,3,opt,name=sales_executive_name,json=salesExecutiveName,proto3" json:"sales_executive_name,omitempty"`
+	Slot               *DesignLeadPre10Request_Payload_Slot `protobuf:"bytes,4,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType        string                               `protobuf:"bytes,5,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignLeadPre10Request_Payload) Reset() {
+	*x = DesignLeadPre10Request_Payload{}
+	mi := &file_notify_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLeadPre10Request_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLeadPre10Request_Payload) ProtoMessage() {}
+
+func (x *DesignLeadPre10Request_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLeadPre10Request_Payload.ProtoReflect.Descriptor instead.
+func (*DesignLeadPre10Request_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{35, 0}
+}
+
+func (x *DesignLeadPre10Request_Payload) GetCurrentPhase() string {
+	if x != nil {
+		return x.CurrentPhase
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Request_Payload) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Request_Payload) GetSalesExecutiveName() string {
+	if x != nil {
+		return x.SalesExecutiveName
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Request_Payload) GetSlot() *DesignLeadPre10Request_Payload_Slot {
+	if x != nil {
+		return x.Slot
+	}
+	return nil
+}
+
+func (x *DesignLeadPre10Request_Payload) GetMeetingType() string {
+	if x != nil {
+		return x.MeetingType
+	}
+	return ""
+}
+
+type DesignLeadPre10Request_Payload_Slot struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	SlotTime      string                 `protobuf:"bytes,2,opt,name=slot_time,json=slotTime,proto3" json:"slot_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignLeadPre10Request_Payload_Slot) Reset() {
+	*x = DesignLeadPre10Request_Payload_Slot{}
+	mi := &file_notify_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLeadPre10Request_Payload_Slot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLeadPre10Request_Payload_Slot) ProtoMessage() {}
+
+func (x *DesignLeadPre10Request_Payload_Slot) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLeadPre10Request_Payload_Slot.ProtoReflect.Descriptor instead.
+func (*DesignLeadPre10Request_Payload_Slot) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{35, 0, 0}
+}
+
+func (x *DesignLeadPre10Request_Payload_Slot) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Request_Payload_Slot) GetSlotTime() string {
+	if x != nil {
+		return x.SlotTime
+	}
+	return ""
+}
+
+type DesignLeadPre10Response_Payload struct {
+	state              protoimpl.MessageState                `protogen:"open.v1"`
+	CurrentPhase       string                                `protobuf:"bytes,1,opt,name=current_phase,json=currentPhase,proto3" json:"current_phase,omitempty"`
+	DesignerName       string                                `protobuf:"bytes,2,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	SalesExecutiveName string                                `protobuf:"bytes,3,opt,name=sales_executive_name,json=salesExecutiveName,proto3" json:"sales_executive_name,omitempty"`
+	Slot               *DesignLeadPre10Response_Payload_Slot `protobuf:"bytes,4,opt,name=slot,proto3" json:"slot,omitempty"`
+	MeetingType        string                                `protobuf:"bytes,5,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignLeadPre10Response_Payload) Reset() {
+	*x = DesignLeadPre10Response_Payload{}
+	mi := &file_notify_proto_msgTypes[73]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLeadPre10Response_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLeadPre10Response_Payload) ProtoMessage() {}
+
+func (x *DesignLeadPre10Response_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[73]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLeadPre10Response_Payload.ProtoReflect.Descriptor instead.
+func (*DesignLeadPre10Response_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{36, 0}
+}
+
+func (x *DesignLeadPre10Response_Payload) GetCurrentPhase() string {
+	if x != nil {
+		return x.CurrentPhase
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Response_Payload) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Response_Payload) GetSalesExecutiveName() string {
+	if x != nil {
+		return x.SalesExecutiveName
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Response_Payload) GetSlot() *DesignLeadPre10Response_Payload_Slot {
+	if x != nil {
+		return x.Slot
+	}
+	return nil
+}
+
+func (x *DesignLeadPre10Response_Payload) GetMeetingType() string {
+	if x != nil {
+		return x.MeetingType
+	}
+	return ""
+}
+
+type DesignLeadPre10Response_Payload_Slot struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	SlotTime      string                 `protobuf:"bytes,2,opt,name=slot_time,json=slotTime,proto3" json:"slot_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignLeadPre10Response_Payload_Slot) Reset() {
+	*x = DesignLeadPre10Response_Payload_Slot{}
+	mi := &file_notify_proto_msgTypes[74]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLeadPre10Response_Payload_Slot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLeadPre10Response_Payload_Slot) ProtoMessage() {}
+
+func (x *DesignLeadPre10Response_Payload_Slot) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[74]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLeadPre10Response_Payload_Slot.ProtoReflect.Descriptor instead.
+func (*DesignLeadPre10Response_Payload_Slot) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{36, 0, 0}
+}
+
+func (x *DesignLeadPre10Response_Payload_Slot) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *DesignLeadPre10Response_Payload_Slot) GetSlotTime() string {
+	if x != nil {
+		return x.SlotTime
+	}
+	return ""
+}
+
+type DesignLead1020Request_Payload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PreviousPhase string                 `protobuf:"bytes,1,opt,name=previous_phase,json=previousPhase,proto3" json:"previous_phase,omitempty"`
+	Trigger       string                 `protobuf:"bytes,2,opt,name=trigger,proto3" json:"trigger,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignLead1020Request_Payload) Reset() {
+	*x = DesignLead1020Request_Payload{}
+	mi := &file_notify_proto_msgTypes[75]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLead1020Request_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLead1020Request_Payload) ProtoMessage() {}
+
+func (x *DesignLead1020Request_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[75]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLead1020Request_Payload.ProtoReflect.Descriptor instead.
+func (*DesignLead1020Request_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{37, 0}
+}
+
+func (x *DesignLead1020Request_Payload) GetPreviousPhase() string {
+	if x != nil {
+		return x.PreviousPhase
+	}
+	return ""
+}
+
+func (x *DesignLead1020Request_Payload) GetTrigger() string {
+	if x != nil {
+		return x.Trigger
+	}
+	return ""
+}
+
+func (x *DesignLead1020Request_Payload) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type DesignLead1020Response_Data struct {
+	state              protoimpl.MessageState               `protogen:"open.v1"`
+	ProjectId          string                               `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                               `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                                `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                               `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                               `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	Phase              string                               `protobuf:"bytes,6,opt,name=phase,proto3" json:"phase,omitempty"`
+	Payload            *DesignLead1020Response_Data_Payload `protobuf:"bytes,7,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                               `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignLead1020Response_Data) Reset() {
+	*x = DesignLead1020Response_Data{}
+	mi := &file_notify_proto_msgTypes[76]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLead1020Response_Data) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLead1020Response_Data) ProtoMessage() {}
+
+func (x *DesignLead1020Response_Data) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[76]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLead1020Response_Data.ProtoReflect.Descriptor instead.
+func (*DesignLead1020Response_Data) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{38, 0}
+}
+
+func (x *DesignLead1020Response_Data) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignLead1020Response_Data) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignLead1020Response_Data) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignLead1020Response_Data) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignLead1020Response_Data) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignLead1020Response_Data) GetPhase() string {
+	if x != nil {
+		return x.Phase
+	}
+	return ""
+}
+
+func (x *DesignLead1020Response_Data) GetPayload() *DesignLead1020Response_Data_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *DesignLead1020Response_Data) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignLead1020Response_Data_Payload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PreviousPhase string                 `protobuf:"bytes,1,opt,name=previous_phase,json=previousPhase,proto3" json:"previous_phase,omitempty"`
+	Trigger       string                 `protobuf:"bytes,2,opt,name=trigger,proto3" json:"trigger,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignLead1020Response_Data_Payload) Reset() {
+	*x = DesignLead1020Response_Data_Payload{}
+	mi := &file_notify_proto_msgTypes[77]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignLead1020Response_Data_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignLead1020Response_Data_Payload) ProtoMessage() {}
+
+func (x *DesignLead1020Response_Data_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[77]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignLead1020Response_Data_Payload.ProtoReflect.Descriptor instead.
+func (*DesignLead1020Response_Data_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{38, 0, 0}
+}
+
+func (x *DesignLead1020Response_Data_Payload) GetPreviousPhase() string {
+	if x != nil {
+		return x.PreviousPhase
+	}
+	return ""
+}
+
+func (x *DesignLead1020Response_Data_Payload) GetTrigger() string {
+	if x != nil {
+		return x.Trigger
+	}
+	return ""
+}
+
+func (x *DesignLead1020Response_Data_Payload) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type DesignMilestoneRequest_Payload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	MilestoneName  string                 `protobuf:"bytes,1,opt,name=milestone_name,json=milestoneName,proto3" json:"milestone_name,omitempty"`
+	TaskName       string                 `protobuf:"bytes,2,opt,name=task_name,json=taskName,proto3" json:"task_name,omitempty"`
+	MilestoneIndex int32                  `protobuf:"varint,3,opt,name=milestone_index,json=milestoneIndex,proto3" json:"milestone_index,omitempty"`
+	DesignerName   string                 `protobuf:"bytes,4,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignMilestoneRequest_Payload) Reset() {
+	*x = DesignMilestoneRequest_Payload{}
+	mi := &file_notify_proto_msgTypes[78]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMilestoneRequest_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMilestoneRequest_Payload) ProtoMessage() {}
+
+func (x *DesignMilestoneRequest_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[78]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMilestoneRequest_Payload.ProtoReflect.Descriptor instead.
+func (*DesignMilestoneRequest_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{39, 0}
+}
+
+func (x *DesignMilestoneRequest_Payload) GetMilestoneName() string {
+	if x != nil {
+		return x.MilestoneName
+	}
+	return ""
+}
+
+func (x *DesignMilestoneRequest_Payload) GetTaskName() string {
+	if x != nil {
+		return x.TaskName
+	}
+	return ""
+}
+
+func (x *DesignMilestoneRequest_Payload) GetMilestoneIndex() int32 {
+	if x != nil {
+		return x.MilestoneIndex
+	}
+	return 0
+}
+
+func (x *DesignMilestoneRequest_Payload) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+type DesignMilestoneResponse_Data struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	MilestoneName      string                 `protobuf:"bytes,6,opt,name=milestone_name,json=milestoneName,proto3" json:"milestone_name,omitempty"`
+	TaskName           string                 `protobuf:"bytes,7,opt,name=task_name,json=taskName,proto3" json:"task_name,omitempty"`
+	MilestoneIndex     int32                  `protobuf:"varint,8,opt,name=milestone_index,json=milestoneIndex,proto3" json:"milestone_index,omitempty"`
+	DesignerName       string                 `protobuf:"bytes,9,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignMilestoneResponse_Data) Reset() {
+	*x = DesignMilestoneResponse_Data{}
+	mi := &file_notify_proto_msgTypes[79]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMilestoneResponse_Data) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMilestoneResponse_Data) ProtoMessage() {}
+
+func (x *DesignMilestoneResponse_Data) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[79]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMilestoneResponse_Data.ProtoReflect.Descriptor instead.
+func (*DesignMilestoneResponse_Data) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{40, 0}
+}
+
+func (x *DesignMilestoneResponse_Data) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignMilestoneResponse_Data) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignMilestoneResponse_Data) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignMilestoneResponse_Data) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignMilestoneResponse_Data) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignMilestoneResponse_Data) GetMilestoneName() string {
+	if x != nil {
+		return x.MilestoneName
+	}
+	return ""
+}
+
+func (x *DesignMilestoneResponse_Data) GetTaskName() string {
+	if x != nil {
+		return x.TaskName
+	}
+	return ""
+}
+
+func (x *DesignMilestoneResponse_Data) GetMilestoneIndex() int32 {
+	if x != nil {
+		return x.MilestoneIndex
+	}
+	return 0
+}
+
+func (x *DesignMilestoneResponse_Data) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignMilestoneResponse_Data) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignPaymentRequestRequest_Payload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PaymentType   PaymentType            `protobuf:"varint,1,opt,name=payment_type,json=paymentType,proto3,enum=notify.PaymentType" json:"payment_type,omitempty"`
+	UploadName    string                 `protobuf:"bytes,2,opt,name=upload_name,json=uploadName,proto3" json:"upload_name,omitempty"`
+	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignPaymentRequestRequest_Payload) Reset() {
+	*x = DesignPaymentRequestRequest_Payload{}
+	mi := &file_notify_proto_msgTypes[80]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignPaymentRequestRequest_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignPaymentRequestRequest_Payload) ProtoMessage() {}
+
+func (x *DesignPaymentRequestRequest_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[80]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignPaymentRequestRequest_Payload.ProtoReflect.Descriptor instead.
+func (*DesignPaymentRequestRequest_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{41, 0}
+}
+
+func (x *DesignPaymentRequestRequest_Payload) GetPaymentType() PaymentType {
+	if x != nil {
+		return x.PaymentType
+	}
+	return PaymentType_PAYMENT_TYPE_UNSPECIFIED
+}
+
+func (x *DesignPaymentRequestRequest_Payload) GetUploadName() string {
+	if x != nil {
+		return x.UploadName
+	}
+	return ""
+}
+
+func (x *DesignPaymentRequestRequest_Payload) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+type DesignPaymentRequestResponse_Data struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	PaymentType        PaymentType            `protobuf:"varint,6,opt,name=payment_type,json=paymentType,proto3,enum=notify.PaymentType" json:"payment_type,omitempty"`
+	UploadName         string                 `protobuf:"bytes,7,opt,name=upload_name,json=uploadName,proto3" json:"upload_name,omitempty"`
+	Amount             float64                `protobuf:"fixed64,8,opt,name=amount,proto3" json:"amount,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignPaymentRequestResponse_Data) Reset() {
+	*x = DesignPaymentRequestResponse_Data{}
+	mi := &file_notify_proto_msgTypes[81]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignPaymentRequestResponse_Data) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignPaymentRequestResponse_Data) ProtoMessage() {}
+
+func (x *DesignPaymentRequestResponse_Data) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[81]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignPaymentRequestResponse_Data.ProtoReflect.Descriptor instead.
+func (*DesignPaymentRequestResponse_Data) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{42, 0}
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetPaymentType() PaymentType {
+	if x != nil {
+		return x.PaymentType
+	}
+	return PaymentType_PAYMENT_TYPE_UNSPECIFIED
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetUploadName() string {
+	if x != nil {
+		return x.UploadName
+	}
+	return ""
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *DesignPaymentRequestResponse_Data) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignPaymentStatusResponse_Payload struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Status           string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	DecisionType     string                 `protobuf:"bytes,2,opt,name=decision_type,json=decisionType,proto3" json:"decision_type,omitempty"`
+	PaymentType      string                 `protobuf:"bytes,3,opt,name=payment_type,json=paymentType,proto3" json:"payment_type,omitempty"`
+	MilestoneContext string                 `protobuf:"bytes,4,opt,name=milestone_context,json=milestoneContext,proto3" json:"milestone_context,omitempty"`
+	ApproverName     string                 `protobuf:"bytes,5,opt,name=approver_name,json=approverName,proto3" json:"approver_name,omitempty"`
+	Amount           float64                `protobuf:"fixed64,6,opt,name=amount,proto3" json:"amount,omitempty"`
+	RejectionReason  string                 `protobuf:"bytes,7,opt,name=rejection_reason,json=rejectionReason,proto3" json:"rejection_reason,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *DesignPaymentStatusResponse_Payload) Reset() {
+	*x = DesignPaymentStatusResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[82]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignPaymentStatusResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignPaymentStatusResponse_Payload) ProtoMessage() {}
+
+func (x *DesignPaymentStatusResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[82]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignPaymentStatusResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignPaymentStatusResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{44, 0}
+}
+
+func (x *DesignPaymentStatusResponse_Payload) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusResponse_Payload) GetDecisionType() string {
+	if x != nil {
+		return x.DecisionType
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusResponse_Payload) GetPaymentType() string {
+	if x != nil {
+		return x.PaymentType
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusResponse_Payload) GetMilestoneContext() string {
+	if x != nil {
+		return x.MilestoneContext
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusResponse_Payload) GetApproverName() string {
+	if x != nil {
+		return x.ApproverName
+	}
+	return ""
+}
+
+func (x *DesignPaymentStatusResponse_Payload) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *DesignPaymentStatusResponse_Payload) GetRejectionReason() string {
+	if x != nil {
+		return x.RejectionReason
+	}
+	return ""
+}
+
+type DesignDQCRequestResponse_Data struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,3,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,5,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	DqcRound           string                 `protobuf:"bytes,6,opt,name=dqc_round,json=dqcRound,proto3" json:"dqc_round,omitempty"`
+	ReviewId           int32                  `protobuf:"varint,7,opt,name=review_id,json=reviewId,proto3" json:"review_id,omitempty"`
+	DesignerName       string                 `protobuf:"bytes,8,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignDQCRequestResponse_Data) Reset() {
+	*x = DesignDQCRequestResponse_Data{}
+	mi := &file_notify_proto_msgTypes[83]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignDQCRequestResponse_Data) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignDQCRequestResponse_Data) ProtoMessage() {}
+
+func (x *DesignDQCRequestResponse_Data) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[83]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignDQCRequestResponse_Data.ProtoReflect.Descriptor instead.
+func (*DesignDQCRequestResponse_Data) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{46, 0}
+}
+
+func (x *DesignDQCRequestResponse_Data) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestResponse_Data) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestResponse_Data) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignDQCRequestResponse_Data) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestResponse_Data) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestResponse_Data) GetDqcRound() string {
+	if x != nil {
+		return x.DqcRound
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestResponse_Data) GetReviewId() int32 {
+	if x != nil {
+		return x.ReviewId
+	}
+	return 0
+}
+
+func (x *DesignDQCRequestResponse_Data) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignDQCRequestResponse_Data) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignDQCStatusResponse_Payload struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Status          string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	DecisionType    string                 `protobuf:"bytes,2,opt,name=decision_type,json=decisionType,proto3" json:"decision_type,omitempty"`
+	DqcRound        string                 `protobuf:"bytes,3,opt,name=dqc_round,json=dqcRound,proto3" json:"dqc_round,omitempty"`
+	DesignerName    string                 `protobuf:"bytes,4,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	RejectionReason string                 `protobuf:"bytes,5,opt,name=rejection_reason,json=rejectionReason,proto3" json:"rejection_reason,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *DesignDQCStatusResponse_Payload) Reset() {
+	*x = DesignDQCStatusResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[84]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignDQCStatusResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignDQCStatusResponse_Payload) ProtoMessage() {}
+
+func (x *DesignDQCStatusResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[84]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignDQCStatusResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignDQCStatusResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{48, 0}
+}
+
+func (x *DesignDQCStatusResponse_Payload) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusResponse_Payload) GetDecisionType() string {
+	if x != nil {
+		return x.DecisionType
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusResponse_Payload) GetDqcRound() string {
+	if x != nil {
+		return x.DqcRound
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusResponse_Payload) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignDQCStatusResponse_Payload) GetRejectionReason() string {
+	if x != nil {
+		return x.RejectionReason
+	}
+	return ""
+}
+
+type DesignMMTRequestResponse_Payload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	MmtScope       string                 `protobuf:"bytes,1,opt,name=mmt_scope,json=mmtScope,proto3" json:"mmt_scope,omitempty"`
+	VisitDate      string                 `protobuf:"bytes,2,opt,name=visit_date,json=visitDate,proto3" json:"visit_date,omitempty"`
+	VisitTime      string                 `protobuf:"bytes,3,opt,name=visit_time,json=visitTime,proto3" json:"visit_time,omitempty"`
+	MmtManagerId   int32                  `protobuf:"varint,4,opt,name=mmt_manager_id,json=mmtManagerId,proto3" json:"mmt_manager_id,omitempty"`
+	DesignerName   string                 `protobuf:"bytes,5,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	MmtManagerName string                 `protobuf:"bytes,6,opt,name=mmt_manager_name,json=mmtManagerName,proto3" json:"mmt_manager_name,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignMMTRequestResponse_Payload) Reset() {
+	*x = DesignMMTRequestResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[85]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTRequestResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTRequestResponse_Payload) ProtoMessage() {}
+
+func (x *DesignMMTRequestResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[85]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTRequestResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignMMTRequestResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{50, 0}
+}
+
+func (x *DesignMMTRequestResponse_Payload) GetMmtScope() string {
+	if x != nil {
+		return x.MmtScope
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestResponse_Payload) GetVisitDate() string {
+	if x != nil {
+		return x.VisitDate
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestResponse_Payload) GetVisitTime() string {
+	if x != nil {
+		return x.VisitTime
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestResponse_Payload) GetMmtManagerId() int32 {
+	if x != nil {
+		return x.MmtManagerId
+	}
+	return 0
+}
+
+func (x *DesignMMTRequestResponse_Payload) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+func (x *DesignMMTRequestResponse_Payload) GetMmtManagerName() string {
+	if x != nil {
+		return x.MmtManagerName
+	}
+	return ""
+}
+
+type DesignMMTAssignRequest_Payload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AssignmentType string                 `protobuf:"bytes,1,opt,name=assignment_type,json=assignmentType,proto3" json:"assignment_type,omitempty"`
+	ToName         string                 `protobuf:"bytes,2,opt,name=to_name,json=toName,proto3" json:"to_name,omitempty"`
+	ToId           int32                  `protobuf:"varint,3,opt,name=to_id,json=toId,proto3" json:"to_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignMMTAssignRequest_Payload) Reset() {
+	*x = DesignMMTAssignRequest_Payload{}
+	mi := &file_notify_proto_msgTypes[86]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTAssignRequest_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTAssignRequest_Payload) ProtoMessage() {}
+
+func (x *DesignMMTAssignRequest_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[86]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTAssignRequest_Payload.ProtoReflect.Descriptor instead.
+func (*DesignMMTAssignRequest_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{51, 0}
+}
+
+func (x *DesignMMTAssignRequest_Payload) GetAssignmentType() string {
+	if x != nil {
+		return x.AssignmentType
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignRequest_Payload) GetToName() string {
+	if x != nil {
+		return x.ToName
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignRequest_Payload) GetToId() int32 {
+	if x != nil {
+		return x.ToId
+	}
+	return 0
+}
+
+type DesignMMTAssignResponse_Payload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AssignmentType string                 `protobuf:"bytes,1,opt,name=assignment_type,json=assignmentType,proto3" json:"assignment_type,omitempty"`
+	ToName         string                 `protobuf:"bytes,2,opt,name=to_name,json=toName,proto3" json:"to_name,omitempty"`
+	ToId           int32                  `protobuf:"varint,3,opt,name=to_id,json=toId,proto3" json:"to_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignMMTAssignResponse_Payload) Reset() {
+	*x = DesignMMTAssignResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[87]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTAssignResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTAssignResponse_Payload) ProtoMessage() {}
+
+func (x *DesignMMTAssignResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[87]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTAssignResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignMMTAssignResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{52, 0}
+}
+
+func (x *DesignMMTAssignResponse_Payload) GetAssignmentType() string {
+	if x != nil {
+		return x.AssignmentType
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignResponse_Payload) GetToName() string {
+	if x != nil {
+		return x.ToName
+	}
+	return ""
+}
+
+func (x *DesignMMTAssignResponse_Payload) GetToId() int32 {
+	if x != nil {
+		return x.ToId
+	}
+	return 0
+}
+
+type DesignMMTDocReadyRequest_Payload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MmtScope      string                 `protobuf:"bytes,1,opt,name=mmt_scope,json=mmtScope,proto3" json:"mmt_scope,omitempty"`
+	Via           string                 `protobuf:"bytes,2,opt,name=via,proto3" json:"via,omitempty"`
+	UploadName    string                 `protobuf:"bytes,3,opt,name=upload_name,json=uploadName,proto3" json:"upload_name,omitempty"`
+	ApprovedBy    string                 `protobuf:"bytes,4,opt,name=approved_by,json=approvedBy,proto3" json:"approved_by,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMMTDocReadyRequest_Payload) Reset() {
+	*x = DesignMMTDocReadyRequest_Payload{}
+	mi := &file_notify_proto_msgTypes[88]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTDocReadyRequest_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTDocReadyRequest_Payload) ProtoMessage() {}
+
+func (x *DesignMMTDocReadyRequest_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[88]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTDocReadyRequest_Payload.ProtoReflect.Descriptor instead.
+func (*DesignMMTDocReadyRequest_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{53, 0}
+}
+
+func (x *DesignMMTDocReadyRequest_Payload) GetMmtScope() string {
+	if x != nil {
+		return x.MmtScope
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyRequest_Payload) GetVia() string {
+	if x != nil {
+		return x.Via
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyRequest_Payload) GetUploadName() string {
+	if x != nil {
+		return x.UploadName
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyRequest_Payload) GetApprovedBy() string {
+	if x != nil {
+		return x.ApprovedBy
+	}
+	return ""
+}
+
+type DesignMMTDocReadyResponse_Payload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MmtScope      string                 `protobuf:"bytes,1,opt,name=mmt_scope,json=mmtScope,proto3" json:"mmt_scope,omitempty"`
+	Via           string                 `protobuf:"bytes,2,opt,name=via,proto3" json:"via,omitempty"`
+	UploadName    string                 `protobuf:"bytes,3,opt,name=upload_name,json=uploadName,proto3" json:"upload_name,omitempty"`
+	ApprovedBy    string                 `protobuf:"bytes,4,opt,name=approved_by,json=approvedBy,proto3" json:"approved_by,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMMTDocReadyResponse_Payload) Reset() {
+	*x = DesignMMTDocReadyResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[89]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMMTDocReadyResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMMTDocReadyResponse_Payload) ProtoMessage() {}
+
+func (x *DesignMMTDocReadyResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[89]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMMTDocReadyResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignMMTDocReadyResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{54, 0}
+}
+
+func (x *DesignMMTDocReadyResponse_Payload) GetMmtScope() string {
+	if x != nil {
+		return x.MmtScope
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyResponse_Payload) GetVia() string {
+	if x != nil {
+		return x.Via
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyResponse_Payload) GetUploadName() string {
+	if x != nil {
+		return x.UploadName
+	}
+	return ""
+}
+
+func (x *DesignMMTDocReadyResponse_Payload) GetApprovedBy() string {
+	if x != nil {
+		return x.ApprovedBy
+	}
+	return ""
+}
+
+type DesignMeetingRequest_Slot struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	TimeSlot      string                 `protobuf:"bytes,2,opt,name=time_slot,json=timeSlot,proto3" json:"time_slot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMeetingRequest_Slot) Reset() {
+	*x = DesignMeetingRequest_Slot{}
+	mi := &file_notify_proto_msgTypes[90]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMeetingRequest_Slot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMeetingRequest_Slot) ProtoMessage() {}
+
+func (x *DesignMeetingRequest_Slot) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[90]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMeetingRequest_Slot.ProtoReflect.Descriptor instead.
+func (*DesignMeetingRequest_Slot) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{55, 0}
+}
+
+func (x *DesignMeetingRequest_Slot) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *DesignMeetingRequest_Slot) GetTimeSlot() string {
+	if x != nil {
+		return x.TimeSlot
+	}
+	return ""
+}
+
+type DesignMeetingResponse_Payload struct {
+	state         protoimpl.MessageState              `protogen:"open.v1"`
+	MeetingType   string                              `protobuf:"bytes,1,opt,name=meeting_type,json=meetingType,proto3" json:"meeting_type,omitempty"`
+	Mod           string                              `protobuf:"bytes,2,opt,name=mod,proto3" json:"mod,omitempty"`
+	Slot          *DesignMeetingResponse_Payload_Slot `protobuf:"bytes,3,opt,name=slot,proto3" json:"slot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMeetingResponse_Payload) Reset() {
+	*x = DesignMeetingResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[91]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMeetingResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMeetingResponse_Payload) ProtoMessage() {}
+
+func (x *DesignMeetingResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[91]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMeetingResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignMeetingResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{56, 0}
+}
+
+func (x *DesignMeetingResponse_Payload) GetMeetingType() string {
+	if x != nil {
+		return x.MeetingType
+	}
+	return ""
+}
+
+func (x *DesignMeetingResponse_Payload) GetMod() string {
+	if x != nil {
+		return x.Mod
+	}
+	return ""
+}
+
+func (x *DesignMeetingResponse_Payload) GetSlot() *DesignMeetingResponse_Payload_Slot {
+	if x != nil {
+		return x.Slot
+	}
+	return nil
+}
+
+type DesignMeetingResponse_Payload_Slot struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	TimeSlot      string                 `protobuf:"bytes,2,opt,name=time_slot,json=timeSlot,proto3" json:"time_slot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignMeetingResponse_Payload_Slot) Reset() {
+	*x = DesignMeetingResponse_Payload_Slot{}
+	mi := &file_notify_proto_msgTypes[92]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignMeetingResponse_Payload_Slot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignMeetingResponse_Payload_Slot) ProtoMessage() {}
+
+func (x *DesignMeetingResponse_Payload_Slot) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[92]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignMeetingResponse_Payload_Slot.ProtoReflect.Descriptor instead.
+func (*DesignMeetingResponse_Payload_Slot) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{56, 0, 0}
+}
+
+func (x *DesignMeetingResponse_Payload_Slot) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *DesignMeetingResponse_Payload_Slot) GetTimeSlot() string {
+	if x != nil {
+		return x.TimeSlot
+	}
+	return ""
+}
+
+type DesignAssignDesignerRequest_Payload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AssignmentType string                 `protobuf:"bytes,1,opt,name=assignment_type,json=assignmentType,proto3" json:"assignment_type,omitempty"`
+	FromId         int32                  `protobuf:"varint,2,opt,name=from_id,json=fromId,proto3" json:"from_id,omitempty"`
+	ToId           int32                  `protobuf:"varint,3,opt,name=to_id,json=toId,proto3" json:"to_id,omitempty"`
+	FromName       string                 `protobuf:"bytes,4,opt,name=from_name,json=fromName,proto3" json:"from_name,omitempty"`
+	ToName         string                 `protobuf:"bytes,5,opt,name=to_name,json=toName,proto3" json:"to_name,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignAssignDesignerRequest_Payload) Reset() {
+	*x = DesignAssignDesignerRequest_Payload{}
+	mi := &file_notify_proto_msgTypes[93]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignAssignDesignerRequest_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignAssignDesignerRequest_Payload) ProtoMessage() {}
+
+func (x *DesignAssignDesignerRequest_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[93]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignAssignDesignerRequest_Payload.ProtoReflect.Descriptor instead.
+func (*DesignAssignDesignerRequest_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{57, 0}
+}
+
+func (x *DesignAssignDesignerRequest_Payload) GetAssignmentType() string {
+	if x != nil {
+		return x.AssignmentType
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerRequest_Payload) GetFromId() int32 {
+	if x != nil {
+		return x.FromId
+	}
+	return 0
+}
+
+func (x *DesignAssignDesignerRequest_Payload) GetToId() int32 {
+	if x != nil {
+		return x.ToId
+	}
+	return 0
+}
+
+func (x *DesignAssignDesignerRequest_Payload) GetFromName() string {
+	if x != nil {
+		return x.FromName
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerRequest_Payload) GetToName() string {
+	if x != nil {
+		return x.ToName
+	}
+	return ""
+}
+
+type DesignAssignDesignerResponse_Payload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AssignmentType string                 `protobuf:"bytes,1,opt,name=assignment_type,json=assignmentType,proto3" json:"assignment_type,omitempty"`
+	FromId         int32                  `protobuf:"varint,2,opt,name=from_id,json=fromId,proto3" json:"from_id,omitempty"`
+	ToId           int32                  `protobuf:"varint,3,opt,name=to_id,json=toId,proto3" json:"to_id,omitempty"`
+	FromName       string                 `protobuf:"bytes,4,opt,name=from_name,json=fromName,proto3" json:"from_name,omitempty"`
+	ToName         string                 `protobuf:"bytes,5,opt,name=to_name,json=toName,proto3" json:"to_name,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignAssignDesignerResponse_Payload) Reset() {
+	*x = DesignAssignDesignerResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[94]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignAssignDesignerResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignAssignDesignerResponse_Payload) ProtoMessage() {}
+
+func (x *DesignAssignDesignerResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[94]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignAssignDesignerResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignAssignDesignerResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{58, 0}
+}
+
+func (x *DesignAssignDesignerResponse_Payload) GetAssignmentType() string {
+	if x != nil {
+		return x.AssignmentType
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerResponse_Payload) GetFromId() int32 {
+	if x != nil {
+		return x.FromId
+	}
+	return 0
+}
+
+func (x *DesignAssignDesignerResponse_Payload) GetToId() int32 {
+	if x != nil {
+		return x.ToId
+	}
+	return 0
+}
+
+func (x *DesignAssignDesignerResponse_Payload) GetFromName() string {
+	if x != nil {
+		return x.FromName
+	}
+	return ""
+}
+
+func (x *DesignAssignDesignerResponse_Payload) GetToName() string {
+	if x != nil {
+		return x.ToName
+	}
+	return ""
+}
+
+type DesignAssignPMRequest_Payload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AssignmentType string                 `protobuf:"bytes,1,opt,name=assignment_type,json=assignmentType,proto3" json:"assignment_type,omitempty"`
+	ToId           int32                  `protobuf:"varint,2,opt,name=to_id,json=toId,proto3" json:"to_id,omitempty"`
+	ToName         string                 `protobuf:"bytes,3,opt,name=to_name,json=toName,proto3" json:"to_name,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignAssignPMRequest_Payload) Reset() {
+	*x = DesignAssignPMRequest_Payload{}
+	mi := &file_notify_proto_msgTypes[95]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignAssignPMRequest_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignAssignPMRequest_Payload) ProtoMessage() {}
+
+func (x *DesignAssignPMRequest_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[95]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignAssignPMRequest_Payload.ProtoReflect.Descriptor instead.
+func (*DesignAssignPMRequest_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{59, 0}
+}
+
+func (x *DesignAssignPMRequest_Payload) GetAssignmentType() string {
+	if x != nil {
+		return x.AssignmentType
+	}
+	return ""
+}
+
+func (x *DesignAssignPMRequest_Payload) GetToId() int32 {
+	if x != nil {
+		return x.ToId
+	}
+	return 0
+}
+
+func (x *DesignAssignPMRequest_Payload) GetToName() string {
+	if x != nil {
+		return x.ToName
+	}
+	return ""
+}
+
+type DesignAssignPMResponse_Payload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AssignmentType string                 `protobuf:"bytes,1,opt,name=assignment_type,json=assignmentType,proto3" json:"assignment_type,omitempty"`
+	ToId           int32                  `protobuf:"varint,2,opt,name=to_id,json=toId,proto3" json:"to_id,omitempty"`
+	ToName         string                 `protobuf:"bytes,3,opt,name=to_name,json=toName,proto3" json:"to_name,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DesignAssignPMResponse_Payload) Reset() {
+	*x = DesignAssignPMResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[96]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignAssignPMResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignAssignPMResponse_Payload) ProtoMessage() {}
+
+func (x *DesignAssignPMResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[96]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignAssignPMResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignAssignPMResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{60, 0}
+}
+
+func (x *DesignAssignPMResponse_Payload) GetAssignmentType() string {
+	if x != nil {
+		return x.AssignmentType
+	}
+	return ""
+}
+
+func (x *DesignAssignPMResponse_Payload) GetToId() int32 {
+	if x != nil {
+		return x.ToId
+	}
+	return 0
+}
+
+func (x *DesignAssignPMResponse_Payload) GetToName() string {
+	if x != nil {
+		return x.ToName
+	}
+	return ""
+}
+
+type DesignQuoteRequest_Payload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	QuoteId       string                 `protobuf:"bytes,1,opt,name=quote_id,json=quoteId,proto3" json:"quote_id,omitempty"`
+	QuoteLink     string                 `protobuf:"bytes,2,opt,name=quote_link,json=quoteLink,proto3" json:"quote_link,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignQuoteRequest_Payload) Reset() {
+	*x = DesignQuoteRequest_Payload{}
+	mi := &file_notify_proto_msgTypes[97]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignQuoteRequest_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignQuoteRequest_Payload) ProtoMessage() {}
+
+func (x *DesignQuoteRequest_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[97]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignQuoteRequest_Payload.ProtoReflect.Descriptor instead.
+func (*DesignQuoteRequest_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{61, 0}
+}
+
+func (x *DesignQuoteRequest_Payload) GetQuoteId() string {
+	if x != nil {
+		return x.QuoteId
+	}
+	return ""
+}
+
+func (x *DesignQuoteRequest_Payload) GetQuoteLink() string {
+	if x != nil {
+		return x.QuoteLink
+	}
+	return ""
+}
+
+type DesignQuoteResponse_Payload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	QuoteId       string                 `protobuf:"bytes,1,opt,name=quote_id,json=quoteId,proto3" json:"quote_id,omitempty"`
+	QuoteLink     string                 `protobuf:"bytes,2,opt,name=quote_link,json=quoteLink,proto3" json:"quote_link,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignQuoteResponse_Payload) Reset() {
+	*x = DesignQuoteResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[98]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignQuoteResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignQuoteResponse_Payload) ProtoMessage() {}
+
+func (x *DesignQuoteResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[98]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignQuoteResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignQuoteResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{62, 0}
+}
+
+func (x *DesignQuoteResponse_Payload) GetQuoteId() string {
+	if x != nil {
+		return x.QuoteId
+	}
+	return ""
+}
+
+func (x *DesignQuoteResponse_Payload) GetQuoteLink() string {
+	if x != nil {
+		return x.QuoteLink
+	}
+	return ""
+}
+
+type DesignP2PResponse_Payload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DesignerName  string                 `protobuf:"bytes,1,opt,name=designer_name,json=designerName,proto3" json:"designer_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignP2PResponse_Payload) Reset() {
+	*x = DesignP2PResponse_Payload{}
+	mi := &file_notify_proto_msgTypes[99]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignP2PResponse_Payload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignP2PResponse_Payload) ProtoMessage() {}
+
+func (x *DesignP2PResponse_Payload) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[99]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignP2PResponse_Payload.ProtoReflect.Descriptor instead.
+func (*DesignP2PResponse_Payload) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{64, 0}
+}
+
+func (x *DesignP2PResponse_Payload) GetDesignerName() string {
+	if x != nil {
+		return x.DesignerName
+	}
+	return ""
+}
+
+type DesignNotificationFeedResponse_Data struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,3,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,4,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,5,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload            string                 `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignNotificationFeedResponse_Data) Reset() {
+	*x = DesignNotificationFeedResponse_Data{}
+	mi := &file_notify_proto_msgTypes[100]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationFeedResponse_Data) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationFeedResponse_Data) ProtoMessage() {}
+
+func (x *DesignNotificationFeedResponse_Data) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[100]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationFeedResponse_Data.ProtoReflect.Descriptor instead.
+func (*DesignNotificationFeedResponse_Data) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{66, 0}
+}
+
+func (x *DesignNotificationFeedResponse_Data) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignNotificationFeedResponse_Data) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignNotificationFeedResponse_Data) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignNotificationFeedResponse_Data) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignNotificationFeedResponse_Data) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignNotificationFeedResponse_Data) GetPayload() string {
+	if x != nil {
+		return x.Payload
+	}
+	return ""
+}
+
+func (x *DesignNotificationFeedResponse_Data) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DesignNotificationCountsResponse_ByType struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	LEAD          int32                  `protobuf:"varint,1,opt,name=LEAD,proto3" json:"LEAD,omitempty"`
+	PHASE         int32                  `protobuf:"varint,2,opt,name=PHASE,proto3" json:"PHASE,omitempty"`
+	MILESTONE     int32                  `protobuf:"varint,3,opt,name=MILESTONE,proto3" json:"MILESTONE,omitempty"`
+	PAYMENT       int32                  `protobuf:"varint,4,opt,name=PAYMENT,proto3" json:"PAYMENT,omitempty"`
+	DQC           int32                  `protobuf:"varint,5,opt,name=DQC,proto3" json:"DQC,omitempty"`
+	MMT           int32                  `protobuf:"varint,6,opt,name=MMT,proto3" json:"MMT,omitempty"`
+	MEETING       int32                  `protobuf:"varint,7,opt,name=MEETING,proto3" json:"MEETING,omitempty"`
+	ASSIGNMENT    int32                  `protobuf:"varint,8,opt,name=ASSIGNMENT,proto3" json:"ASSIGNMENT,omitempty"`
+	QUOTE         int32                  `protobuf:"varint,9,opt,name=QUOTE,proto3" json:"QUOTE,omitempty"`
+	P2P           int32                  `protobuf:"varint,10,opt,name=P2P,proto3" json:"P2P,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignNotificationCountsResponse_ByType) Reset() {
+	*x = DesignNotificationCountsResponse_ByType{}
+	mi := &file_notify_proto_msgTypes[101]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationCountsResponse_ByType) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationCountsResponse_ByType) ProtoMessage() {}
+
+func (x *DesignNotificationCountsResponse_ByType) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[101]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationCountsResponse_ByType.ProtoReflect.Descriptor instead.
+func (*DesignNotificationCountsResponse_ByType) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{68, 0}
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetLEAD() int32 {
+	if x != nil {
+		return x.LEAD
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetPHASE() int32 {
+	if x != nil {
+		return x.PHASE
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetMILESTONE() int32 {
+	if x != nil {
+		return x.MILESTONE
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetPAYMENT() int32 {
+	if x != nil {
+		return x.PAYMENT
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetDQC() int32 {
+	if x != nil {
+		return x.DQC
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetMMT() int32 {
+	if x != nil {
+		return x.MMT
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetMEETING() int32 {
+	if x != nil {
+		return x.MEETING
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetASSIGNMENT() int32 {
+	if x != nil {
+		return x.ASSIGNMENT
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetQUOTE() int32 {
+	if x != nil {
+		return x.QUOTE
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_ByType) GetP2P() int32 {
+	if x != nil {
+		return x.P2P
+	}
+	return 0
+}
+
+type DesignNotificationCountsResponse_Data struct {
+	state         protoimpl.MessageState                   `protogen:"open.v1"`
+	Total         int32                                    `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	ByType        *DesignNotificationCountsResponse_ByType `protobuf:"bytes,2,opt,name=by_type,json=byType,proto3" json:"by_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DesignNotificationCountsResponse_Data) Reset() {
+	*x = DesignNotificationCountsResponse_Data{}
+	mi := &file_notify_proto_msgTypes[102]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationCountsResponse_Data) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationCountsResponse_Data) ProtoMessage() {}
+
+func (x *DesignNotificationCountsResponse_Data) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[102]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationCountsResponse_Data.ProtoReflect.Descriptor instead.
+func (*DesignNotificationCountsResponse_Data) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{68, 1}
+}
+
+func (x *DesignNotificationCountsResponse_Data) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *DesignNotificationCountsResponse_Data) GetByType() *DesignNotificationCountsResponse_ByType {
+	if x != nil {
+		return x.ByType
+	}
+	return nil
+}
+
+type DesignNotificationDetailsResponse_Data struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId          string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	LeadName           string                 `protobuf:"bytes,2,opt,name=lead_name,json=leadName,proto3" json:"lead_name,omitempty"`
+	NotificationType   string                 `protobuf:"bytes,3,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
+	NotificationAction string                 `protobuf:"bytes,4,opt,name=notification_action,json=notificationAction,proto3" json:"notification_action,omitempty"`
+	DesignerId         int32                  `protobuf:"varint,5,opt,name=designer_id,json=designerId,proto3" json:"designer_id,omitempty"`
+	Payload            string                 `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DesignNotificationDetailsResponse_Data) Reset() {
+	*x = DesignNotificationDetailsResponse_Data{}
+	mi := &file_notify_proto_msgTypes[103]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DesignNotificationDetailsResponse_Data) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DesignNotificationDetailsResponse_Data) ProtoMessage() {}
+
+func (x *DesignNotificationDetailsResponse_Data) ProtoReflect() protoreflect.Message {
+	mi := &file_notify_proto_msgTypes[103]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DesignNotificationDetailsResponse_Data.ProtoReflect.Descriptor instead.
+func (*DesignNotificationDetailsResponse_Data) Descriptor() ([]byte, []int) {
+	return file_notify_proto_rawDescGZIP(), []int{70, 0}
+}
+
+func (x *DesignNotificationDetailsResponse_Data) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *DesignNotificationDetailsResponse_Data) GetLeadName() string {
+	if x != nil {
+		return x.LeadName
+	}
+	return ""
+}
+
+func (x *DesignNotificationDetailsResponse_Data) GetNotificationType() string {
+	if x != nil {
+		return x.NotificationType
+	}
+	return ""
+}
+
+func (x *DesignNotificationDetailsResponse_Data) GetNotificationAction() string {
+	if x != nil {
+		return x.NotificationAction
+	}
+	return ""
+}
+
+func (x *DesignNotificationDetailsResponse_Data) GetDesignerId() int32 {
+	if x != nil {
+		return x.DesignerId
+	}
+	return 0
+}
+
+func (x *DesignNotificationDetailsResponse_Data) GetPayload() string {
+	if x != nil {
+		return x.Payload
+	}
+	return ""
+}
+
+func (x *DesignNotificationDetailsResponse_Data) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
 var File_notify_proto protoreflect.FileDescriptor
 
 const file_notify_proto_rawDesc = "" +
 	"\n" +
-	"\fnotify.proto\x12\x06notify\x1a\x1cgoogle/api/annotations.proto\"\xd1\x01\n" +
+	"\fnotify.proto\x12\x06notify\x1a\x1cgoogle/api/annotations.proto\"\xf2\x01\n" +
 	"\x13MeetingCancellation\x12\x1d\n" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x03 \x01(\tR\bleadName\x126\n" +
-	"\tmilestone\x18\x04 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x04 \x01(\tR\n" +
+	"assignedTo\x126\n" +
+	"\tmilestone\x18\x05 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\"\xab\x01\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\"\xe9\x01\n" +
 	"\x0eMeetingSuccess\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1f\n" +
-	"\vnext_action\x18\x02 \x01(\tR\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12\x1f\n" +
+	"\vnext_action\x18\x04 \x01(\tR\n" +
 	"nextAction\x120\n" +
-	"\x14quote_link_generated\x18\x03 \x01(\bR\x12quoteLinkGenerated\x12\x1d\n" +
+	"\x14quote_link_generated\x18\x05 \x01(\bR\x12quoteLinkGenerated\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\tR\tcreatedAt\"\xaf\x02\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\"\xd0\x02\n" +
 	"\x10MeetingScheduled\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x14\n" +
-	"\x05title\x18\x04 \x01(\tR\x05title\x12!\n" +
-	"\fmeeting_date\x18\x05 \x01(\tR\vmeetingDate\x12\x12\n" +
-	"\x04slot\x18\x06 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\a \x01(\tR\vmeetingType\x126\n" +
-	"\tmilestone\x18\b \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x04 \x01(\tR\n" +
+	"assignedTo\x12\x14\n" +
+	"\x05title\x18\x05 \x01(\tR\x05title\x12!\n" +
+	"\fmeeting_date\x18\x06 \x01(\tR\vmeetingDate\x12\x12\n" +
+	"\x04slot\x18\a \x01(\tR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\b \x01(\tR\vmeetingType\x126\n" +
+	"\tmilestone\x18\t \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\t \x01(\tR\tcreatedAt\"\xb1\x02\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\"\xd2\x02\n" +
 	"\x12MeetingRescheduled\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x14\n" +
-	"\x05title\x18\x04 \x01(\tR\x05title\x12!\n" +
-	"\fmeeting_date\x18\x05 \x01(\tR\vmeetingDate\x12\x12\n" +
-	"\x04slot\x18\x06 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\a \x01(\tR\vmeetingType\x126\n" +
-	"\tmilestone\x18\b \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x04 \x01(\tR\n" +
+	"assignedTo\x12\x14\n" +
+	"\x05title\x18\x05 \x01(\tR\x05title\x12!\n" +
+	"\fmeeting_date\x18\x06 \x01(\tR\vmeetingDate\x12\x12\n" +
+	"\x04slot\x18\a \x01(\tR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\b \x01(\tR\vmeetingType\x126\n" +
+	"\tmilestone\x18\t \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\t \x01(\tR\tcreatedAt\"\x93\x01\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\"\xb4\x01\n" +
 	"\x13CancellationRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x02 \x01(\tR\bleadName\x126\n" +
-	"\tmilestone\x18\x03 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\"6\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x126\n" +
+	"\tmilestone\x18\x04 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\"6\n" +
 	"\x15GetByMeetingIDRequest\x12\x1d\n" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"E\n" +
 	"\x1aGetByLeadIdentifierRequest\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\x92\x01\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\xd0\x01\n" +
 	"\x14CreateSuccessRequest\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1f\n" +
-	"\vnext_action\x18\x02 \x01(\tR\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12\x1f\n" +
+	"\vnext_action\x18\x04 \x01(\tR\n" +
 	"nextAction\x120\n" +
-	"\x14quote_link_generated\x18\x03 \x01(\bR\x12quoteLinkGenerated\"\xf0\x01\n" +
+	"\x14quote_link_generated\x18\x05 \x01(\bR\x12quoteLinkGenerated\"\x91\x02\n" +
 	"\x16CreateScheduledRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12!\n" +
-	"\fmeeting_date\x18\x03 \x01(\tR\vmeetingDate\x12\x12\n" +
-	"\x04slot\x18\x04 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\x05 \x01(\tR\vmeetingType\x126\n" +
-	"\tmilestone\x18\x06 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\"8\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12!\n" +
+	"\fmeeting_date\x18\x04 \x01(\tR\vmeetingDate\x12\x12\n" +
+	"\x04slot\x18\x05 \x01(\tR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x126\n" +
+	"\tmilestone\x18\a \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\"8\n" +
 	"\x17GetScheduledByIDRequest\x12\x1d\n" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"N\n" +
 	"#GetScheduledByLeadIdentifierRequest\x12'\n" +
-	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\xec\x01\n" +
+	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\"\x8d\x02\n" +
 	"\x12RescheduledRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12!\n" +
-	"\fmeeting_date\x18\x03 \x01(\tR\vmeetingDate\x12\x12\n" +
-	"\x04slot\x18\x04 \x01(\tR\x04slot\x12!\n" +
-	"\fmeeting_type\x18\x05 \x01(\tR\vmeetingType\x126\n" +
-	"\tmilestone\x18\x06 \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\":\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12!\n" +
+	"\fmeeting_date\x18\x04 \x01(\tR\vmeetingDate\x12\x12\n" +
+	"\x04slot\x18\x05 \x01(\tR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x126\n" +
+	"\tmilestone\x18\a \x01(\x0e2\x18.notify.MeetingMilestoneR\tmilestone\":\n" +
 	"\x19GetRescheduledByIDRequest\x12\x1d\n" +
 	"\n" +
 	"meeting_id\x18\x01 \x01(\x05R\tmeetingId\"P\n" +
@@ -2239,31 +7403,35 @@ const file_notify_proto_rawDesc = "" +
 	"\fLeadResponse\x12 \n" +
 	"\x04data\x18\x01 \x01(\v2\f.notify.LeadR\x04data\"4\n" +
 	"\x10LeadListResponse\x12 \n" +
-	"\x04data\x18\x01 \x03(\v2\f.notify.LeadR\x04data\"\xe0\x02\n" +
+	"\x04data\x18\x01 \x03(\v2\f.notify.LeadR\x04data\"\x81\x03\n" +
 	"\aBooking\x12\x1d\n" +
 	"\n" +
 	"booking_id\x18\x01 \x01(\x05R\tbookingId\x12'\n" +
 	"\x0flead_identifier\x18\x02 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12!\n" +
-	"\fpayment_type\x18\x04 \x01(\tR\vpaymentType\x12\x1f\n" +
-	"\vpaid_amount\x18\x05 \x01(\x01R\n" +
+	"\tlead_name\x18\x03 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x04 \x01(\tR\n" +
+	"assignedTo\x12!\n" +
+	"\fpayment_type\x18\x05 \x01(\tR\vpaymentType\x12\x1f\n" +
+	"\vpaid_amount\x18\x06 \x01(\x01R\n" +
 	"paidAmount\x12)\n" +
-	"\x10remaining_amount\x18\x06 \x01(\x01R\x0fremainingAmount\x12!\n" +
-	"\fpayment_date\x18\a \x01(\tR\vpaymentDate\x12%\n" +
-	"\x0epayment_status\x18\b \x01(\tR\rpaymentStatus\x12\x18\n" +
-	"\aremarks\x18\t \x01(\tR\aremarks\x12\x1d\n" +
+	"\x10remaining_amount\x18\a \x01(\x01R\x0fremainingAmount\x12!\n" +
+	"\fpayment_date\x18\b \x01(\tR\vpaymentDate\x12%\n" +
+	"\x0epayment_status\x18\t \x01(\tR\rpaymentStatus\x12\x18\n" +
+	"\aremarks\x18\n" +
+	" \x01(\tR\aremarks\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\n" +
-	" \x01(\tR\tcreatedAt\"\xa6\x02\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\"\xc7\x02\n" +
 	"\x14CreateBookingRequest\x12'\n" +
 	"\x0flead_identifier\x18\x01 \x01(\tR\x0eleadIdentifier\x12\x1b\n" +
-	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12!\n" +
-	"\fpayment_type\x18\x03 \x01(\tR\vpaymentType\x12\x16\n" +
-	"\x06amount\x18\x04 \x01(\x01R\x06amount\x12!\n" +
-	"\fpayment_date\x18\x05 \x01(\tR\vpaymentDate\x12%\n" +
-	"\x0epayment_status\x18\x06 \x01(\tR\rpaymentStatus\x12\x18\n" +
-	"\aremarks\x18\a \x01(\tR\aremarks\x12)\n" +
-	"\x10remaining_amount\x18\b \x01(\x01R\x0fremainingAmount\"6\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vassigned_to\x18\x03 \x01(\tR\n" +
+	"assignedTo\x12!\n" +
+	"\fpayment_type\x18\x04 \x01(\tR\vpaymentType\x12\x16\n" +
+	"\x06amount\x18\x05 \x01(\x01R\x06amount\x12!\n" +
+	"\fpayment_date\x18\x06 \x01(\tR\vpaymentDate\x12%\n" +
+	"\x0epayment_status\x18\a \x01(\tR\rpaymentStatus\x12\x18\n" +
+	"\aremarks\x18\b \x01(\tR\aremarks\x12)\n" +
+	"\x10remaining_amount\x18\t \x01(\x01R\x0fremainingAmount\"6\n" +
 	"\x15GetBookingByIDRequest\x12\x1d\n" +
 	"\n" +
 	"booking_id\x18\x01 \x01(\x05R\tbookingId\"L\n" +
@@ -2281,11 +7449,493 @@ const file_notify_proto_rawDesc = "" +
 	"\x11total_rescheduled\x18\x03 \x01(\x05R\x10totalRescheduled\x12'\n" +
 	"\x0ftotal_cancelled\x18\x04 \x01(\x05R\x0etotalCancelled\x12#\n" +
 	"\rtotal_success\x18\x05 \x01(\x05R\ftotalSuccess\x12%\n" +
-	"\x0etotal_bookings\x18\x06 \x01(\x05R\rtotalBookings*h\n" +
+	"\x0etotal_bookings\x18\x06 \x01(\x05R\rtotalBookings\"\xdc\x03\n" +
+	"\x16DesignLeadPre10Request\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12@\n" +
+	"\apayload\x18\x04 \x01(\v2&.notify.DesignLeadPre10Request.PayloadR\apayload\x1a\xa2\x02\n" +
+	"\aPayload\x12#\n" +
+	"\rcurrent_phase\x18\x01 \x01(\tR\fcurrentPhase\x12#\n" +
+	"\rdesigner_name\x18\x02 \x01(\tR\fdesignerName\x120\n" +
+	"\x14sales_executive_name\x18\x03 \x01(\tR\x12salesExecutiveName\x12?\n" +
+	"\x04slot\x18\x04 \x01(\v2+.notify.DesignLeadPre10Request.Payload.SlotR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\x05 \x01(\tR\vmeetingType\x1a7\n" +
+	"\x04Slot\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x1b\n" +
+	"\tslot_time\x18\x02 \x01(\tR\bslotTime\"\xdc\x04\n" +
+	"\x17DesignLeadPre10Response\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12A\n" +
+	"\apayload\x18\x06 \x01(\v2'.notify.DesignLeadPre10Response.PayloadR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x1a\xa3\x02\n" +
+	"\aPayload\x12#\n" +
+	"\rcurrent_phase\x18\x01 \x01(\tR\fcurrentPhase\x12#\n" +
+	"\rdesigner_name\x18\x02 \x01(\tR\fdesignerName\x120\n" +
+	"\x14sales_executive_name\x18\x03 \x01(\tR\x12salesExecutiveName\x12@\n" +
+	"\x04slot\x18\x04 \x01(\v2,.notify.DesignLeadPre10Response.Payload.SlotR\x04slot\x12!\n" +
+	"\fmeeting_type\x18\x05 \x01(\tR\vmeetingType\x1a7\n" +
+	"\x04Slot\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x1b\n" +
+	"\tslot_time\x18\x02 \x01(\tR\bslotTime\"\x9b\x02\n" +
+	"\x15DesignLead1020Request\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12?\n" +
+	"\apayload\x18\x04 \x01(\v2%.notify.DesignLead1020Request.PayloadR\apayload\x1ad\n" +
+	"\aPayload\x12%\n" +
+	"\x0eprevious_phase\x18\x01 \x01(\tR\rpreviousPhase\x12\x18\n" +
+	"\atrigger\x18\x02 \x01(\tR\atrigger\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"\xf7\x03\n" +
+	"\x16DesignLead1020Response\x127\n" +
+	"\x04data\x18\x01 \x01(\v2#.notify.DesignLead1020Response.DataR\x04data\x1a\xa3\x03\n" +
+	"\x04Data\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12\x14\n" +
+	"\x05phase\x18\x06 \x01(\tR\x05phase\x12E\n" +
+	"\apayload\x18\a \x01(\v2+.notify.DesignLead1020Response.Data.PayloadR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\b \x01(\tR\tcreatedAt\x1ad\n" +
+	"\aPayload\x12%\n" +
+	"\x0eprevious_phase\x18\x01 \x01(\tR\rpreviousPhase\x12\x18\n" +
+	"\atrigger\x18\x02 \x01(\tR\atrigger\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"\xd5\x02\n" +
+	"\x16DesignMilestoneRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12@\n" +
+	"\apayload\x18\x04 \x01(\v2&.notify.DesignMilestoneRequest.PayloadR\apayload\x1a\x9b\x01\n" +
+	"\aPayload\x12%\n" +
+	"\x0emilestone_name\x18\x01 \x01(\tR\rmilestoneName\x12\x1b\n" +
+	"\ttask_name\x18\x02 \x01(\tR\btaskName\x12'\n" +
+	"\x0fmilestone_index\x18\x03 \x01(\x05R\x0emilestoneIndex\x12#\n" +
+	"\rdesigner_name\x18\x04 \x01(\tR\fdesignerName\"\xc8\x03\n" +
+	"\x17DesignMilestoneResponse\x128\n" +
+	"\x04data\x18\x01 \x01(\v2$.notify.DesignMilestoneResponse.DataR\x04data\x1a\xf2\x02\n" +
+	"\x04Data\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12%\n" +
+	"\x0emilestone_name\x18\x06 \x01(\tR\rmilestoneName\x12\x1b\n" +
+	"\ttask_name\x18\a \x01(\tR\btaskName\x12'\n" +
+	"\x0fmilestone_index\x18\b \x01(\x05R\x0emilestoneIndex\x12#\n" +
+	"\rdesigner_name\x18\t \x01(\tR\fdesignerName\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\"\xbd\x02\n" +
+	"\x1bDesignPaymentRequestRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12E\n" +
+	"\apayload\x18\x04 \x01(\v2+.notify.DesignPaymentRequestRequest.PayloadR\apayload\x1az\n" +
+	"\aPayload\x126\n" +
+	"\fpayment_type\x18\x01 \x01(\x0e2\x13.notify.PaymentTypeR\vpaymentType\x12\x1f\n" +
+	"\vupload_name\x18\x02 \x01(\tR\n" +
+	"uploadName\x12\x16\n" +
+	"\x06amount\x18\x03 \x01(\x01R\x06amount\"\xb1\x03\n" +
+	"\x1cDesignPaymentRequestResponse\x12=\n" +
+	"\x04data\x18\x01 \x01(\v2).notify.DesignPaymentRequestResponse.DataR\x04data\x1a\xd1\x02\n" +
+	"\x04Data\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x126\n" +
+	"\fpayment_type\x18\x06 \x01(\x0e2\x13.notify.PaymentTypeR\vpaymentType\x12\x1f\n" +
+	"\vupload_name\x18\a \x01(\tR\n" +
+	"uploadName\x12\x16\n" +
+	"\x06amount\x18\b \x01(\x01R\x06amount\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\"\xeb\x03\n" +
+	"\x1aDesignPaymentStatusRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\x12#\n" +
+	"\rdecision_type\x18\a \x01(\tR\fdecisionType\x12!\n" +
+	"\fpayment_type\x18\b \x01(\tR\vpaymentType\x12+\n" +
+	"\x11milestone_context\x18\t \x01(\tR\x10milestoneContext\x12#\n" +
+	"\rapprover_name\x18\n" +
+	" \x01(\tR\fapproverName\x12\x16\n" +
+	"\x06amount\x18\v \x01(\x01R\x06amount\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\f \x01(\tR\tcreatedAt\x12)\n" +
+	"\x10rejection_reason\x18\r \x01(\tR\x0frejectionReason\"\xc2\x03\n" +
+	"\x1bDesignPaymentStatusResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12E\n" +
+	"\apayload\x18\x04 \x01(\v2+.notify.DesignPaymentStatusResponse.PayloadR\apayload\x1a\xfe\x01\n" +
+	"\aPayload\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12#\n" +
+	"\rdecision_type\x18\x02 \x01(\tR\fdecisionType\x12!\n" +
+	"\fpayment_type\x18\x03 \x01(\tR\vpaymentType\x12+\n" +
+	"\x11milestone_context\x18\x04 \x01(\tR\x10milestoneContext\x12#\n" +
+	"\rapprover_name\x18\x05 \x01(\tR\fapproverName\x12\x16\n" +
+	"\x06amount\x18\x06 \x01(\x01R\x06amount\x12)\n" +
+	"\x10rejection_reason\x18\a \x01(\tR\x0frejectionReason\"\xd5\x01\n" +
+	"\x17DesignDQCRequestRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12\x1b\n" +
+	"\tdqc_round\x18\x04 \x01(\tR\bdqcRound\x12\x1b\n" +
+	"\treview_id\x18\x05 \x01(\x05R\breviewId\x12#\n" +
+	"\rdesigner_name\x18\x06 \x01(\tR\fdesignerName\"\x97\x03\n" +
+	"\x18DesignDQCRequestResponse\x129\n" +
+	"\x04data\x18\x01 \x01(\v2%.notify.DesignDQCRequestResponse.DataR\x04data\x1a\xbf\x02\n" +
+	"\x04Data\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12\x1b\n" +
+	"\tdqc_round\x18\x06 \x01(\tR\bdqcRound\x12\x1b\n" +
+	"\treview_id\x18\a \x01(\x05R\breviewId\x12#\n" +
+	"\rdesigner_name\x18\b \x01(\tR\fdesignerName\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\"\x9c\x03\n" +
+	"\x16DesignDQCStatusRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\x12#\n" +
+	"\rdecision_type\x18\a \x01(\tR\fdecisionType\x12\x1b\n" +
+	"\tdqc_round\x18\b \x01(\tR\bdqcRound\x12#\n" +
+	"\rdesigner_name\x18\t \x01(\tR\fdesignerName\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\x12)\n" +
+	"\x10rejection_reason\x18\v \x01(\tR\x0frejectionReason\"\xef\x02\n" +
+	"\x17DesignDQCStatusResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12A\n" +
+	"\apayload\x18\x04 \x01(\v2'.notify.DesignDQCStatusResponse.PayloadR\apayload\x1a\xb3\x01\n" +
+	"\aPayload\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12#\n" +
+	"\rdecision_type\x18\x02 \x01(\tR\fdecisionType\x12\x1b\n" +
+	"\tdqc_round\x18\x03 \x01(\tR\bdqcRound\x12#\n" +
+	"\rdesigner_name\x18\x04 \x01(\tR\fdesignerName\x12)\n" +
+	"\x10rejection_reason\x18\x05 \x01(\tR\x0frejectionReason\"\xc3\x03\n" +
+	"\x17DesignMMTRequestRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12\x1b\n" +
+	"\tmmt_scope\x18\x06 \x01(\tR\bmmtScope\x12\x1d\n" +
+	"\n" +
+	"visit_date\x18\a \x01(\tR\tvisitDate\x12\x1d\n" +
+	"\n" +
+	"visit_time\x18\b \x01(\tR\tvisitTime\x12$\n" +
+	"\x0emmt_manager_id\x18\t \x01(\x05R\fmmtManagerId\x12#\n" +
+	"\rdesigner_name\x18\n" +
+	" \x01(\tR\fdesignerName\x12(\n" +
+	"\x10mmt_manager_name\x18\v \x01(\tR\x0emmtManagerName\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\f \x01(\tR\tcreatedAt\"\x97\x03\n" +
+	"\x18DesignMMTRequestResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12B\n" +
+	"\apayload\x18\x04 \x01(\v2(.notify.DesignMMTRequestResponse.PayloadR\apayload\x1a\xd9\x01\n" +
+	"\aPayload\x12\x1b\n" +
+	"\tmmt_scope\x18\x01 \x01(\tR\bmmtScope\x12\x1d\n" +
+	"\n" +
+	"visit_date\x18\x02 \x01(\tR\tvisitDate\x12\x1d\n" +
+	"\n" +
+	"visit_time\x18\x03 \x01(\tR\tvisitTime\x12$\n" +
+	"\x0emmt_manager_id\x18\x04 \x01(\x05R\fmmtManagerId\x12#\n" +
+	"\rdesigner_name\x18\x05 \x01(\tR\fdesignerName\x12(\n" +
+	"\x10mmt_manager_name\x18\x06 \x01(\tR\x0emmtManagerName\"\x96\x03\n" +
+	"\x16DesignMMTAssignRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12@\n" +
+	"\apayload\x18\x06 \x01(\v2&.notify.DesignMMTAssignRequest.PayloadR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x1a`\n" +
+	"\aPayload\x12'\n" +
+	"\x0fassignment_type\x18\x01 \x01(\tR\x0eassignmentType\x12\x17\n" +
+	"\ato_name\x18\x02 \x01(\tR\x06toName\x12\x13\n" +
+	"\x05to_id\x18\x03 \x01(\x05R\x04toId\"\x9b\x02\n" +
+	"\x17DesignMMTAssignResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12A\n" +
+	"\apayload\x18\x04 \x01(\v2'.notify.DesignMMTAssignResponse.PayloadR\apayload\x1a`\n" +
+	"\aPayload\x12'\n" +
+	"\x0fassignment_type\x18\x01 \x01(\tR\x0eassignmentType\x12\x17\n" +
+	"\ato_name\x18\x02 \x01(\tR\x06toName\x12\x13\n" +
+	"\x05to_id\x18\x03 \x01(\x05R\x04toId\"\xb4\x03\n" +
+	"\x18DesignMMTDocReadyRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12B\n" +
+	"\apayload\x18\x06 \x01(\v2(.notify.DesignMMTDocReadyRequest.PayloadR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x1az\n" +
+	"\aPayload\x12\x1b\n" +
+	"\tmmt_scope\x18\x01 \x01(\tR\bmmtScope\x12\x10\n" +
+	"\x03via\x18\x02 \x01(\tR\x03via\x12\x1f\n" +
+	"\vupload_name\x18\x03 \x01(\tR\n" +
+	"uploadName\x12\x1f\n" +
+	"\vapproved_by\x18\x04 \x01(\tR\n" +
+	"approvedBy\"\x98\x02\n" +
+	"\x19DesignMMTDocReadyResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12C\n" +
+	"\apayload\x18\x03 \x01(\v2).notify.DesignMMTDocReadyResponse.PayloadR\apayload\x1az\n" +
+	"\aPayload\x12\x1b\n" +
+	"\tmmt_scope\x18\x01 \x01(\tR\bmmtScope\x12\x10\n" +
+	"\x03via\x18\x02 \x01(\tR\x03via\x12\x1f\n" +
+	"\vupload_name\x18\x03 \x01(\tR\n" +
+	"uploadName\x12\x1f\n" +
+	"\vapproved_by\x18\x04 \x01(\tR\n" +
+	"approvedBy\"\x95\x03\n" +
+	"\x14DesignMeetingRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12!\n" +
+	"\fmeeting_type\x18\x06 \x01(\tR\vmeetingType\x12\x10\n" +
+	"\x03mod\x18\a \x01(\tR\x03mod\x125\n" +
+	"\x04slot\x18\b \x01(\v2!.notify.DesignMeetingRequest.SlotR\x04slot\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\x1a7\n" +
+	"\x04Slot\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x1b\n" +
+	"\ttime_slot\x18\x02 \x01(\tR\btimeSlot\"\xce\x02\n" +
+	"\x15DesignMeetingResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12?\n" +
+	"\apayload\x18\x03 \x01(\v2%.notify.DesignMeetingResponse.PayloadR\apayload\x1a\xb7\x01\n" +
+	"\aPayload\x12!\n" +
+	"\fmeeting_type\x18\x01 \x01(\tR\vmeetingType\x12\x10\n" +
+	"\x03mod\x18\x02 \x01(\tR\x03mod\x12>\n" +
+	"\x04slot\x18\x03 \x01(\v2*.notify.DesignMeetingResponse.Payload.SlotR\x04slot\x1a7\n" +
+	"\x04Slot\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x1b\n" +
+	"\ttime_slot\x18\x02 \x01(\tR\btimeSlot\"\xb6\x03\n" +
+	"\x1bDesignAssignDesignerRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12+\n" +
+	"\x11notification_type\x18\x03 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x04 \x01(\tR\x12notificationAction\x12E\n" +
+	"\apayload\x18\x05 \x01(\v2+.notify.DesignAssignDesignerRequest.PayloadR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\x1a\x96\x01\n" +
+	"\aPayload\x12'\n" +
+	"\x0fassignment_type\x18\x01 \x01(\tR\x0eassignmentType\x12\x17\n" +
+	"\afrom_id\x18\x02 \x01(\x05R\x06fromId\x12\x13\n" +
+	"\x05to_id\x18\x03 \x01(\x05R\x04toId\x12\x1b\n" +
+	"\tfrom_name\x18\x04 \x01(\tR\bfromName\x12\x17\n" +
+	"\ato_name\x18\x05 \x01(\tR\x06toName\"\xbb\x02\n" +
+	"\x1cDesignAssignDesignerResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12F\n" +
+	"\apayload\x18\x03 \x01(\v2,.notify.DesignAssignDesignerResponse.PayloadR\apayload\x1a\x96\x01\n" +
+	"\aPayload\x12'\n" +
+	"\x0fassignment_type\x18\x01 \x01(\tR\x0eassignmentType\x12\x17\n" +
+	"\afrom_id\x18\x02 \x01(\x05R\x06fromId\x12\x13\n" +
+	"\x05to_id\x18\x03 \x01(\x05R\x04toId\x12\x1b\n" +
+	"\tfrom_name\x18\x04 \x01(\tR\bfromName\x12\x17\n" +
+	"\ato_name\x18\x05 \x01(\tR\x06toName\"\x94\x03\n" +
+	"\x15DesignAssignPMRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12?\n" +
+	"\apayload\x18\x06 \x01(\v2%.notify.DesignAssignPMRequest.PayloadR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x1a`\n" +
+	"\aPayload\x12'\n" +
+	"\x0fassignment_type\x18\x01 \x01(\tR\x0eassignmentType\x12\x13\n" +
+	"\x05to_id\x18\x02 \x01(\x05R\x04toId\x12\x17\n" +
+	"\ato_name\x18\x03 \x01(\tR\x06toName\"\x99\x02\n" +
+	"\x16DesignAssignPMResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12@\n" +
+	"\apayload\x18\x04 \x01(\v2&.notify.DesignAssignPMResponse.PayloadR\apayload\x1a`\n" +
+	"\aPayload\x12'\n" +
+	"\x0fassignment_type\x18\x01 \x01(\tR\x0eassignmentType\x12\x13\n" +
+	"\x05to_id\x18\x02 \x01(\x05R\x04toId\x12\x17\n" +
+	"\ato_name\x18\x03 \x01(\tR\x06toName\"\xf1\x02\n" +
+	"\x12DesignQuoteRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12<\n" +
+	"\apayload\x18\x06 \x01(\v2\".notify.DesignQuoteRequest.PayloadR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x1aC\n" +
+	"\aPayload\x12\x19\n" +
+	"\bquote_id\x18\x01 \x01(\tR\aquoteId\x12\x1d\n" +
+	"\n" +
+	"quote_link\x18\x02 \x01(\tR\tquoteLink\"\xd5\x01\n" +
+	"\x13DesignQuoteResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12=\n" +
+	"\apayload\x18\x03 \x01(\v2#.notify.DesignQuoteResponse.PayloadR\apayload\x1aC\n" +
+	"\aPayload\x12\x19\n" +
+	"\bquote_id\x18\x01 \x01(\tR\aquoteId\x12\x1d\n" +
+	"\n" +
+	"quote_link\x18\x02 \x01(\tR\tquoteLink\"\x91\x02\n" +
+	"\x10DesignP2PRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12+\n" +
+	"\x11notification_type\x18\x04 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x05 \x01(\tR\x12notificationAction\x12#\n" +
+	"\rdesigner_name\x18\x06 \x01(\tR\fdesignerName\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\"\xdd\x01\n" +
+	"\x11DesignP2PResponse\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12\x1f\n" +
+	"\vdesigner_id\x18\x03 \x01(\x05R\n" +
+	"designerId\x12;\n" +
+	"\apayload\x18\x04 \x01(\v2!.notify.DesignP2PResponse.PayloadR\apayload\x1a.\n" +
+	"\aPayload\x12#\n" +
+	"\rdesigner_name\x18\x01 \x01(\tR\fdesignerName\"j\n" +
+	"\x1dDesignNotificationFeedRequest\x12\x14\n" +
+	"\x05since\x18\x01 \x01(\tR\x05since\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x03 \x01(\tR\tprojectId\"\xde\x02\n" +
+	"\x1eDesignNotificationFeedResponse\x12?\n" +
+	"\x04data\x18\x01 \x03(\v2+.notify.DesignNotificationFeedResponse.DataR\x04data\x1a\xfa\x01\n" +
+	"\x04Data\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12+\n" +
+	"\x11notification_type\x18\x03 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x04 \x01(\tR\x12notificationAction\x12\x1f\n" +
+	"\vdesigner_id\x18\x05 \x01(\x05R\n" +
+	"designerId\x12\x18\n" +
+	"\apayload\x18\x06 \x01(\tR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\"7\n" +
+	"\x1fDesignNotificationCountsRequest\x12\x14\n" +
+	"\x05since\x18\x01 \x01(\tR\x05since\"\xc0\x03\n" +
+	" DesignNotificationCountsResponse\x12A\n" +
+	"\x04data\x18\x01 \x01(\v2-.notify.DesignNotificationCountsResponse.DataR\x04data\x1a\xf0\x01\n" +
+	"\x06ByType\x12\x12\n" +
+	"\x04LEAD\x18\x01 \x01(\x05R\x04LEAD\x12\x14\n" +
+	"\x05PHASE\x18\x02 \x01(\x05R\x05PHASE\x12\x1c\n" +
+	"\tMILESTONE\x18\x03 \x01(\x05R\tMILESTONE\x12\x18\n" +
+	"\aPAYMENT\x18\x04 \x01(\x05R\aPAYMENT\x12\x10\n" +
+	"\x03DQC\x18\x05 \x01(\x05R\x03DQC\x12\x10\n" +
+	"\x03MMT\x18\x06 \x01(\x05R\x03MMT\x12\x18\n" +
+	"\aMEETING\x18\a \x01(\x05R\aMEETING\x12\x1e\n" +
+	"\n" +
+	"ASSIGNMENT\x18\b \x01(\x05R\n" +
+	"ASSIGNMENT\x12\x14\n" +
+	"\x05QUOTE\x18\t \x01(\x05R\x05QUOTE\x12\x10\n" +
+	"\x03P2P\x18\n" +
+	" \x01(\x05R\x03P2P\x1af\n" +
+	"\x04Data\x12\x14\n" +
+	"\x05total\x18\x01 \x01(\x05R\x05total\x12H\n" +
+	"\aby_type\x18\x02 \x01(\v2/.notify.DesignNotificationCountsResponse.ByTypeR\x06byType\"K\n" +
+	" DesignNotificationDetailsRequest\x12'\n" +
+	"\x0fnotification_id\x18\x01 \x01(\x05R\x0enotificationId\"\xe4\x02\n" +
+	"!DesignNotificationDetailsResponse\x12B\n" +
+	"\x04data\x18\x01 \x01(\v2..notify.DesignNotificationDetailsResponse.DataR\x04data\x1a\xfa\x01\n" +
+	"\x04Data\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tlead_name\x18\x02 \x01(\tR\bleadName\x12+\n" +
+	"\x11notification_type\x18\x03 \x01(\tR\x10notificationType\x12/\n" +
+	"\x13notification_action\x18\x04 \x01(\tR\x12notificationAction\x12\x1f\n" +
+	"\vdesigner_id\x18\x05 \x01(\x05R\n" +
+	"designerId\x12\x18\n" +
+	"\apayload\x18\x06 \x01(\tR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt*h\n" +
 	"\x10MeetingMilestone\x12\x19\n" +
 	"\x15MILESTONE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14MILESTONE_CONNECTION\x10\x01\x12\x1f\n" +
-	"\x1bMILESTONE_EXPERIENCE_DESIGN\x10\x022\x80\x11\n" +
+	"\x1bMILESTONE_EXPERIENCE_DESIGN\x10\x02*s\n" +
+	"\vPaymentType\x12\x1c\n" +
+	"\x18PAYMENT_TYPE_UNSPECIFIED\x10\x00\x12\x12\n" +
+	"\x0ePRE_10_PERCENT\x10\x01\x12\x18\n" +
+	"\x14MILESTONE_10_PERCENT\x10\x02\x12\x18\n" +
+	"\x14MILESTONE_40_PERCENT\x10\x032\x86%\n" +
 	"\rNotifyService\x12o\n" +
 	"\fCancellation\x12\x1b.notify.CancellationRequest\x1a\x1c.notify.CancellationResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\x1a\x19/v1/meetings/cancellation\x12~\n" +
 	"\x13GetAllCancellations\x12\".notify.GetByLeadIdentifierRequest\x1a .notify.CancellationListResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/meetings/cancellation\x12\x82\x01\n" +
@@ -2307,7 +7957,25 @@ const file_notify_proto_rawDesc = "" +
 	"\x0eGetAllBookings\x12).notify.GetBookingByLeadIdentifierRequest\x1a\x1b.notify.BookingListResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/v1/bookings\x12k\n" +
 	"\x0eGetBookingByID\x12\x1d.notify.GetBookingByIDRequest\x1a\x17.notify.BookingResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/bookings/{booking_id}\x12N\n" +
 	"\tGetCounts\x12\x15.notify.CountsRequest\x1a\x16.notify.CountsResponse\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
-	"/v1/countsB\x13Z\x11./protogen/notifyb\x06proto3"
+	"/v1/counts\x12\x89\x01\n" +
+	"\x15CreateDesignLeadPre10\x12\x1e.notify.DesignLeadPre10Request\x1a\x1f.notify.DesignLeadPre10Response\"/\x82\xd3\xe4\x93\x02):\x01*\"$/v1/design/notifications/lead/pre-10\x12\x85\x01\n" +
+	"\x14CreateDesignLead1020\x12\x1d.notify.DesignLead1020Request\x1a\x1e.notify.DesignLead1020Response\".\x82\xd3\xe4\x93\x02(:\x01*\"#/v1/design/notifications/lead/10-20\x12\x87\x01\n" +
+	"\x15CreateDesignMilestone\x12\x1e.notify.DesignMilestoneRequest\x1a\x1f.notify.DesignMilestoneResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/v1/design/notifications/milestone\x12\x9c\x01\n" +
+	"\x1aCreateDesignPaymentRequest\x12#.notify.DesignPaymentRequestRequest\x1a$.notify.DesignPaymentRequestResponse\"3\x82\xd3\xe4\x93\x02-:\x01*\"(/v1/design/notifications/payment/request\x12\x98\x01\n" +
+	"\x19CreateDesignPaymentStatus\x12\".notify.DesignPaymentStatusRequest\x1a#.notify.DesignPaymentStatusResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/v1/design/notifications/payment/status\x12\x8c\x01\n" +
+	"\x16CreateDesignDQCRequest\x12\x1f.notify.DesignDQCRequestRequest\x1a .notify.DesignDQCRequestResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/v1/design/notifications/dqc/request\x12\x88\x01\n" +
+	"\x15CreateDesignDQCStatus\x12\x1e.notify.DesignDQCStatusRequest\x1a\x1f.notify.DesignDQCStatusResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/v1/design/notifications/dqc/status\x12\x8c\x01\n" +
+	"\x16CreateDesignMMTRequest\x12\x1f.notify.DesignMMTRequestRequest\x1a .notify.DesignMMTRequestResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/v1/design/notifications/mmt/request\x12\x88\x01\n" +
+	"\x15CreateDesignMMTAssign\x12\x1e.notify.DesignMMTAssignRequest\x1a\x1f.notify.DesignMMTAssignResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/v1/design/notifications/mmt/assign\x12\x91\x01\n" +
+	"\x17CreateDesignMMTDocReady\x12 .notify.DesignMMTDocReadyRequest\x1a!.notify.DesignMMTDocReadyResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/v1/design/notifications/mmt/doc-ready\x12\x7f\n" +
+	"\x13CreateDesignMeeting\x12\x1c.notify.DesignMeetingRequest\x1a\x1d.notify.DesignMeetingResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\" /v1/design/notifications/meeting\x12\x9c\x01\n" +
+	"\x1aCreateDesignAssignDesigner\x12#.notify.DesignAssignDesignerRequest\x1a$.notify.DesignAssignDesignerResponse\"3\x82\xd3\xe4\x93\x02-:\x01*\"(/v1/design/notifications/assign/designer\x12\x84\x01\n" +
+	"\x14CreateDesignAssignPM\x12\x1d.notify.DesignAssignPMRequest\x1a\x1e.notify.DesignAssignPMResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/v1/design/notifications/assign/pm\x12w\n" +
+	"\x11CreateDesignQuote\x12\x1a.notify.DesignQuoteRequest\x1a\x1b.notify.DesignQuoteResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/v1/design/notifications/quote\x12o\n" +
+	"\x0fCreateDesignP2P\x12\x18.notify.DesignP2PRequest\x1a\x19.notify.DesignP2PResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/v1/design/notifications/p2p\x12\x8c\x01\n" +
+	"\x19GetDesignNotificationFeed\x12%.notify.DesignNotificationFeedRequest\x1a&.notify.DesignNotificationFeedResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/v1/design/notifications\x12\x99\x01\n" +
+	"\x1bGetDesignNotificationCounts\x12'.notify.DesignNotificationCountsRequest\x1a(.notify.DesignNotificationCountsResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/v1/design/notifications/counts\x12\xa7\x01\n" +
+	"\x1cGetDesignNotificationDetails\x12(.notify.DesignNotificationDetailsRequest\x1a).notify.DesignNotificationDetailsResponse\"2\x82\xd3\xe4\x93\x02,\x12*/v1/design/notifications/{notification_id}B\x13Z\x11./protogen/notifyb\x06proto3"
 
 var (
 	file_notify_proto_rawDescOnce sync.Once
@@ -2321,108 +7989,249 @@ func file_notify_proto_rawDescGZIP() []byte {
 	return file_notify_proto_rawDescData
 }
 
-var file_notify_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_notify_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_notify_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_notify_proto_msgTypes = make([]protoimpl.MessageInfo, 104)
 var file_notify_proto_goTypes = []any{
-	(MeetingMilestone)(0),                         // 0: notify.MeetingMilestone
-	(*MeetingCancellation)(nil),                   // 1: notify.MeetingCancellation
-	(*MeetingSuccess)(nil),                        // 2: notify.MeetingSuccess
-	(*MeetingScheduled)(nil),                      // 3: notify.MeetingScheduled
-	(*MeetingRescheduled)(nil),                    // 4: notify.MeetingRescheduled
-	(*CancellationRequest)(nil),                   // 5: notify.CancellationRequest
-	(*GetByMeetingIDRequest)(nil),                 // 6: notify.GetByMeetingIDRequest
-	(*GetByLeadIdentifierRequest)(nil),            // 7: notify.GetByLeadIdentifierRequest
-	(*CreateSuccessRequest)(nil),                  // 8: notify.CreateSuccessRequest
-	(*CreateScheduledRequest)(nil),                // 9: notify.CreateScheduledRequest
-	(*GetScheduledByIDRequest)(nil),               // 10: notify.GetScheduledByIDRequest
-	(*GetScheduledByLeadIdentifierRequest)(nil),   // 11: notify.GetScheduledByLeadIdentifierRequest
-	(*RescheduledRequest)(nil),                    // 12: notify.RescheduledRequest
-	(*GetRescheduledByIDRequest)(nil),             // 13: notify.GetRescheduledByIDRequest
-	(*GetRescheduledByLeadIdentifierRequest)(nil), // 14: notify.GetRescheduledByLeadIdentifierRequest
-	(*CancellationResponse)(nil),                  // 15: notify.CancellationResponse
-	(*CancellationListResponse)(nil),              // 16: notify.CancellationListResponse
-	(*SuccessResponse)(nil),                       // 17: notify.SuccessResponse
-	(*SuccessListResponse)(nil),                   // 18: notify.SuccessListResponse
-	(*ScheduledResponse)(nil),                     // 19: notify.ScheduledResponse
-	(*ScheduledListResponse)(nil),                 // 20: notify.ScheduledListResponse
-	(*RescheduledResponse)(nil),                   // 21: notify.RescheduledResponse
-	(*RescheduledListResponse)(nil),               // 22: notify.RescheduledListResponse
-	(*DeleteResponse)(nil),                        // 23: notify.DeleteResponse
-	(*Lead)(nil),                                  // 24: notify.Lead
-	(*CreateLeadRequest)(nil),                     // 25: notify.CreateLeadRequest
-	(*LeadResponse)(nil),                          // 26: notify.LeadResponse
-	(*LeadListResponse)(nil),                      // 27: notify.LeadListResponse
-	(*Booking)(nil),                               // 28: notify.Booking
-	(*CreateBookingRequest)(nil),                  // 29: notify.CreateBookingRequest
-	(*GetBookingByIDRequest)(nil),                 // 30: notify.GetBookingByIDRequest
-	(*GetBookingByLeadIdentifierRequest)(nil),     // 31: notify.GetBookingByLeadIdentifierRequest
-	(*BookingResponse)(nil),                       // 32: notify.BookingResponse
-	(*BookingListResponse)(nil),                   // 33: notify.BookingListResponse
-	(*CountsRequest)(nil),                         // 34: notify.CountsRequest
-	(*CountsResponse)(nil),                        // 35: notify.CountsResponse
+	(MeetingMilestone)(0),                           // 0: notify.MeetingMilestone
+	(PaymentType)(0),                                // 1: notify.PaymentType
+	(*MeetingCancellation)(nil),                     // 2: notify.MeetingCancellation
+	(*MeetingSuccess)(nil),                          // 3: notify.MeetingSuccess
+	(*MeetingScheduled)(nil),                        // 4: notify.MeetingScheduled
+	(*MeetingRescheduled)(nil),                      // 5: notify.MeetingRescheduled
+	(*CancellationRequest)(nil),                     // 6: notify.CancellationRequest
+	(*GetByMeetingIDRequest)(nil),                   // 7: notify.GetByMeetingIDRequest
+	(*GetByLeadIdentifierRequest)(nil),              // 8: notify.GetByLeadIdentifierRequest
+	(*CreateSuccessRequest)(nil),                    // 9: notify.CreateSuccessRequest
+	(*CreateScheduledRequest)(nil),                  // 10: notify.CreateScheduledRequest
+	(*GetScheduledByIDRequest)(nil),                 // 11: notify.GetScheduledByIDRequest
+	(*GetScheduledByLeadIdentifierRequest)(nil),     // 12: notify.GetScheduledByLeadIdentifierRequest
+	(*RescheduledRequest)(nil),                      // 13: notify.RescheduledRequest
+	(*GetRescheduledByIDRequest)(nil),               // 14: notify.GetRescheduledByIDRequest
+	(*GetRescheduledByLeadIdentifierRequest)(nil),   // 15: notify.GetRescheduledByLeadIdentifierRequest
+	(*CancellationResponse)(nil),                    // 16: notify.CancellationResponse
+	(*CancellationListResponse)(nil),                // 17: notify.CancellationListResponse
+	(*SuccessResponse)(nil),                         // 18: notify.SuccessResponse
+	(*SuccessListResponse)(nil),                     // 19: notify.SuccessListResponse
+	(*ScheduledResponse)(nil),                       // 20: notify.ScheduledResponse
+	(*ScheduledListResponse)(nil),                   // 21: notify.ScheduledListResponse
+	(*RescheduledResponse)(nil),                     // 22: notify.RescheduledResponse
+	(*RescheduledListResponse)(nil),                 // 23: notify.RescheduledListResponse
+	(*DeleteResponse)(nil),                          // 24: notify.DeleteResponse
+	(*Lead)(nil),                                    // 25: notify.Lead
+	(*CreateLeadRequest)(nil),                       // 26: notify.CreateLeadRequest
+	(*LeadResponse)(nil),                            // 27: notify.LeadResponse
+	(*LeadListResponse)(nil),                        // 28: notify.LeadListResponse
+	(*Booking)(nil),                                 // 29: notify.Booking
+	(*CreateBookingRequest)(nil),                    // 30: notify.CreateBookingRequest
+	(*GetBookingByIDRequest)(nil),                   // 31: notify.GetBookingByIDRequest
+	(*GetBookingByLeadIdentifierRequest)(nil),       // 32: notify.GetBookingByLeadIdentifierRequest
+	(*BookingResponse)(nil),                         // 33: notify.BookingResponse
+	(*BookingListResponse)(nil),                     // 34: notify.BookingListResponse
+	(*CountsRequest)(nil),                           // 35: notify.CountsRequest
+	(*CountsResponse)(nil),                          // 36: notify.CountsResponse
+	(*DesignLeadPre10Request)(nil),                  // 37: notify.DesignLeadPre10Request
+	(*DesignLeadPre10Response)(nil),                 // 38: notify.DesignLeadPre10Response
+	(*DesignLead1020Request)(nil),                   // 39: notify.DesignLead1020Request
+	(*DesignLead1020Response)(nil),                  // 40: notify.DesignLead1020Response
+	(*DesignMilestoneRequest)(nil),                  // 41: notify.DesignMilestoneRequest
+	(*DesignMilestoneResponse)(nil),                 // 42: notify.DesignMilestoneResponse
+	(*DesignPaymentRequestRequest)(nil),             // 43: notify.DesignPaymentRequestRequest
+	(*DesignPaymentRequestResponse)(nil),            // 44: notify.DesignPaymentRequestResponse
+	(*DesignPaymentStatusRequest)(nil),              // 45: notify.DesignPaymentStatusRequest
+	(*DesignPaymentStatusResponse)(nil),             // 46: notify.DesignPaymentStatusResponse
+	(*DesignDQCRequestRequest)(nil),                 // 47: notify.DesignDQCRequestRequest
+	(*DesignDQCRequestResponse)(nil),                // 48: notify.DesignDQCRequestResponse
+	(*DesignDQCStatusRequest)(nil),                  // 49: notify.DesignDQCStatusRequest
+	(*DesignDQCStatusResponse)(nil),                 // 50: notify.DesignDQCStatusResponse
+	(*DesignMMTRequestRequest)(nil),                 // 51: notify.DesignMMTRequestRequest
+	(*DesignMMTRequestResponse)(nil),                // 52: notify.DesignMMTRequestResponse
+	(*DesignMMTAssignRequest)(nil),                  // 53: notify.DesignMMTAssignRequest
+	(*DesignMMTAssignResponse)(nil),                 // 54: notify.DesignMMTAssignResponse
+	(*DesignMMTDocReadyRequest)(nil),                // 55: notify.DesignMMTDocReadyRequest
+	(*DesignMMTDocReadyResponse)(nil),               // 56: notify.DesignMMTDocReadyResponse
+	(*DesignMeetingRequest)(nil),                    // 57: notify.DesignMeetingRequest
+	(*DesignMeetingResponse)(nil),                   // 58: notify.DesignMeetingResponse
+	(*DesignAssignDesignerRequest)(nil),             // 59: notify.DesignAssignDesignerRequest
+	(*DesignAssignDesignerResponse)(nil),            // 60: notify.DesignAssignDesignerResponse
+	(*DesignAssignPMRequest)(nil),                   // 61: notify.DesignAssignPMRequest
+	(*DesignAssignPMResponse)(nil),                  // 62: notify.DesignAssignPMResponse
+	(*DesignQuoteRequest)(nil),                      // 63: notify.DesignQuoteRequest
+	(*DesignQuoteResponse)(nil),                     // 64: notify.DesignQuoteResponse
+	(*DesignP2PRequest)(nil),                        // 65: notify.DesignP2PRequest
+	(*DesignP2PResponse)(nil),                       // 66: notify.DesignP2PResponse
+	(*DesignNotificationFeedRequest)(nil),           // 67: notify.DesignNotificationFeedRequest
+	(*DesignNotificationFeedResponse)(nil),          // 68: notify.DesignNotificationFeedResponse
+	(*DesignNotificationCountsRequest)(nil),         // 69: notify.DesignNotificationCountsRequest
+	(*DesignNotificationCountsResponse)(nil),        // 70: notify.DesignNotificationCountsResponse
+	(*DesignNotificationDetailsRequest)(nil),        // 71: notify.DesignNotificationDetailsRequest
+	(*DesignNotificationDetailsResponse)(nil),       // 72: notify.DesignNotificationDetailsResponse
+	(*DesignLeadPre10Request_Payload)(nil),          // 73: notify.DesignLeadPre10Request.Payload
+	(*DesignLeadPre10Request_Payload_Slot)(nil),     // 74: notify.DesignLeadPre10Request.Payload.Slot
+	(*DesignLeadPre10Response_Payload)(nil),         // 75: notify.DesignLeadPre10Response.Payload
+	(*DesignLeadPre10Response_Payload_Slot)(nil),    // 76: notify.DesignLeadPre10Response.Payload.Slot
+	(*DesignLead1020Request_Payload)(nil),           // 77: notify.DesignLead1020Request.Payload
+	(*DesignLead1020Response_Data)(nil),             // 78: notify.DesignLead1020Response.Data
+	(*DesignLead1020Response_Data_Payload)(nil),     // 79: notify.DesignLead1020Response.Data.Payload
+	(*DesignMilestoneRequest_Payload)(nil),          // 80: notify.DesignMilestoneRequest.Payload
+	(*DesignMilestoneResponse_Data)(nil),            // 81: notify.DesignMilestoneResponse.Data
+	(*DesignPaymentRequestRequest_Payload)(nil),     // 82: notify.DesignPaymentRequestRequest.Payload
+	(*DesignPaymentRequestResponse_Data)(nil),       // 83: notify.DesignPaymentRequestResponse.Data
+	(*DesignPaymentStatusResponse_Payload)(nil),     // 84: notify.DesignPaymentStatusResponse.Payload
+	(*DesignDQCRequestResponse_Data)(nil),           // 85: notify.DesignDQCRequestResponse.Data
+	(*DesignDQCStatusResponse_Payload)(nil),         // 86: notify.DesignDQCStatusResponse.Payload
+	(*DesignMMTRequestResponse_Payload)(nil),        // 87: notify.DesignMMTRequestResponse.Payload
+	(*DesignMMTAssignRequest_Payload)(nil),          // 88: notify.DesignMMTAssignRequest.Payload
+	(*DesignMMTAssignResponse_Payload)(nil),         // 89: notify.DesignMMTAssignResponse.Payload
+	(*DesignMMTDocReadyRequest_Payload)(nil),        // 90: notify.DesignMMTDocReadyRequest.Payload
+	(*DesignMMTDocReadyResponse_Payload)(nil),       // 91: notify.DesignMMTDocReadyResponse.Payload
+	(*DesignMeetingRequest_Slot)(nil),               // 92: notify.DesignMeetingRequest.Slot
+	(*DesignMeetingResponse_Payload)(nil),           // 93: notify.DesignMeetingResponse.Payload
+	(*DesignMeetingResponse_Payload_Slot)(nil),      // 94: notify.DesignMeetingResponse.Payload.Slot
+	(*DesignAssignDesignerRequest_Payload)(nil),     // 95: notify.DesignAssignDesignerRequest.Payload
+	(*DesignAssignDesignerResponse_Payload)(nil),    // 96: notify.DesignAssignDesignerResponse.Payload
+	(*DesignAssignPMRequest_Payload)(nil),           // 97: notify.DesignAssignPMRequest.Payload
+	(*DesignAssignPMResponse_Payload)(nil),          // 98: notify.DesignAssignPMResponse.Payload
+	(*DesignQuoteRequest_Payload)(nil),              // 99: notify.DesignQuoteRequest.Payload
+	(*DesignQuoteResponse_Payload)(nil),             // 100: notify.DesignQuoteResponse.Payload
+	(*DesignP2PResponse_Payload)(nil),               // 101: notify.DesignP2PResponse.Payload
+	(*DesignNotificationFeedResponse_Data)(nil),     // 102: notify.DesignNotificationFeedResponse.Data
+	(*DesignNotificationCountsResponse_ByType)(nil), // 103: notify.DesignNotificationCountsResponse.ByType
+	(*DesignNotificationCountsResponse_Data)(nil),   // 104: notify.DesignNotificationCountsResponse.Data
+	(*DesignNotificationDetailsResponse_Data)(nil),  // 105: notify.DesignNotificationDetailsResponse.Data
 }
 var file_notify_proto_depIdxs = []int32{
-	0,  // 0: notify.MeetingCancellation.milestone:type_name -> notify.MeetingMilestone
-	0,  // 1: notify.MeetingScheduled.milestone:type_name -> notify.MeetingMilestone
-	0,  // 2: notify.MeetingRescheduled.milestone:type_name -> notify.MeetingMilestone
-	0,  // 3: notify.CancellationRequest.milestone:type_name -> notify.MeetingMilestone
-	0,  // 4: notify.CreateScheduledRequest.milestone:type_name -> notify.MeetingMilestone
-	0,  // 5: notify.RescheduledRequest.milestone:type_name -> notify.MeetingMilestone
-	1,  // 6: notify.CancellationResponse.data:type_name -> notify.MeetingCancellation
-	1,  // 7: notify.CancellationListResponse.data:type_name -> notify.MeetingCancellation
-	2,  // 8: notify.SuccessResponse.data:type_name -> notify.MeetingSuccess
-	2,  // 9: notify.SuccessListResponse.data:type_name -> notify.MeetingSuccess
-	3,  // 10: notify.ScheduledResponse.data:type_name -> notify.MeetingScheduled
-	3,  // 11: notify.ScheduledListResponse.data:type_name -> notify.MeetingScheduled
-	4,  // 12: notify.RescheduledResponse.data:type_name -> notify.MeetingRescheduled
-	4,  // 13: notify.RescheduledListResponse.data:type_name -> notify.MeetingRescheduled
-	24, // 14: notify.LeadResponse.data:type_name -> notify.Lead
-	24, // 15: notify.LeadListResponse.data:type_name -> notify.Lead
-	28, // 16: notify.BookingResponse.data:type_name -> notify.Booking
-	28, // 17: notify.BookingListResponse.data:type_name -> notify.Booking
-	5,  // 18: notify.NotifyService.Cancellation:input_type -> notify.CancellationRequest
-	7,  // 19: notify.NotifyService.GetAllCancellations:input_type -> notify.GetByLeadIdentifierRequest
-	6,  // 20: notify.NotifyService.GetCancellationByID:input_type -> notify.GetByMeetingIDRequest
-	8,  // 21: notify.NotifyService.CreateSuccess:input_type -> notify.CreateSuccessRequest
-	7,  // 22: notify.NotifyService.GetAllSuccesses:input_type -> notify.GetByLeadIdentifierRequest
-	7,  // 23: notify.NotifyService.GetSuccessByLeadIdentifier:input_type -> notify.GetByLeadIdentifierRequest
-	9,  // 24: notify.NotifyService.CreateScheduled:input_type -> notify.CreateScheduledRequest
-	11, // 25: notify.NotifyService.GetAllScheduled:input_type -> notify.GetScheduledByLeadIdentifierRequest
-	10, // 26: notify.NotifyService.GetScheduledByID:input_type -> notify.GetScheduledByIDRequest
-	12, // 27: notify.NotifyService.Rescheduled:input_type -> notify.RescheduledRequest
-	14, // 28: notify.NotifyService.GetAllRescheduled:input_type -> notify.GetRescheduledByLeadIdentifierRequest
-	13, // 29: notify.NotifyService.GetRescheduledByID:input_type -> notify.GetRescheduledByIDRequest
-	25, // 30: notify.NotifyService.CreateLead:input_type -> notify.CreateLeadRequest
-	34, // 31: notify.NotifyService.GetAllLeads:input_type -> notify.CountsRequest
-	7,  // 32: notify.NotifyService.GetLeadByIdentifier:input_type -> notify.GetByLeadIdentifierRequest
-	29, // 33: notify.NotifyService.CreateBooking:input_type -> notify.CreateBookingRequest
-	31, // 34: notify.NotifyService.GetAllBookings:input_type -> notify.GetBookingByLeadIdentifierRequest
-	30, // 35: notify.NotifyService.GetBookingByID:input_type -> notify.GetBookingByIDRequest
-	34, // 36: notify.NotifyService.GetCounts:input_type -> notify.CountsRequest
-	15, // 37: notify.NotifyService.Cancellation:output_type -> notify.CancellationResponse
-	16, // 38: notify.NotifyService.GetAllCancellations:output_type -> notify.CancellationListResponse
-	15, // 39: notify.NotifyService.GetCancellationByID:output_type -> notify.CancellationResponse
-	17, // 40: notify.NotifyService.CreateSuccess:output_type -> notify.SuccessResponse
-	18, // 41: notify.NotifyService.GetAllSuccesses:output_type -> notify.SuccessListResponse
-	17, // 42: notify.NotifyService.GetSuccessByLeadIdentifier:output_type -> notify.SuccessResponse
-	19, // 43: notify.NotifyService.CreateScheduled:output_type -> notify.ScheduledResponse
-	20, // 44: notify.NotifyService.GetAllScheduled:output_type -> notify.ScheduledListResponse
-	19, // 45: notify.NotifyService.GetScheduledByID:output_type -> notify.ScheduledResponse
-	21, // 46: notify.NotifyService.Rescheduled:output_type -> notify.RescheduledResponse
-	22, // 47: notify.NotifyService.GetAllRescheduled:output_type -> notify.RescheduledListResponse
-	21, // 48: notify.NotifyService.GetRescheduledByID:output_type -> notify.RescheduledResponse
-	26, // 49: notify.NotifyService.CreateLead:output_type -> notify.LeadResponse
-	27, // 50: notify.NotifyService.GetAllLeads:output_type -> notify.LeadListResponse
-	26, // 51: notify.NotifyService.GetLeadByIdentifier:output_type -> notify.LeadResponse
-	32, // 52: notify.NotifyService.CreateBooking:output_type -> notify.BookingResponse
-	33, // 53: notify.NotifyService.GetAllBookings:output_type -> notify.BookingListResponse
-	32, // 54: notify.NotifyService.GetBookingByID:output_type -> notify.BookingResponse
-	35, // 55: notify.NotifyService.GetCounts:output_type -> notify.CountsResponse
-	37, // [37:56] is the sub-list for method output_type
-	18, // [18:37] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	0,   // 0: notify.MeetingCancellation.milestone:type_name -> notify.MeetingMilestone
+	0,   // 1: notify.MeetingScheduled.milestone:type_name -> notify.MeetingMilestone
+	0,   // 2: notify.MeetingRescheduled.milestone:type_name -> notify.MeetingMilestone
+	0,   // 3: notify.CancellationRequest.milestone:type_name -> notify.MeetingMilestone
+	0,   // 4: notify.CreateScheduledRequest.milestone:type_name -> notify.MeetingMilestone
+	0,   // 5: notify.RescheduledRequest.milestone:type_name -> notify.MeetingMilestone
+	2,   // 6: notify.CancellationResponse.data:type_name -> notify.MeetingCancellation
+	2,   // 7: notify.CancellationListResponse.data:type_name -> notify.MeetingCancellation
+	3,   // 8: notify.SuccessResponse.data:type_name -> notify.MeetingSuccess
+	3,   // 9: notify.SuccessListResponse.data:type_name -> notify.MeetingSuccess
+	4,   // 10: notify.ScheduledResponse.data:type_name -> notify.MeetingScheduled
+	4,   // 11: notify.ScheduledListResponse.data:type_name -> notify.MeetingScheduled
+	5,   // 12: notify.RescheduledResponse.data:type_name -> notify.MeetingRescheduled
+	5,   // 13: notify.RescheduledListResponse.data:type_name -> notify.MeetingRescheduled
+	25,  // 14: notify.LeadResponse.data:type_name -> notify.Lead
+	25,  // 15: notify.LeadListResponse.data:type_name -> notify.Lead
+	29,  // 16: notify.BookingResponse.data:type_name -> notify.Booking
+	29,  // 17: notify.BookingListResponse.data:type_name -> notify.Booking
+	73,  // 18: notify.DesignLeadPre10Request.payload:type_name -> notify.DesignLeadPre10Request.Payload
+	75,  // 19: notify.DesignLeadPre10Response.payload:type_name -> notify.DesignLeadPre10Response.Payload
+	77,  // 20: notify.DesignLead1020Request.payload:type_name -> notify.DesignLead1020Request.Payload
+	78,  // 21: notify.DesignLead1020Response.data:type_name -> notify.DesignLead1020Response.Data
+	80,  // 22: notify.DesignMilestoneRequest.payload:type_name -> notify.DesignMilestoneRequest.Payload
+	81,  // 23: notify.DesignMilestoneResponse.data:type_name -> notify.DesignMilestoneResponse.Data
+	82,  // 24: notify.DesignPaymentRequestRequest.payload:type_name -> notify.DesignPaymentRequestRequest.Payload
+	83,  // 25: notify.DesignPaymentRequestResponse.data:type_name -> notify.DesignPaymentRequestResponse.Data
+	84,  // 26: notify.DesignPaymentStatusResponse.payload:type_name -> notify.DesignPaymentStatusResponse.Payload
+	85,  // 27: notify.DesignDQCRequestResponse.data:type_name -> notify.DesignDQCRequestResponse.Data
+	86,  // 28: notify.DesignDQCStatusResponse.payload:type_name -> notify.DesignDQCStatusResponse.Payload
+	87,  // 29: notify.DesignMMTRequestResponse.payload:type_name -> notify.DesignMMTRequestResponse.Payload
+	88,  // 30: notify.DesignMMTAssignRequest.payload:type_name -> notify.DesignMMTAssignRequest.Payload
+	89,  // 31: notify.DesignMMTAssignResponse.payload:type_name -> notify.DesignMMTAssignResponse.Payload
+	90,  // 32: notify.DesignMMTDocReadyRequest.payload:type_name -> notify.DesignMMTDocReadyRequest.Payload
+	91,  // 33: notify.DesignMMTDocReadyResponse.payload:type_name -> notify.DesignMMTDocReadyResponse.Payload
+	92,  // 34: notify.DesignMeetingRequest.slot:type_name -> notify.DesignMeetingRequest.Slot
+	93,  // 35: notify.DesignMeetingResponse.payload:type_name -> notify.DesignMeetingResponse.Payload
+	95,  // 36: notify.DesignAssignDesignerRequest.payload:type_name -> notify.DesignAssignDesignerRequest.Payload
+	96,  // 37: notify.DesignAssignDesignerResponse.payload:type_name -> notify.DesignAssignDesignerResponse.Payload
+	97,  // 38: notify.DesignAssignPMRequest.payload:type_name -> notify.DesignAssignPMRequest.Payload
+	98,  // 39: notify.DesignAssignPMResponse.payload:type_name -> notify.DesignAssignPMResponse.Payload
+	99,  // 40: notify.DesignQuoteRequest.payload:type_name -> notify.DesignQuoteRequest.Payload
+	100, // 41: notify.DesignQuoteResponse.payload:type_name -> notify.DesignQuoteResponse.Payload
+	101, // 42: notify.DesignP2PResponse.payload:type_name -> notify.DesignP2PResponse.Payload
+	102, // 43: notify.DesignNotificationFeedResponse.data:type_name -> notify.DesignNotificationFeedResponse.Data
+	104, // 44: notify.DesignNotificationCountsResponse.data:type_name -> notify.DesignNotificationCountsResponse.Data
+	105, // 45: notify.DesignNotificationDetailsResponse.data:type_name -> notify.DesignNotificationDetailsResponse.Data
+	74,  // 46: notify.DesignLeadPre10Request.Payload.slot:type_name -> notify.DesignLeadPre10Request.Payload.Slot
+	76,  // 47: notify.DesignLeadPre10Response.Payload.slot:type_name -> notify.DesignLeadPre10Response.Payload.Slot
+	79,  // 48: notify.DesignLead1020Response.Data.payload:type_name -> notify.DesignLead1020Response.Data.Payload
+	1,   // 49: notify.DesignPaymentRequestRequest.Payload.payment_type:type_name -> notify.PaymentType
+	1,   // 50: notify.DesignPaymentRequestResponse.Data.payment_type:type_name -> notify.PaymentType
+	94,  // 51: notify.DesignMeetingResponse.Payload.slot:type_name -> notify.DesignMeetingResponse.Payload.Slot
+	103, // 52: notify.DesignNotificationCountsResponse.Data.by_type:type_name -> notify.DesignNotificationCountsResponse.ByType
+	6,   // 53: notify.NotifyService.Cancellation:input_type -> notify.CancellationRequest
+	8,   // 54: notify.NotifyService.GetAllCancellations:input_type -> notify.GetByLeadIdentifierRequest
+	7,   // 55: notify.NotifyService.GetCancellationByID:input_type -> notify.GetByMeetingIDRequest
+	9,   // 56: notify.NotifyService.CreateSuccess:input_type -> notify.CreateSuccessRequest
+	8,   // 57: notify.NotifyService.GetAllSuccesses:input_type -> notify.GetByLeadIdentifierRequest
+	8,   // 58: notify.NotifyService.GetSuccessByLeadIdentifier:input_type -> notify.GetByLeadIdentifierRequest
+	10,  // 59: notify.NotifyService.CreateScheduled:input_type -> notify.CreateScheduledRequest
+	12,  // 60: notify.NotifyService.GetAllScheduled:input_type -> notify.GetScheduledByLeadIdentifierRequest
+	11,  // 61: notify.NotifyService.GetScheduledByID:input_type -> notify.GetScheduledByIDRequest
+	13,  // 62: notify.NotifyService.Rescheduled:input_type -> notify.RescheduledRequest
+	15,  // 63: notify.NotifyService.GetAllRescheduled:input_type -> notify.GetRescheduledByLeadIdentifierRequest
+	14,  // 64: notify.NotifyService.GetRescheduledByID:input_type -> notify.GetRescheduledByIDRequest
+	26,  // 65: notify.NotifyService.CreateLead:input_type -> notify.CreateLeadRequest
+	35,  // 66: notify.NotifyService.GetAllLeads:input_type -> notify.CountsRequest
+	8,   // 67: notify.NotifyService.GetLeadByIdentifier:input_type -> notify.GetByLeadIdentifierRequest
+	30,  // 68: notify.NotifyService.CreateBooking:input_type -> notify.CreateBookingRequest
+	32,  // 69: notify.NotifyService.GetAllBookings:input_type -> notify.GetBookingByLeadIdentifierRequest
+	31,  // 70: notify.NotifyService.GetBookingByID:input_type -> notify.GetBookingByIDRequest
+	35,  // 71: notify.NotifyService.GetCounts:input_type -> notify.CountsRequest
+	37,  // 72: notify.NotifyService.CreateDesignLeadPre10:input_type -> notify.DesignLeadPre10Request
+	39,  // 73: notify.NotifyService.CreateDesignLead1020:input_type -> notify.DesignLead1020Request
+	41,  // 74: notify.NotifyService.CreateDesignMilestone:input_type -> notify.DesignMilestoneRequest
+	43,  // 75: notify.NotifyService.CreateDesignPaymentRequest:input_type -> notify.DesignPaymentRequestRequest
+	45,  // 76: notify.NotifyService.CreateDesignPaymentStatus:input_type -> notify.DesignPaymentStatusRequest
+	47,  // 77: notify.NotifyService.CreateDesignDQCRequest:input_type -> notify.DesignDQCRequestRequest
+	49,  // 78: notify.NotifyService.CreateDesignDQCStatus:input_type -> notify.DesignDQCStatusRequest
+	51,  // 79: notify.NotifyService.CreateDesignMMTRequest:input_type -> notify.DesignMMTRequestRequest
+	53,  // 80: notify.NotifyService.CreateDesignMMTAssign:input_type -> notify.DesignMMTAssignRequest
+	55,  // 81: notify.NotifyService.CreateDesignMMTDocReady:input_type -> notify.DesignMMTDocReadyRequest
+	57,  // 82: notify.NotifyService.CreateDesignMeeting:input_type -> notify.DesignMeetingRequest
+	59,  // 83: notify.NotifyService.CreateDesignAssignDesigner:input_type -> notify.DesignAssignDesignerRequest
+	61,  // 84: notify.NotifyService.CreateDesignAssignPM:input_type -> notify.DesignAssignPMRequest
+	63,  // 85: notify.NotifyService.CreateDesignQuote:input_type -> notify.DesignQuoteRequest
+	65,  // 86: notify.NotifyService.CreateDesignP2P:input_type -> notify.DesignP2PRequest
+	67,  // 87: notify.NotifyService.GetDesignNotificationFeed:input_type -> notify.DesignNotificationFeedRequest
+	69,  // 88: notify.NotifyService.GetDesignNotificationCounts:input_type -> notify.DesignNotificationCountsRequest
+	71,  // 89: notify.NotifyService.GetDesignNotificationDetails:input_type -> notify.DesignNotificationDetailsRequest
+	16,  // 90: notify.NotifyService.Cancellation:output_type -> notify.CancellationResponse
+	17,  // 91: notify.NotifyService.GetAllCancellations:output_type -> notify.CancellationListResponse
+	16,  // 92: notify.NotifyService.GetCancellationByID:output_type -> notify.CancellationResponse
+	18,  // 93: notify.NotifyService.CreateSuccess:output_type -> notify.SuccessResponse
+	19,  // 94: notify.NotifyService.GetAllSuccesses:output_type -> notify.SuccessListResponse
+	18,  // 95: notify.NotifyService.GetSuccessByLeadIdentifier:output_type -> notify.SuccessResponse
+	20,  // 96: notify.NotifyService.CreateScheduled:output_type -> notify.ScheduledResponse
+	21,  // 97: notify.NotifyService.GetAllScheduled:output_type -> notify.ScheduledListResponse
+	20,  // 98: notify.NotifyService.GetScheduledByID:output_type -> notify.ScheduledResponse
+	22,  // 99: notify.NotifyService.Rescheduled:output_type -> notify.RescheduledResponse
+	23,  // 100: notify.NotifyService.GetAllRescheduled:output_type -> notify.RescheduledListResponse
+	22,  // 101: notify.NotifyService.GetRescheduledByID:output_type -> notify.RescheduledResponse
+	27,  // 102: notify.NotifyService.CreateLead:output_type -> notify.LeadResponse
+	28,  // 103: notify.NotifyService.GetAllLeads:output_type -> notify.LeadListResponse
+	27,  // 104: notify.NotifyService.GetLeadByIdentifier:output_type -> notify.LeadResponse
+	33,  // 105: notify.NotifyService.CreateBooking:output_type -> notify.BookingResponse
+	34,  // 106: notify.NotifyService.GetAllBookings:output_type -> notify.BookingListResponse
+	33,  // 107: notify.NotifyService.GetBookingByID:output_type -> notify.BookingResponse
+	36,  // 108: notify.NotifyService.GetCounts:output_type -> notify.CountsResponse
+	38,  // 109: notify.NotifyService.CreateDesignLeadPre10:output_type -> notify.DesignLeadPre10Response
+	40,  // 110: notify.NotifyService.CreateDesignLead1020:output_type -> notify.DesignLead1020Response
+	42,  // 111: notify.NotifyService.CreateDesignMilestone:output_type -> notify.DesignMilestoneResponse
+	44,  // 112: notify.NotifyService.CreateDesignPaymentRequest:output_type -> notify.DesignPaymentRequestResponse
+	46,  // 113: notify.NotifyService.CreateDesignPaymentStatus:output_type -> notify.DesignPaymentStatusResponse
+	48,  // 114: notify.NotifyService.CreateDesignDQCRequest:output_type -> notify.DesignDQCRequestResponse
+	50,  // 115: notify.NotifyService.CreateDesignDQCStatus:output_type -> notify.DesignDQCStatusResponse
+	52,  // 116: notify.NotifyService.CreateDesignMMTRequest:output_type -> notify.DesignMMTRequestResponse
+	54,  // 117: notify.NotifyService.CreateDesignMMTAssign:output_type -> notify.DesignMMTAssignResponse
+	56,  // 118: notify.NotifyService.CreateDesignMMTDocReady:output_type -> notify.DesignMMTDocReadyResponse
+	58,  // 119: notify.NotifyService.CreateDesignMeeting:output_type -> notify.DesignMeetingResponse
+	60,  // 120: notify.NotifyService.CreateDesignAssignDesigner:output_type -> notify.DesignAssignDesignerResponse
+	62,  // 121: notify.NotifyService.CreateDesignAssignPM:output_type -> notify.DesignAssignPMResponse
+	64,  // 122: notify.NotifyService.CreateDesignQuote:output_type -> notify.DesignQuoteResponse
+	66,  // 123: notify.NotifyService.CreateDesignP2P:output_type -> notify.DesignP2PResponse
+	68,  // 124: notify.NotifyService.GetDesignNotificationFeed:output_type -> notify.DesignNotificationFeedResponse
+	70,  // 125: notify.NotifyService.GetDesignNotificationCounts:output_type -> notify.DesignNotificationCountsResponse
+	72,  // 126: notify.NotifyService.GetDesignNotificationDetails:output_type -> notify.DesignNotificationDetailsResponse
+	90,  // [90:127] is the sub-list for method output_type
+	53,  // [53:90] is the sub-list for method input_type
+	53,  // [53:53] is the sub-list for extension type_name
+	53,  // [53:53] is the sub-list for extension extendee
+	0,   // [0:53] is the sub-list for field type_name
 }
 
 func init() { file_notify_proto_init() }
@@ -2435,8 +8244,8 @@ func file_notify_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_notify_proto_rawDesc), len(file_notify_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   35,
+			NumEnums:      2,
+			NumMessages:   104,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

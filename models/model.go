@@ -18,6 +18,7 @@ type MeetingDetails struct {
 	MeetingID      int32     `gorm:"column:meeting_id;primaryKey;autoIncrement"`
 	LeadIdentifier string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
 	LeadName       string    `gorm:"column:lead_name;type:varchar(100);not null"`
+	AssignedTo     string    `gorm:"column:assigned_to;type:varchar(100)"`
 	SubStage       string    `gorm:"column:sub_stage;type:enum('SCHEDULED','RESCHEDULED','CANCELLED');not null"`
 	Title          string    `gorm:"column:title;type:varchar(150)"`
 	MeetingDate    time.Time `gorm:"column:meeting_date;type:date"`
@@ -26,6 +27,7 @@ type MeetingDetails struct {
 	Milestone      string    `gorm:"column:milestone;type:enum('CONNECTION','EXPERIENCE_AND_DESIGN')"`
 	CreatedAt      time.Time `gorm:"column:created_at;autoCreateTime"`
 }
+
 // Note: reason column has been removed; sub_stage replaces submilestone; milestone replaces stage
 
 func (MeetingDetails) TableName() string { return "meeting_details" }
@@ -33,6 +35,8 @@ func (MeetingDetails) TableName() string { return "meeting_details" }
 // successful table — standalone, no foreign key constraints
 type Successful struct {
 	LeadIdentifier     string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
+	LeadName           string    `gorm:"column:lead_name;type:varchar(100);not null"`
+	AssignedTo         string    `gorm:"column:assigned_to;type:varchar(100)"`
 	NextAction         string    `gorm:"column:next_action;type:varchar(100)"`
 	QuoteLinkGenerated bool      `gorm:"column:quote_link_generated;default:false"`
 	CreatedAt          time.Time `gorm:"column:created_at;autoCreateTime"`
@@ -43,8 +47,9 @@ func (Successful) TableName() string { return "successful" }
 // booking table — standalone, no foreign key constraints
 type Booking struct {
 	BookingID       int32     `gorm:"column:booking_id;primaryKey;autoIncrement"`
-	LeadName	    string    `gorm:"column:lead_name;type:varchar(100);not null"`
+	LeadName        string    `gorm:"column:lead_name;type:varchar(100);not null"`
 	LeadIdentifier  string    `gorm:"column:lead_identifier;type:varchar(100);not null"`
+	AssignedTo      string    `gorm:"column:assigned_to;type:varchar(100)"`
 	PaymentType     string    `gorm:"column:payment_type;type:enum('TOKEN','BOOKING FUll_10');not null"`
 	PaidAmount      float64   `gorm:"column:paid_amount;type:decimal(10,2);not null"`
 	RemainingAmount float64   `gorm:"column:Remaining_amount;type:decimal(10,2);not null"`
@@ -81,3 +86,22 @@ type NotificationRecipient struct {
 }
 
 func (NotificationRecipient) TableName() string { return "notification_recipients" }
+
+// DesignUserNotification is one inbox row per person (fan-out on write).
+type DesignUserNotification struct {
+	ID                 int64      `gorm:"column:id;primaryKey;autoIncrement"`
+	EventID            string     `gorm:"column:event_id;type:varchar(255);uniqueIndex:uk_design_inbox_event_user;not null"`
+	UserID             int32      `gorm:"column:user_id;uniqueIndex:uk_design_inbox_event_user;index:idx_design_inbox_user_created;not null"`
+	RecipientRole      string     `gorm:"column:recipient_role;type:varchar(50)"`
+	LeadID             int32      `gorm:"column:lead_id"`
+	ProjectID          string     `gorm:"column:project_id;type:varchar(100)"`
+	LeadName           string     `gorm:"column:lead_name;type:varchar(255)"`
+	DesignerID         int32      `gorm:"column:designer_id"`
+	NotificationType   string     `gorm:"column:notification_type;type:varchar(30);not null"`
+	NotificationAction string     `gorm:"column:notification_action;type:varchar(30);not null"`
+	Payload            string     `gorm:"column:payload;type:json"`
+	ReadAt             *time.Time `gorm:"column:read_at;index:idx_design_inbox_read_at"`
+	CreatedAt          time.Time  `gorm:"column:created_at;autoCreateTime;index:idx_design_inbox_user_created"`
+}
+
+func (DesignUserNotification) TableName() string { return "design_user_notifications" }

@@ -68,9 +68,9 @@ func (s *NotifyServiceServer) Cancellation(_ context.Context, req *pb.Cancellati
 	}
 	title := meetingTitle("CANCELLED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, milestone, created_at)
-		 VALUES (?, ?, 'CANCELLED', ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, title, milestoneDBValue(req.Milestone),
+		`INSERT INTO meeting_details (lead_identifier, lead_name, assigned_to, sub_stage, title, milestone, created_at)
+		 VALUES (?, ?, ?, 'CANCELLED', ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, title, milestoneDBValue(req.Milestone),
 	)
 	if err != nil {
 		log.Printf("Failed to create cancellation: %v", err)
@@ -87,12 +87,12 @@ func (s *NotifyServiceServer) GetAllCancellations(_ context.Context, req *pb.Get
 	)
 	if req.LeadIdentifier != "" {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'CANCELLED' AND lead_identifier = ?
 			 ORDER BY created_at DESC`, req.LeadIdentifier)
 	} else {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'CANCELLED' ORDER BY created_at DESC`)
 	}
 	if err != nil {
@@ -125,12 +125,15 @@ func (s *NotifyServiceServer) CreateSuccess(_ context.Context, req *pb.CreateSuc
 	if req.LeadIdentifier == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "lead_identifier is required")
 	}
+	if req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "lead_name is required")
+	}
 	if req.NextAction == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "next_action is required")
 	}
 	_, err := s.db.Exec(
-		`INSERT INTO successful (lead_identifier, next_action, quote_link_generated, created_at) VALUES (?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.NextAction, req.QuoteLinkGenerated,
+		`INSERT INTO successful (lead_identifier, lead_name, assigned_to, next_action, quote_link_generated, created_at) VALUES (?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, req.NextAction, req.QuoteLinkGenerated,
 	)
 	if err != nil {
 		log.Printf("Failed to create success record: %v", err)
@@ -140,7 +143,7 @@ func (s *NotifyServiceServer) CreateSuccess(_ context.Context, req *pb.CreateSuc
 }
 
 func (s *NotifyServiceServer) GetAllSuccesses(_ context.Context, req *pb.GetByLeadIdentifierRequest) (*pb.SuccessListResponse, error) {
-	const base = `SELECT lead_identifier, next_action, quote_link_generated, created_at FROM successful`
+	const base = `SELECT lead_identifier, lead_name, assigned_to, next_action, quote_link_generated, created_at FROM successful`
 	var (
 		rows *sql.Rows
 		err  error
@@ -194,9 +197,9 @@ func (s *NotifyServiceServer) CreateScheduled(_ context.Context, req *pb.CreateS
 	}
 	title := meetingTitle("SCHEDULED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
-		 VALUES (?, ?, 'SCHEDULED', ?, ?, ?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, title,
+		`INSERT INTO meeting_details (lead_identifier, lead_name,  assigned_to, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
+		 VALUES (?, ?, ?, 'SCHEDULED', ?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, title,
 		req.MeetingDate, req.Slot, req.MeetingType, milestoneDBValue(req.Milestone),
 	)
 	if err != nil {
@@ -214,12 +217,12 @@ func (s *NotifyServiceServer) GetAllScheduled(_ context.Context, req *pb.GetSche
 	)
 	if req.LeadIdentifier != "" {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'SCHEDULED' AND lead_identifier = ?
 			 ORDER BY created_at DESC`, req.LeadIdentifier)
 	} else {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'SCHEDULED' ORDER BY created_at DESC`)
 	}
 	if err != nil {
@@ -266,9 +269,9 @@ func (s *NotifyServiceServer) Rescheduled(_ context.Context, req *pb.Rescheduled
 	}
 	title := meetingTitle("RESCHEDULED", req.LeadName)
 	res, err := s.db.Exec(
-		`INSERT INTO meeting_details (lead_identifier, lead_name, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
-		 VALUES (?, ?, 'RESCHEDULED', ?, ?, ?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, title,
+		`INSERT INTO meeting_details (lead_identifier, lead_name,  assigned_to, sub_stage, title, meeting_date, slot, meeting_type, milestone, created_at)
+		 VALUES (?, ?, ?, 'RESCHEDULED', ?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, title,
 		req.MeetingDate, req.Slot, req.MeetingType, milestoneDBValue(req.Milestone),
 	)
 	if err != nil {
@@ -286,12 +289,12 @@ func (s *NotifyServiceServer) GetAllRescheduled(_ context.Context, req *pb.GetRe
 	)
 	if req.LeadIdentifier != "" {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'RESCHEDULED' AND lead_identifier = ?
 			 ORDER BY created_at DESC`, req.LeadIdentifier)
 	} else {
 		rows, err = s.db.Query(
-			`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+			`SELECT meeting_id, lead_identifier, lead_name, assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 			 FROM meeting_details WHERE sub_stage = 'RESCHEDULED' ORDER BY created_at DESC`)
 	}
 	if err != nil {
@@ -408,21 +411,22 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 		paymentStatus = "PENDING"
 	}
 
-	// getBookingByID JOINs leadDetails — ensure the lead row exists first
+	// Ensure the lead row exists so foreign key / joins work.
+	// Booking requests don't carry lead_type, so we pass '' and only upsert the name.
 	if _, err := s.db.Exec(
 		`INSERT INTO leadDetails (lead_identifier, lead_name, lead_type, assigned_to, created_at)
-		 VALUES (?, ?, 'ADD_LEAD', '', NOW())
+		 VALUES (?, ?, '', ?, NOW())
 		 ON DUPLICATE KEY UPDATE lead_name = VALUES(lead_name)`,
-		req.LeadIdentifier, req.LeadName,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo,
 	); err != nil {
 		log.Printf("Failed to upsert lead for booking: %v", err)
 		return nil, status.Errorf(codes.Internal, "Failed to ensure lead exists: %v", err)
 	}
 
 	res, err := s.db.Exec(
-		`INSERT INTO booking (lead_identifier, lead_name, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-		req.LeadIdentifier, req.LeadName, paymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
+		`INSERT INTO booking (lead_identifier, lead_name, assigned_to, payment_type, paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+		req.LeadIdentifier, req.LeadName, req.AssignedTo, paymentType, req.Amount, remaining, dt, paymentStatus, req.Remarks,
 	)
 	if err != nil {
 		log.Printf("Failed to create booking: %v", err)
@@ -433,7 +437,7 @@ func (s *NotifyServiceServer) CreateBooking(_ context.Context, req *pb.CreateBoo
 }
 
 func (s *NotifyServiceServer) GetAllBookings(_ context.Context, req *pb.GetBookingByLeadIdentifierRequest) (*pb.BookingListResponse, error) {
-	const base = `SELECT booking_id, lead_identifier, lead_name, payment_type,
+	const base = `SELECT booking_id, lead_identifier, lead_name, assigned_to, payment_type,
 		paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at
 		FROM booking`
 	var (
@@ -502,7 +506,7 @@ func (s *NotifyServiceServer) GetCounts(_ context.Context, _ *pb.CountsRequest) 
 
 func (s *NotifyServiceServer) getCancellationByID(meetingID int32) (*pb.CancellationResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT meeting_id, lead_identifier, lead_name, milestone, created_at
+		`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, milestone, created_at
 		 FROM meeting_details WHERE meeting_id = ? AND sub_stage = 'CANCELLED'`, meetingID)
 	item, err := scanCancellation(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -516,7 +520,7 @@ func (s *NotifyServiceServer) getCancellationByID(meetingID int32) (*pb.Cancella
 
 func (s *NotifyServiceServer) getSuccessByLeadIdentifier(leadIdentifier string) (*pb.SuccessResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT lead_identifier, next_action, quote_link_generated, created_at
+		`SELECT lead_identifier, lead_name,  assigned_to, next_action, quote_link_generated, created_at
 		 FROM successful WHERE lead_identifier = ? ORDER BY created_at DESC LIMIT 1`, leadIdentifier)
 	item, err := scanSuccess(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -530,7 +534,7 @@ func (s *NotifyServiceServer) getSuccessByLeadIdentifier(leadIdentifier string) 
 
 func (s *NotifyServiceServer) getScheduledByID(id int32) (*pb.ScheduledResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+		`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 		 FROM meeting_details WHERE meeting_id = ? AND sub_stage = 'SCHEDULED'`, id)
 	item, err := scanScheduled(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -544,7 +548,7 @@ func (s *NotifyServiceServer) getScheduledByID(id int32) (*pb.ScheduledResponse,
 
 func (s *NotifyServiceServer) getRescheduledByID(id int32) (*pb.RescheduledResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT meeting_id, lead_identifier, lead_name, title, meeting_date, slot, meeting_type, milestone, created_at
+		`SELECT meeting_id, lead_identifier, lead_name,  assigned_to, title, meeting_date, slot, meeting_type, milestone, created_at
 		 FROM meeting_details WHERE meeting_id = ? AND sub_stage = 'RESCHEDULED'`, id)
 	item, err := scanRescheduled(row.Scan)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -572,7 +576,7 @@ func (s *NotifyServiceServer) getLeadByIdentifier(leadIdentifier string) (*pb.Le
 
 func (s *NotifyServiceServer) getBookingByID(bookingID int32) (*pb.BookingResponse, error) {
 	row := s.db.QueryRow(
-		`SELECT booking_id, lead_identifier, lead_name, payment_type,
+		`SELECT booking_id, lead_identifier, lead_name,  assigned_to, payment_type,
 		        paid_amount, Remaining_amount, payment_date, payment_status, remarks, created_at
 		 FROM booking WHERE booking_id = ?`, bookingID)
 	item, err := scanBooking(row.Scan)
@@ -595,7 +599,7 @@ func scanCancellation(fn func(...any) error) (*pb.MeetingCancellation, error) {
 		milestone sql.NullString
 		createdAt sql.NullTime
 	)
-	if err := fn(&m.MeetingId, &m.LeadIdentifier, &m.LeadName, &milestone, &createdAt); err != nil {
+	if err := fn(&m.MeetingId, &m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &milestone, &createdAt); err != nil {
 		return nil, err
 	}
 	m.Milestone = milestoneProtoValue(milestone.String)
@@ -611,7 +615,7 @@ func scanSuccess(fn func(...any) error) (*pb.MeetingSuccess, error) {
 		nextAction sql.NullString
 		createdAt  sql.NullTime
 	)
-	if err := fn(&m.LeadIdentifier, &nextAction, &m.QuoteLinkGenerated, &createdAt); err != nil {
+	if err := fn(&m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &nextAction, &m.QuoteLinkGenerated, &createdAt); err != nil {
 		return nil, err
 	}
 	m.NextAction = nextAction.String
@@ -631,7 +635,7 @@ func scanScheduled(fn func(...any) error) (*pb.MeetingScheduled, error) {
 		milestone   sql.NullString
 		createdAt   sql.NullTime
 	)
-	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
+	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
 		return nil, err
 	}
 	m.Title = title.String
@@ -655,7 +659,7 @@ func scanRescheduled(fn func(...any) error) (*pb.MeetingRescheduled, error) {
 		milestone   sql.NullString
 		createdAt   sql.NullTime
 	)
-	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
+	if err := fn(&m.Id, &m.LeadIdentifier, &m.LeadName, &m.AssignedTo, &title, &meetingDate, &slot, &meetingType, &milestone, &createdAt); err != nil {
 		return nil, err
 	}
 	m.Title = title.String
@@ -671,14 +675,12 @@ func scanRescheduled(fn func(...any) error) (*pb.MeetingRescheduled, error) {
 
 func scanLead(fn func(...any) error) (*pb.Lead, error) {
 	var (
-		m          pb.Lead
-		assignedTo sql.NullString
-		createdAt  sql.NullTime
+		m         pb.Lead
+		createdAt sql.NullTime
 	)
-	if err := fn(&m.LeadIdentifier, &m.LeadName, &m.LeadType, &assignedTo, &createdAt); err != nil {
+	if err := fn(&m.LeadIdentifier, &m.LeadName, &m.LeadType, &m.AssignedTo, &createdAt); err != nil {
 		return nil, err
 	}
-	m.AssignedTo = assignedTo.String
 	if createdAt.Valid {
 		m.CreatedAt = fmtTime(createdAt.Time)
 	}
@@ -689,6 +691,7 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 	var (
 		m             pb.Booking
 		leadName      sql.NullString
+		assignedTo    sql.NullString
 		paymentType   sql.NullString
 		remarks       sql.NullString
 		paymentStatus sql.NullString
@@ -696,13 +699,14 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 		createdAt     sql.NullTime
 	)
 	if err := fn(
-		&m.BookingId, &m.LeadIdentifier, &leadName, &paymentType,
+		&m.BookingId, &m.LeadIdentifier, &leadName, &assignedTo, &paymentType,
 		&m.PaidAmount, &m.RemainingAmount, &paymentDate,
 		&paymentStatus, &remarks, &createdAt,
 	); err != nil {
 		return nil, err
 	}
 	m.LeadName = leadName.String
+	m.AssignedTo = assignedTo.String
 	m.PaymentType = paymentType.String
 	m.PaymentStatus = paymentStatus.String
 	m.Remarks = remarks.String
@@ -713,4 +717,490 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 		m.CreatedAt = fmtTime(createdAt.Time)
 	}
 	return &m, nil
+}
+
+// -----------------------------------------------------------------------
+// Design Notification APIs (01-18) Implementation
+// -----------------------------------------------------------------------
+
+// API 01 — Pre-10% New Lead
+func (s *NotifyServiceServer) CreateDesignLeadPre10(
+	_ context.Context,
+	req *pb.DesignLeadPre10Request,
+) (*pb.DesignLeadPre10Response, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"project_id and lead_name are required",
+		)
+	}
+
+	var respPayload *pb.DesignLeadPre10Response_Payload
+
+	if req.Payload != nil {
+		respPayload = &pb.DesignLeadPre10Response_Payload{
+			CurrentPhase:       req.Payload.CurrentPhase,
+			DesignerName:       req.Payload.DesignerName,
+			SalesExecutiveName: req.Payload.SalesExecutiveName,
+			MeetingType:        req.Payload.MeetingType,
+		}
+
+		if req.Payload.Slot != nil {
+			respPayload.Slot = &pb.DesignLeadPre10Response_Payload_Slot{
+				Date:     req.Payload.Slot.Date,
+				SlotTime: req.Payload.Slot.SlotTime,
+			}
+		}
+	}
+
+	return &pb.DesignLeadPre10Response{
+		ProjectId:          req.ProjectId,
+		LeadName:           req.LeadName,
+		DesignerId:         req.DesignerId,
+		NotificationType:   "LEAD",
+		NotificationAction: "CREATED",
+		Payload:            respPayload,
+		CreatedAt:          time.Now().Format(time.RFC3339),
+	}, nil
+}
+func (s *NotifyServiceServer) CreateDesignLead1020(
+	_ context.Context,
+	req *pb.DesignLead1020Request,
+) (*pb.DesignLead1020Response, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"project_id and lead_name are required",
+		)
+	}
+
+	var payload *pb.DesignLead1020Response_Data_Payload
+
+	if req.Payload != nil {
+		payload = &pb.DesignLead1020Response_Data_Payload{
+			PreviousPhase: req.Payload.PreviousPhase,
+			Trigger:       req.Payload.Trigger,
+			Message:       req.Payload.Message,
+		}
+	}
+
+	return &pb.DesignLead1020Response{
+		Data: &pb.DesignLead1020Response_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   "PHASE",
+			NotificationAction: "PHASE_ENTERED",
+			Phase:              "PHASE_10_20",
+			Payload:            payload,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
+// API 03 — Milestone Completed
+func (s *NotifyServiceServer) CreateDesignMilestone(
+	_ context.Context,
+	req *pb.DesignMilestoneRequest,
+) (*pb.DesignMilestoneResponse, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"project_id and lead_name are required",
+		)
+	}
+
+	if req.Payload == nil {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"payload is required",
+		)
+	}
+
+	return &pb.DesignMilestoneResponse{
+		Data: &pb.DesignMilestoneResponse_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   "MILESTONE",
+			NotificationAction: "COMPLETED",
+			MilestoneName:      req.Payload.MilestoneName,
+			TaskName:           req.Payload.TaskName,
+			MilestoneIndex:     req.Payload.MilestoneIndex,
+			DesignerName:       req.Payload.DesignerName,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
+// API 04 — Payment Requested
+func (s *NotifyServiceServer) CreateDesignPaymentRequest(
+	_ context.Context,
+	req *pb.DesignPaymentRequestRequest,
+) (*pb.DesignPaymentRequestResponse, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"project_id and lead_name are required",
+		)
+	}
+
+	if req.Payload == nil {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"payload is required",
+		)
+	}
+
+	return &pb.DesignPaymentRequestResponse{
+		Data: &pb.DesignPaymentRequestResponse_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   "PAYMENT",
+			NotificationAction: "REQUESTED",
+			PaymentType:        req.Payload.PaymentType,
+			UploadName:         req.Payload.UploadName,
+			Amount:             req.Payload.Amount,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
+// API 05 — Payment / Sales Closure Status
+func (s *NotifyServiceServer) CreateDesignPaymentStatus(
+	_ context.Context,
+	req *pb.DesignPaymentStatusRequest,
+) (*pb.DesignPaymentStatusResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignPaymentStatusResponse_Payload{
+		Status:           req.Status,
+		DecisionType:     req.DecisionType,
+		PaymentType:      req.PaymentType,
+		MilestoneContext: req.MilestoneContext,
+		ApproverName:     req.ApproverName,
+		Amount:           req.Amount,
+		RejectionReason:  req.RejectionReason,
+	}
+
+	return &pb.DesignPaymentStatusResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+func (s *NotifyServiceServer) CreateDesignDQCRequest(
+	_ context.Context,
+	req *pb.DesignDQCRequestRequest,
+) (*pb.DesignDQCRequestResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	return &pb.DesignDQCRequestResponse{
+		Data: &pb.DesignDQCRequestResponse_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   "DQC",
+			NotificationAction: "REQUESTED",
+			DqcRound:           req.DqcRound,
+			ReviewId:           req.ReviewId,
+			DesignerName:       req.DesignerName,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
+// API 07 — DQC Status
+func (s *NotifyServiceServer) CreateDesignDQCStatus(
+	_ context.Context,
+	req *pb.DesignDQCStatusRequest,
+) (*pb.DesignDQCStatusResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignDQCStatusResponse_Payload{
+		Status:          req.Status,
+		DecisionType:    req.DecisionType,
+		DqcRound:        req.DqcRound,
+		DesignerName:    req.DesignerName,
+		RejectionReason: req.RejectionReason,
+	}
+
+	return &pb.DesignDQCStatusResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 08 — MMT Visit Requested
+func (s *NotifyServiceServer) CreateDesignMMTRequest(
+	_ context.Context,
+	req *pb.DesignMMTRequestRequest,
+) (*pb.DesignMMTRequestResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignMMTRequestResponse_Payload{
+		MmtScope:       req.MmtScope,
+		VisitDate:      req.VisitDate,
+		VisitTime:      req.VisitTime,
+		MmtManagerId:   req.MmtManagerId,
+		DesignerName:   req.DesignerName,
+		MmtManagerName: req.MmtManagerName,
+	}
+
+	return &pb.DesignMMTRequestResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 09 — MMT Executive Assigned
+func (s *NotifyServiceServer) CreateDesignMMTAssign(
+	_ context.Context,
+	req *pb.DesignMMTAssignRequest,
+) (*pb.DesignMMTAssignResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignMMTAssignResponse_Payload{
+		AssignmentType: req.Payload.AssignmentType,
+		ToName:         req.Payload.ToName,
+		ToId:           req.Payload.ToId,
+	}
+
+	return &pb.DesignMMTAssignResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 10 — MMT Documents Ready
+func (s *NotifyServiceServer) CreateDesignMMTDocReady(
+	_ context.Context,
+	req *pb.DesignMMTDocReadyRequest,
+) (*pb.DesignMMTDocReadyResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignMMTDocReadyResponse_Payload{
+		MmtScope:   req.Payload.MmtScope,
+		Via:        req.Payload.Via,
+		UploadName: req.Payload.UploadName,
+		ApprovedBy: req.Payload.ApprovedBy,
+	}
+
+	return &pb.DesignMMTDocReadyResponse{
+		ProjectId: req.ProjectId,
+		LeadName:  req.LeadName,
+		Payload:   respPayload,
+	}, nil
+}
+
+// API 11 — Design Meeting Scheduled
+func (s *NotifyServiceServer) CreateDesignMeeting(
+	_ context.Context,
+	req *pb.DesignMeetingRequest,
+) (*pb.DesignMeetingResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignMeetingResponse_Payload{
+		MeetingType: req.MeetingType,
+		Mod:         req.Mod,
+	}
+
+	if req.Slot != nil {
+		respPayload.Slot = &pb.DesignMeetingResponse_Payload_Slot{
+			Date:     req.Slot.Date,
+			TimeSlot: req.Slot.TimeSlot,
+		}
+	}
+
+	return &pb.DesignMeetingResponse{
+		ProjectId: req.ProjectId,
+		LeadName:  req.LeadName,
+		Payload:   respPayload,
+	}, nil
+}
+
+// API 12 — Designer Reassignment
+func (s *NotifyServiceServer) CreateDesignAssignDesigner(
+	_ context.Context,
+	req *pb.DesignAssignDesignerRequest,
+) (*pb.DesignAssignDesignerResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignAssignDesignerResponse_Payload{
+		AssignmentType: req.Payload.AssignmentType,
+		FromId:         req.Payload.FromId,
+		ToId:           req.Payload.ToId,
+		FromName:       req.Payload.FromName,
+		ToName:         req.Payload.ToName,
+	}
+
+	return &pb.DesignAssignDesignerResponse{
+		ProjectId: req.ProjectId,
+		LeadName:  req.LeadName,
+		Payload:   respPayload,
+	}, nil
+}
+
+// API 13 — PM Assignment
+func (s *NotifyServiceServer) CreateDesignAssignPM(
+	_ context.Context,
+	req *pb.DesignAssignPMRequest,
+) (*pb.DesignAssignPMResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignAssignPMResponse_Payload{
+		AssignmentType: req.Payload.AssignmentType,
+		ToId:           req.Payload.ToId,
+		ToName:         req.Payload.ToName,
+	}
+
+	return &pb.DesignAssignPMResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 14 — New Quote
+func (s *NotifyServiceServer) CreateDesignQuote(
+	_ context.Context,
+	req *pb.DesignQuoteRequest,
+) (*pb.DesignQuoteResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignQuoteResponse_Payload{
+		QuoteId:   req.Payload.QuoteId,
+		QuoteLink: req.Payload.QuoteLink,
+	}
+
+	return &pb.DesignQuoteResponse{
+		ProjectId: req.ProjectId,
+		LeadName:  req.LeadName,
+		Payload:   respPayload,
+	}, nil
+}
+
+// API 15 — P2P Completed
+func (s *NotifyServiceServer) CreateDesignP2P(
+	_ context.Context,
+	req *pb.DesignP2PRequest,
+) (*pb.DesignP2PResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignP2PResponse_Payload{
+		DesignerName: req.DesignerName,
+	}
+
+	return &pb.DesignP2PResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 16 — Notification Feed
+func (s *NotifyServiceServer) GetDesignNotificationFeed(
+	_ context.Context,
+	_ *pb.DesignNotificationFeedRequest,
+) (*pb.DesignNotificationFeedResponse, error) {
+	return &pb.DesignNotificationFeedResponse{
+		Data: []*pb.DesignNotificationFeedResponse_Data{},
+	}, nil
+}
+
+// API 17 — Notification Counts
+func (s *NotifyServiceServer) GetDesignNotificationCounts(
+	_ context.Context,
+	_ *pb.DesignNotificationCountsRequest,
+) (*pb.DesignNotificationCountsResponse, error) {
+	return &pb.DesignNotificationCountsResponse{
+		Data: &pb.DesignNotificationCountsResponse_Data{
+			Total: 0,
+			ByType: &pb.DesignNotificationCountsResponse_ByType{
+				LEAD:       0,
+				PHASE:      0,
+				MILESTONE:  0,
+				PAYMENT:    0,
+				DQC:        0,
+				MMT:        0,
+				MEETING:    0,
+				ASSIGNMENT: 0,
+				QUOTE:      0,
+				P2P:        0,
+			},
+		},
+	}, nil
+}
+
+// API 18 — Notification Details
+func (s *NotifyServiceServer) GetDesignNotificationDetails(
+	_ context.Context,
+	req *pb.DesignNotificationDetailsRequest,
+) (*pb.DesignNotificationDetailsResponse, error) {
+	if req.NotificationId == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "notification_id is required")
+	}
+
+	return &pb.DesignNotificationDetailsResponse{
+		Data: &pb.DesignNotificationDetailsResponse_Data{
+			ProjectId:          "",
+			LeadName:           "",
+			NotificationType:   "",
+			NotificationAction: "",
+			DesignerId:         0,
+			Payload:            "",
+			CreatedAt:          "",
+		},
+	}, nil
 }

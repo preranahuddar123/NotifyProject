@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS meeting_details (
   meeting_id       INT AUTO_INCREMENT PRIMARY KEY,
   lead_identifier  VARCHAR(100) NOT NULL,
   lead_name        VARCHAR(100) NOT NULL,
+  assigned_to      VARCHAR(100),
   sub_stage        ENUM('SCHEDULED', 'RESCHEDULED', 'CANCELLED') NOT NULL,
   title            VARCHAR(150),
   meeting_date     DATE,
@@ -31,6 +32,8 @@ CREATE TABLE IF NOT EXISTS meeting_details (
 
 CREATE TABLE IF NOT EXISTS successful (
   lead_identifier      VARCHAR(100) NOT NULL,
+  lead_name            VARCHAR(100) NOT NULL,
+  assigned_to          VARCHAR(100),
   next_action          VARCHAR(100),
   quote_link_generated TINYINT(1) DEFAULT 0,
   created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -39,7 +42,8 @@ CREATE TABLE IF NOT EXISTS successful (
 CREATE TABLE IF NOT EXISTS booking (
   booking_id        INT AUTO_INCREMENT PRIMARY KEY,
   lead_identifier   VARCHAR(100) NOT NULL,
-  lead_name         VARCHAR(255),
+  lead_name         VARCHAR(100) NOT NULL,
+  assigned_to       VARCHAR(100),
   payment_type      ENUM('TOKEN', 'BOOKING FUll_10') NOT NULL,
   paid_amount       DECIMAL(10, 2) NOT NULL,
   Remaining_amount  DECIMAL(10, 2) NOT NULL,
@@ -68,4 +72,23 @@ CREATE TABLE IF NOT EXISTS notification_recipients (
   recipient_type   VARCHAR(50) NOT NULL,
   delivery_status  VARCHAR(20) DEFAULT 'PENDING',
   seen_at          TIMESTAMP NULL DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS design_user_notifications (
+  id                   BIGINT AUTO_INCREMENT PRIMARY KEY,
+  event_id             VARCHAR(255) NOT NULL,
+  user_id              INT NOT NULL,
+  recipient_role       VARCHAR(50),
+  lead_id              INT,
+  project_id           VARCHAR(100),
+  lead_name            VARCHAR(255),
+  designer_id          INT,
+  notification_type    VARCHAR(30) NOT NULL,
+  notification_action  VARCHAR(30) NOT NULL,
+  payload              JSON,
+  read_at              TIMESTAMP NULL DEFAULT NULL,
+  created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_design_inbox_event_user (event_id, user_id),
+  KEY idx_design_inbox_user_created (user_id, created_at),
+  KEY idx_design_inbox_read_at (read_at)
 );
