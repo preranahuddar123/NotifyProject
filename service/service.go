@@ -718,3 +718,489 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 	}
 	return &m, nil
 }
+
+// -----------------------------------------------------------------------
+// Design Notification APIs (01-18) Implementation
+// -----------------------------------------------------------------------
+
+// API 01 — Pre-10% New Lead
+func (s *NotifyServiceServer) CreateDesignLeadPre10(
+	_ context.Context,
+	req *pb.DesignLeadPre10Request,
+) (*pb.DesignLeadPre10Response, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"project_id and lead_name are required",
+		)
+	}
+
+	var respPayload *pb.DesignLeadPre10Response_Payload
+
+	if req.Payload != nil {
+		respPayload = &pb.DesignLeadPre10Response_Payload{
+			CurrentPhase:       req.Payload.CurrentPhase,
+			DesignerName:       req.Payload.DesignerName,
+			SalesExecutiveName: req.Payload.SalesExecutiveName,
+			MeetingType:        req.Payload.MeetingType,
+		}
+
+		if req.Payload.Slot != nil {
+			respPayload.Slot = &pb.DesignLeadPre10Response_Payload_Slot{
+				Date:     req.Payload.Slot.Date,
+				SlotTime: req.Payload.Slot.SlotTime,
+			}
+		}
+	}
+
+	return &pb.DesignLeadPre10Response{
+		ProjectId:          req.ProjectId,
+		LeadName:           req.LeadName,
+		DesignerId:         req.DesignerId,
+		NotificationType:   "LEAD",
+		NotificationAction: "CREATED",
+		Payload:            respPayload,
+		CreatedAt:          time.Now().Format(time.RFC3339),
+	}, nil
+}
+func (s *NotifyServiceServer) CreateDesignLead1020(
+	_ context.Context,
+	req *pb.DesignLead1020Request,
+) (*pb.DesignLead1020Response, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"project_id and lead_name are required",
+		)
+	}
+
+	var payload *pb.DesignLead1020Response_Data_Payload
+
+	if req.Payload != nil {
+		payload = &pb.DesignLead1020Response_Data_Payload{
+			PreviousPhase: req.Payload.PreviousPhase,
+			Trigger:       req.Payload.Trigger,
+			Message:       req.Payload.Message,
+		}
+	}
+
+	return &pb.DesignLead1020Response{
+		Data: &pb.DesignLead1020Response_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   "PHASE",
+			NotificationAction: "PHASE_ENTERED",
+			Phase:              "PHASE_10_20",
+			Payload:            payload,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
+// API 03 — Milestone Completed
+func (s *NotifyServiceServer) CreateDesignMilestone(
+	_ context.Context,
+	req *pb.DesignMilestoneRequest,
+) (*pb.DesignMilestoneResponse, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"project_id and lead_name are required",
+		)
+	}
+
+	if req.Payload == nil {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"payload is required",
+		)
+	}
+
+	return &pb.DesignMilestoneResponse{
+		Data: &pb.DesignMilestoneResponse_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   "MILESTONE",
+			NotificationAction: "COMPLETED",
+			MilestoneName:      req.Payload.MilestoneName,
+			TaskName:           req.Payload.TaskName,
+			MilestoneIndex:     req.Payload.MilestoneIndex,
+			DesignerName:       req.Payload.DesignerName,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
+// API 04 — Payment Requested
+func (s *NotifyServiceServer) CreateDesignPaymentRequest(
+	_ context.Context,
+	req *pb.DesignPaymentRequestRequest,
+) (*pb.DesignPaymentRequestResponse, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"project_id and lead_name are required",
+		)
+	}
+
+	if req.Payload == nil {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"payload is required",
+		)
+	}
+
+	return &pb.DesignPaymentRequestResponse{
+		Data: &pb.DesignPaymentRequestResponse_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   "PAYMENT",
+			NotificationAction: "REQUESTED",
+			PaymentType:        req.Payload.PaymentType,
+			UploadName:         req.Payload.UploadName,
+			Amount:             req.Payload.Amount,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
+// API 05 — Payment / Sales Closure Status
+func (s *NotifyServiceServer) CreateDesignPaymentStatus(
+	_ context.Context,
+	req *pb.DesignPaymentStatusRequest,
+) (*pb.DesignPaymentStatusResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignPaymentStatusResponse_Payload{
+		Status:           req.Status,
+		DecisionType:     req.DecisionType,
+		PaymentType:      req.PaymentType,
+		MilestoneContext: req.MilestoneContext,
+		ApproverName:     req.ApproverName,
+		Amount:           req.Amount,
+		RejectionReason:  req.RejectionReason,
+	}
+
+	return &pb.DesignPaymentStatusResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+func (s *NotifyServiceServer) CreateDesignDQCRequest(
+	_ context.Context,
+	req *pb.DesignDQCRequestRequest,
+) (*pb.DesignDQCRequestResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	return &pb.DesignDQCRequestResponse{
+		Data: &pb.DesignDQCRequestResponse_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   "DQC",
+			NotificationAction: "REQUESTED",
+			DqcRound:           req.DqcRound,
+			ReviewId:           req.ReviewId,
+			DesignerName:       req.DesignerName,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
+	}, nil
+}
+
+// API 07 — DQC Status
+func (s *NotifyServiceServer) CreateDesignDQCStatus(
+	_ context.Context,
+	req *pb.DesignDQCStatusRequest,
+) (*pb.DesignDQCStatusResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignDQCStatusResponse_Payload{
+		Status:          req.Status,
+		DecisionType:    req.DecisionType,
+		DqcRound:        req.DqcRound,
+		DesignerName:    req.DesignerName,
+		RejectionReason: req.RejectionReason,
+	}
+
+	return &pb.DesignDQCStatusResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 08 — MMT Visit Requested
+func (s *NotifyServiceServer) CreateDesignMMTRequest(
+	_ context.Context,
+	req *pb.DesignMMTRequestRequest,
+) (*pb.DesignMMTRequestResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignMMTRequestResponse_Payload{
+		MmtScope:       req.MmtScope,
+		VisitDate:      req.VisitDate,
+		VisitTime:      req.VisitTime,
+		MmtManagerId:   req.MmtManagerId,
+		DesignerName:   req.DesignerName,
+		MmtManagerName: req.MmtManagerName,
+	}
+
+	return &pb.DesignMMTRequestResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 09 — MMT Executive Assigned
+func (s *NotifyServiceServer) CreateDesignMMTAssign(
+	_ context.Context,
+	req *pb.DesignMMTAssignRequest,
+) (*pb.DesignMMTAssignResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignMMTAssignResponse_Payload{
+		AssignmentType: req.Payload.AssignmentType,
+		ToName:         req.Payload.ToName,
+		ToId:           req.Payload.ToId,
+	}
+
+	return &pb.DesignMMTAssignResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 10 — MMT Documents Ready
+func (s *NotifyServiceServer) CreateDesignMMTDocReady(
+	_ context.Context,
+	req *pb.DesignMMTDocReadyRequest,
+) (*pb.DesignMMTDocReadyResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignMMTDocReadyResponse_Payload{
+		MmtScope:   req.Payload.MmtScope,
+		Via:        req.Payload.Via,
+		UploadName: req.Payload.UploadName,
+		ApprovedBy: req.Payload.ApprovedBy,
+	}
+
+	return &pb.DesignMMTDocReadyResponse{
+		ProjectId: req.ProjectId,
+		LeadName:  req.LeadName,
+		Payload:   respPayload,
+	}, nil
+}
+
+// API 11 — Design Meeting Scheduled
+func (s *NotifyServiceServer) CreateDesignMeeting(
+	_ context.Context,
+	req *pb.DesignMeetingRequest,
+) (*pb.DesignMeetingResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignMeetingResponse_Payload{
+		MeetingType: req.MeetingType,
+		Mod:         req.Mod,
+	}
+
+	if req.Slot != nil {
+		respPayload.Slot = &pb.DesignMeetingResponse_Payload_Slot{
+			Date:     req.Slot.Date,
+			TimeSlot: req.Slot.TimeSlot,
+		}
+	}
+
+	return &pb.DesignMeetingResponse{
+		ProjectId: req.ProjectId,
+		LeadName:  req.LeadName,
+		Payload:   respPayload,
+	}, nil
+}
+
+// API 12 — Designer Reassignment
+func (s *NotifyServiceServer) CreateDesignAssignDesigner(
+	_ context.Context,
+	req *pb.DesignAssignDesignerRequest,
+) (*pb.DesignAssignDesignerResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignAssignDesignerResponse_Payload{
+		AssignmentType: req.Payload.AssignmentType,
+		FromId:         req.Payload.FromId,
+		ToId:           req.Payload.ToId,
+		FromName:       req.Payload.FromName,
+		ToName:         req.Payload.ToName,
+	}
+
+	return &pb.DesignAssignDesignerResponse{
+		ProjectId: req.ProjectId,
+		LeadName:  req.LeadName,
+		Payload:   respPayload,
+	}, nil
+}
+
+// API 13 — PM Assignment
+func (s *NotifyServiceServer) CreateDesignAssignPM(
+	_ context.Context,
+	req *pb.DesignAssignPMRequest,
+) (*pb.DesignAssignPMResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignAssignPMResponse_Payload{
+		AssignmentType: req.Payload.AssignmentType,
+		ToId:           req.Payload.ToId,
+		ToName:         req.Payload.ToName,
+	}
+
+	return &pb.DesignAssignPMResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 14 — New Quote
+func (s *NotifyServiceServer) CreateDesignQuote(
+	_ context.Context,
+	req *pb.DesignQuoteRequest,
+) (*pb.DesignQuoteResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+	if req.Payload == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
+	}
+
+	respPayload := &pb.DesignQuoteResponse_Payload{
+		QuoteId:   req.Payload.QuoteId,
+		QuoteLink: req.Payload.QuoteLink,
+	}
+
+	return &pb.DesignQuoteResponse{
+		ProjectId: req.ProjectId,
+		LeadName:  req.LeadName,
+		Payload:   respPayload,
+	}, nil
+}
+
+// API 15 — P2P Completed
+func (s *NotifyServiceServer) CreateDesignP2P(
+	_ context.Context,
+	req *pb.DesignP2PRequest,
+) (*pb.DesignP2PResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &pb.DesignP2PResponse_Payload{
+		DesignerName: req.DesignerName,
+	}
+
+	return &pb.DesignP2PResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
+	}, nil
+}
+
+// API 16 — Notification Feed
+func (s *NotifyServiceServer) GetDesignNotificationFeed(
+	_ context.Context,
+	_ *pb.DesignNotificationFeedRequest,
+) (*pb.DesignNotificationFeedResponse, error) {
+	return &pb.DesignNotificationFeedResponse{
+		Data: []*pb.DesignNotificationFeedResponse_Data{},
+	}, nil
+}
+
+// API 17 — Notification Counts
+func (s *NotifyServiceServer) GetDesignNotificationCounts(
+	_ context.Context,
+	_ *pb.DesignNotificationCountsRequest,
+) (*pb.DesignNotificationCountsResponse, error) {
+	return &pb.DesignNotificationCountsResponse{
+		Data: &pb.DesignNotificationCountsResponse_Data{
+			Total: 0,
+			ByType: &pb.DesignNotificationCountsResponse_ByType{
+				LEAD:       0,
+				PHASE:      0,
+				MILESTONE:  0,
+				PAYMENT:    0,
+				DQC:        0,
+				MMT:        0,
+				MEETING:    0,
+				ASSIGNMENT: 0,
+				QUOTE:      0,
+				P2P:        0,
+			},
+		},
+	}, nil
+}
+
+// API 18 — Notification Details
+func (s *NotifyServiceServer) GetDesignNotificationDetails(
+	_ context.Context,
+	req *pb.DesignNotificationDetailsRequest,
+) (*pb.DesignNotificationDetailsResponse, error) {
+	if req.NotificationId == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "notification_id is required")
+	}
+
+	return &pb.DesignNotificationDetailsResponse{
+		Data: &pb.DesignNotificationDetailsResponse_Data{
+			ProjectId:          "",
+			LeadName:           "",
+			NotificationType:   "",
+			NotificationAction: "",
+			DesignerId:         0,
+			Payload:            "",
+			CreatedAt:          "",
+		},
+	}, nil
+}

@@ -79,6 +79,7 @@ func (m *MySQLDetailsSvc) AutoMigrate() {
 		&models.Booking{},
 		&models.Notification{},
 		&models.NotificationRecipient{},
+		&models.DesignUserNotification{},
 	} {
 		if !gormDB.Migrator().HasTable(model) {
 			if err := gormDB.Migrator().CreateTable(model); err != nil {

@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/joho/godotenv"
@@ -16,6 +17,7 @@ import (
 
 	"NotifyProject/config"
 	"NotifyProject/internal/db"
+	"NotifyProject/internal/inbox"
 	pb "NotifyProject/proto/protogen/notify"
 )
 
@@ -70,8 +72,19 @@ func main() {
 		log.Fatalf("Failed to start REST gateway: %v", err)
 	}
 
+	store := inbox.NewStore(conn)
+	inbox.StartCleanup(store)
+	inboxHTTP := inbox.NewHTTP(store)
+	root := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/v1/design/inbox") {
+			inboxHTTP.ServeHTTP(w, r)
+			return
+		}
+		mux.ServeHTTP(w, r)
+	})
+
 	log.Println("Starting REST server on", cfg.HttpDetails.Port)
-	if err := http.ListenAndServe(cfg.HttpDetails.Port, mux); err != nil {
+	if err := http.ListenAndServe(cfg.HttpDetails.Port, root); err != nil {
 		log.Fatalf("Failed to serve REST: %v", err)
 	}
 }
