@@ -36,8 +36,8 @@ const (
 	DesignService_CreateDesignP2P_FullMethodName              = "/design.DesignService/CreateDesignP2P"
 	DesignService_CreateDesignPMStatus_FullMethodName         = "/design.DesignService/CreateDesignPMStatus"
 	DesignService_GetDesignNotificationFeed_FullMethodName    = "/design.DesignService/GetDesignNotificationFeed"
-	DesignService_GetDesignNotificationCounts_FullMethodName  = "/design.DesignService/GetDesignNotificationCounts"
 	DesignService_GetDesignNotificationDetails_FullMethodName = "/design.DesignService/GetDesignNotificationDetails"
+	DesignService_GetDesignNotificationCounts_FullMethodName  = "/design.DesignService/GetDesignNotificationCounts"
 )
 
 // DesignServiceClient is the client API for DesignService service.
@@ -78,10 +78,10 @@ type DesignServiceClient interface {
 	CreateDesignPMStatus(ctx context.Context, in *DesignPMStatusRequest, opts ...grpc.CallOption) (*DesignPMStatusResponse, error)
 	// 17 — Notification Feed
 	GetDesignNotificationFeed(ctx context.Context, in *DesignNotificationFeedRequest, opts ...grpc.CallOption) (*DesignNotificationFeedResponse, error)
-	// 17 — Notification Counts
-	GetDesignNotificationCounts(ctx context.Context, in *DesignNotificationCountsRequest, opts ...grpc.CallOption) (*DesignNotificationCountsResponse, error)
 	// 18 — Notification Details
 	GetDesignNotificationDetails(ctx context.Context, in *DesignNotificationDetailsRequest, opts ...grpc.CallOption) (*DesignNotificationDetailsResponse, error)
+	// 17 — Notification Counts
+	GetDesignNotificationCounts(ctx context.Context, in *DesignNotificationCountsRequest, opts ...grpc.CallOption) (*DesignNotificationCountsResponse, error)
 }
 
 type designServiceClient struct {
@@ -262,20 +262,20 @@ func (c *designServiceClient) GetDesignNotificationFeed(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *designServiceClient) GetDesignNotificationCounts(ctx context.Context, in *DesignNotificationCountsRequest, opts ...grpc.CallOption) (*DesignNotificationCountsResponse, error) {
+func (c *designServiceClient) GetDesignNotificationDetails(ctx context.Context, in *DesignNotificationDetailsRequest, opts ...grpc.CallOption) (*DesignNotificationDetailsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DesignNotificationCountsResponse)
-	err := c.cc.Invoke(ctx, DesignService_GetDesignNotificationCounts_FullMethodName, in, out, cOpts...)
+	out := new(DesignNotificationDetailsResponse)
+	err := c.cc.Invoke(ctx, DesignService_GetDesignNotificationDetails_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *designServiceClient) GetDesignNotificationDetails(ctx context.Context, in *DesignNotificationDetailsRequest, opts ...grpc.CallOption) (*DesignNotificationDetailsResponse, error) {
+func (c *designServiceClient) GetDesignNotificationCounts(ctx context.Context, in *DesignNotificationCountsRequest, opts ...grpc.CallOption) (*DesignNotificationCountsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DesignNotificationDetailsResponse)
-	err := c.cc.Invoke(ctx, DesignService_GetDesignNotificationDetails_FullMethodName, in, out, cOpts...)
+	out := new(DesignNotificationCountsResponse)
+	err := c.cc.Invoke(ctx, DesignService_GetDesignNotificationCounts_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -320,10 +320,10 @@ type DesignServiceServer interface {
 	CreateDesignPMStatus(context.Context, *DesignPMStatusRequest) (*DesignPMStatusResponse, error)
 	// 17 — Notification Feed
 	GetDesignNotificationFeed(context.Context, *DesignNotificationFeedRequest) (*DesignNotificationFeedResponse, error)
-	// 17 — Notification Counts
-	GetDesignNotificationCounts(context.Context, *DesignNotificationCountsRequest) (*DesignNotificationCountsResponse, error)
 	// 18 — Notification Details
 	GetDesignNotificationDetails(context.Context, *DesignNotificationDetailsRequest) (*DesignNotificationDetailsResponse, error)
+	// 17 — Notification Counts
+	GetDesignNotificationCounts(context.Context, *DesignNotificationCountsRequest) (*DesignNotificationCountsResponse, error)
 	mustEmbedUnimplementedDesignServiceServer()
 }
 
@@ -385,11 +385,11 @@ func (UnimplementedDesignServiceServer) CreateDesignPMStatus(context.Context, *D
 func (UnimplementedDesignServiceServer) GetDesignNotificationFeed(context.Context, *DesignNotificationFeedRequest) (*DesignNotificationFeedResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDesignNotificationFeed not implemented")
 }
-func (UnimplementedDesignServiceServer) GetDesignNotificationCounts(context.Context, *DesignNotificationCountsRequest) (*DesignNotificationCountsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetDesignNotificationCounts not implemented")
-}
 func (UnimplementedDesignServiceServer) GetDesignNotificationDetails(context.Context, *DesignNotificationDetailsRequest) (*DesignNotificationDetailsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDesignNotificationDetails not implemented")
+}
+func (UnimplementedDesignServiceServer) GetDesignNotificationCounts(context.Context, *DesignNotificationCountsRequest) (*DesignNotificationCountsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDesignNotificationCounts not implemented")
 }
 func (UnimplementedDesignServiceServer) mustEmbedUnimplementedDesignServiceServer() {}
 func (UnimplementedDesignServiceServer) testEmbeddedByValue()                       {}
@@ -718,24 +718,6 @@ func _DesignService_GetDesignNotificationFeed_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DesignService_GetDesignNotificationCounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DesignNotificationCountsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DesignServiceServer).GetDesignNotificationCounts(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: DesignService_GetDesignNotificationCounts_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DesignServiceServer).GetDesignNotificationCounts(ctx, req.(*DesignNotificationCountsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _DesignService_GetDesignNotificationDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DesignNotificationDetailsRequest)
 	if err := dec(in); err != nil {
@@ -750,6 +732,24 @@ func _DesignService_GetDesignNotificationDetails_Handler(srv interface{}, ctx co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DesignServiceServer).GetDesignNotificationDetails(ctx, req.(*DesignNotificationDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DesignService_GetDesignNotificationCounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DesignNotificationCountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DesignServiceServer).GetDesignNotificationCounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DesignService_GetDesignNotificationCounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DesignServiceServer).GetDesignNotificationCounts(ctx, req.(*DesignNotificationCountsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -830,12 +830,12 @@ var DesignService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DesignService_GetDesignNotificationFeed_Handler,
 		},
 		{
-			MethodName: "GetDesignNotificationCounts",
-			Handler:    _DesignService_GetDesignNotificationCounts_Handler,
-		},
-		{
 			MethodName: "GetDesignNotificationDetails",
 			Handler:    _DesignService_GetDesignNotificationDetails_Handler,
+		},
+		{
+			MethodName: "GetDesignNotificationCounts",
+			Handler:    _DesignService_GetDesignNotificationCounts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -5891,9 +5891,9 @@ const file_design_proto_rawDesc = "" +
 	"\x11CreateDesignQuote\x12\x1a.design.DesignQuoteRequest\x1a\x1b.design.DesignQuoteResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/v1/design/notifications/quote\x12o\n" +
 	"\x0fCreateDesignP2P\x12\x18.design.DesignP2PRequest\x1a\x19.design.DesignP2PResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/v1/design/notifications/p2p\x12\x84\x01\n" +
 	"\x14CreateDesignPMStatus\x12\x1d.design.DesignPMStatusRequest\x1a\x1e.design.DesignPMStatusResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/v1/design/notifications/pm/status\x12\x8c\x01\n" +
-	"\x19GetDesignNotificationFeed\x12%.design.DesignNotificationFeedRequest\x1a&.design.DesignNotificationFeedResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/v1/design/notifications\x12\x99\x01\n" +
-	"\x1bGetDesignNotificationCounts\x12'.design.DesignNotificationCountsRequest\x1a(.design.DesignNotificationCountsResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/v1/design/notifications/counts\x12\xa7\x01\n" +
-	"\x1cGetDesignNotificationDetails\x12(.design.DesignNotificationDetailsRequest\x1a).design.DesignNotificationDetailsResponse\"2\x82\xd3\xe4\x93\x02,\x12*/v1/design/notifications/{notification_id}B\x13Z\x11./protogen/designb\x06proto3"
+	"\x19GetDesignNotificationFeed\x12%.design.DesignNotificationFeedRequest\x1a&.design.DesignNotificationFeedResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/v1/design/notifications\x12\xa7\x01\n" +
+	"\x1cGetDesignNotificationDetails\x12(.design.DesignNotificationDetailsRequest\x1a).design.DesignNotificationDetailsResponse\"2\x82\xd3\xe4\x93\x02,\x12*/v1/design/notifications/{notification_id}\x12\x99\x01\n" +
+	"\x1bGetDesignNotificationCounts\x12'.design.DesignNotificationCountsRequest\x1a(.design.DesignNotificationCountsResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/v1/design/notifications/countsB\x13Z\x11./protogen/designb\x06proto3"
 
 var (
 	file_design_proto_rawDescOnce sync.Once
@@ -6038,8 +6038,8 @@ var file_design_proto_depIdxs = []int32{
 	29, // 50: design.DesignService.CreateDesignP2P:input_type -> design.DesignP2PRequest
 	31, // 51: design.DesignService.CreateDesignPMStatus:input_type -> design.DesignPMStatusRequest
 	33, // 52: design.DesignService.GetDesignNotificationFeed:input_type -> design.DesignNotificationFeedRequest
-	35, // 53: design.DesignService.GetDesignNotificationCounts:input_type -> design.DesignNotificationCountsRequest
-	37, // 54: design.DesignService.GetDesignNotificationDetails:input_type -> design.DesignNotificationDetailsRequest
+	37, // 53: design.DesignService.GetDesignNotificationDetails:input_type -> design.DesignNotificationDetailsRequest
+	35, // 54: design.DesignService.GetDesignNotificationCounts:input_type -> design.DesignNotificationCountsRequest
 	2,  // 55: design.DesignService.CreateDesignLeadPre10:output_type -> design.DesignLeadPre10Response
 	4,  // 56: design.DesignService.CreateDesignLead1020:output_type -> design.DesignLead1020Response
 	6,  // 57: design.DesignService.CreateDesignMilestone:output_type -> design.DesignMilestoneResponse
@@ -6057,8 +6057,8 @@ var file_design_proto_depIdxs = []int32{
 	30, // 69: design.DesignService.CreateDesignP2P:output_type -> design.DesignP2PResponse
 	32, // 70: design.DesignService.CreateDesignPMStatus:output_type -> design.DesignPMStatusResponse
 	34, // 71: design.DesignService.GetDesignNotificationFeed:output_type -> design.DesignNotificationFeedResponse
-	36, // 72: design.DesignService.GetDesignNotificationCounts:output_type -> design.DesignNotificationCountsResponse
-	38, // 73: design.DesignService.GetDesignNotificationDetails:output_type -> design.DesignNotificationDetailsResponse
+	38, // 72: design.DesignService.GetDesignNotificationDetails:output_type -> design.DesignNotificationDetailsResponse
+	36, // 73: design.DesignService.GetDesignNotificationCounts:output_type -> design.DesignNotificationCountsResponse
 	55, // [55:74] is the sub-list for method output_type
 	36, // [36:55] is the sub-list for method input_type
 	36, // [36:36] is the sub-list for extension type_name

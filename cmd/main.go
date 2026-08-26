@@ -18,6 +18,7 @@ import (
 	"NotifyProject/config"
 	"NotifyProject/internal/db"
 	"NotifyProject/internal/inbox"
+	designpb "NotifyProject/proto/protogen/design"
 	pb "NotifyProject/proto/protogen/notify"
 )
 
@@ -46,12 +47,14 @@ func main() {
 	conn := mysqlSvc.ConnectMySQL()
 	defer conn.Close()
 
-	// Initialize the gRPC service
+	// Initialize the gRPC services
 	notifyService := service.NewNotifyServiceServer(conn)
+	designService := service.NewDesignServiceServer(conn)
 
 	// Start the gRPC server
 	grpcServer := grpc.NewServer()
 	pb.RegisterNotifyServiceServer(grpcServer, notifyService)
+	designpb.RegisterDesignServiceServer(grpcServer, designService)
 
 	lis, err := net.Listen(cfg.GrpcDetails.Network, cfg.GrpcDetails.Address)
 	if err != nil {
@@ -68,6 +71,9 @@ func main() {
 	ctx := context.Background()
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
+	if err := designpb.RegisterDesignServiceHandlerFromEndpoint(ctx, mux, cfg.GrpcDetails.Endpoint, opts); err != nil {
+		log.Fatalf("Failed to start REST gateway: %v", err)
+	}
 	if err := pb.RegisterNotifyServiceHandlerFromEndpoint(ctx, mux, cfg.GrpcDetails.Endpoint, opts); err != nil {
 		log.Fatalf("Failed to start REST gateway: %v", err)
 	}

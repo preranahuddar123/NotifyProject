@@ -783,21 +783,21 @@ service DesignService {
     };
   }
 
-  // 17 — Notification Counts
-  rpc GetDesignNotificationCounts(
-      DesignNotificationCountsRequest
-  ) returns (DesignNotificationCountsResponse) {
-    option (google.api.http) = {
-      get: "/v1/design/notifications/counts"
-    };
-  }
-
   // 18 — Notification Details
   rpc GetDesignNotificationDetails(
       DesignNotificationDetailsRequest
   ) returns (DesignNotificationDetailsResponse) {
     option (google.api.http) = {
       get: "/v1/design/notifications/{notification_id}"
+    };
+  }
+
+  // 17 — Notification Counts
+  rpc GetDesignNotificationCounts(
+      DesignNotificationCountsRequest
+  ) returns (DesignNotificationCountsResponse) {
+    option (google.api.http) = {
+      get: "/v1/design/notifications/counts"
     };
   }
 }
