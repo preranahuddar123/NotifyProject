@@ -3,14 +3,19 @@ package service
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"NotifyProject/internal/inbox"
+	designpb "NotifyProject/proto/protogen/design"
 	pb "NotifyProject/proto/protogen/notify"
 )
 
@@ -719,42 +724,117 @@ func scanBooking(fn func(...any) error) (*pb.Booking, error) {
 	return &m, nil
 }
 
+
 // -----------------------------------------------------------------------
-// Design Notification APIs (01-18) Implementation
+// DesignServiceServer Implementation (Handles the actual API requests)
 // -----------------------------------------------------------------------
 
-// API 01 — Pre-10% New Lead
-func (s *NotifyServiceServer) CreateDesignLeadPre10(
-	_ context.Context,
-	req *pb.DesignLeadPre10Request,
-) (*pb.DesignLeadPre10Response, error) {
+type DesignServiceServer struct {
+	designpb.UnimplementedDesignServiceServer
+	db *sql.DB
+}
 
-	if req.ProjectId == "" || req.LeadName == "" {
-		return nil, status.Errorf(
-			codes.InvalidArgument,
-			"project_id and lead_name are required",
-		)
+func NewDesignServiceServer(db *sql.DB) *DesignServiceServer {
+	return &DesignServiceServer{db: db}
+}
+
+// Helper method to persist design notification in database.
+func (s *DesignServiceServer) saveDesignNotification(
+	eventID string,
+	projectID string,
+	leadName string,
+	designerID int32,
+	notifType string,
+	notifAction string,
+	payload any,
+	recipients []*designpb.Recipient,
+) error {
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal payload: %v", err)
 	}
 
-	var respPayload *pb.DesignLeadPre10Response_Payload
+	if len(recipients) == 0 {
+		recipients = []*designpb.Recipient{
+			{UserId: designerID, Role: "designer"},
+		}
+	}
 
+	var leadID int32
+	projectIDStr := strings.TrimPrefix(projectID, "HUB-")
+	if idVal, parseErr := strconv.Atoi(projectIDStr); parseErr == nil {
+		leadID = int32(idVal)
+	}
+
+	var userIDs []int32
+	for _, rec := range recipients {
+		if rec.UserId <= 0 {
+			continue
+		}
+		_, err = s.db.Exec(
+			`INSERT INTO design_user_notifications 
+			 (event_id, user_id, recipient_role, lead_id, project_id, lead_name, designer_id, 
+			  notification_type, notification_action, payload, created_at)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+			 ON DUPLICATE KEY UPDATE event_id = event_id`,
+			eventID,
+			rec.UserId,
+			rec.Role,
+			leadID,
+			projectID,
+			leadName,
+			designerID,
+			notifType,
+			notifAction,
+			string(payloadBytes),
+		)
+		if err != nil {
+			log.Printf("[service] Failed to save design notification for user %d: %v", rec.UserId, err)
+			continue
+		}
+		userIDs = append(userIDs, rec.UserId)
+	}
+
+	if len(userIDs) > 0 {
+		inbox.DefaultHub.Broadcast(userIDs, map[string]any{
+			"type":     "inbox_updated",
+			"event_id": eventID,
+		})
+	}
+
+	log.Printf("[service] Saved fan-out design notification: project=%s type=%s action=%s recipients=%d", projectID, notifType, notifAction, len(userIDs))
+	return nil
+}
+
+// API 01 — Pre-10% New Lead
+func (s *DesignServiceServer) CreateDesignLeadPre10(
+	_ context.Context,
+	req *designpb.DesignLeadPre10Request,
+) (*designpb.DesignLeadPre10Response, error) {
+
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	var respPayload *designpb.DesignLeadPre10Response_Payload
 	if req.Payload != nil {
-		respPayload = &pb.DesignLeadPre10Response_Payload{
+		respPayload = &designpb.DesignLeadPre10Response_Payload{
 			CurrentPhase:       req.Payload.CurrentPhase,
 			DesignerName:       req.Payload.DesignerName,
 			SalesExecutiveName: req.Payload.SalesExecutiveName,
 			MeetingType:        req.Payload.MeetingType,
 		}
-
 		if req.Payload.Slot != nil {
-			respPayload.Slot = &pb.DesignLeadPre10Response_Payload_Slot{
+			respPayload.Slot = &designpb.DesignLeadPre10Response_Payload_Slot{
 				Date:     req.Payload.Slot.Date,
 				SlotTime: req.Payload.Slot.SlotTime,
 			}
 		}
 	}
 
-	return &pb.DesignLeadPre10Response{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "LEAD", "CREATED", respPayload, req.Recipients)
+
+	return &designpb.DesignLeadPre10Response{
 		ProjectId:          req.ProjectId,
 		LeadName:           req.LeadName,
 		DesignerId:         req.DesignerId,
@@ -764,30 +844,30 @@ func (s *NotifyServiceServer) CreateDesignLeadPre10(
 		CreatedAt:          time.Now().Format(time.RFC3339),
 	}, nil
 }
-func (s *NotifyServiceServer) CreateDesignLead1020(
+
+// API 02 — 10–20% Phase Entered
+func (s *DesignServiceServer) CreateDesignLead1020(
 	_ context.Context,
-	req *pb.DesignLead1020Request,
-) (*pb.DesignLead1020Response, error) {
+	req *designpb.DesignLead1020Request,
+) (*designpb.DesignLead1020Response, error) {
 
 	if req.ProjectId == "" || req.LeadName == "" {
-		return nil, status.Errorf(
-			codes.InvalidArgument,
-			"project_id and lead_name are required",
-		)
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
 
-	var payload *pb.DesignLead1020Response_Data_Payload
-
+	var payload *designpb.DesignLead1020Response_Data_Payload
 	if req.Payload != nil {
-		payload = &pb.DesignLead1020Response_Data_Payload{
+		payload = &designpb.DesignLead1020Response_Data_Payload{
 			PreviousPhase: req.Payload.PreviousPhase,
 			Trigger:       req.Payload.Trigger,
 			Message:       req.Payload.Message,
 		}
 	}
 
-	return &pb.DesignLead1020Response{
-		Data: &pb.DesignLead1020Response_Data{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "PHASE", "PHASE_ENTERED", payload, req.Recipients)
+
+	return &designpb.DesignLead1020Response{
+		Data: &designpb.DesignLead1020Response_Data{
 			ProjectId:          req.ProjectId,
 			LeadName:           req.LeadName,
 			DesignerId:         req.DesignerId,
@@ -801,27 +881,22 @@ func (s *NotifyServiceServer) CreateDesignLead1020(
 }
 
 // API 03 — Milestone Completed
-func (s *NotifyServiceServer) CreateDesignMilestone(
+func (s *DesignServiceServer) CreateDesignMilestone(
 	_ context.Context,
-	req *pb.DesignMilestoneRequest,
-) (*pb.DesignMilestoneResponse, error) {
+	req *designpb.DesignMilestoneRequest,
+) (*designpb.DesignMilestoneResponse, error) {
 
 	if req.ProjectId == "" || req.LeadName == "" {
-		return nil, status.Errorf(
-			codes.InvalidArgument,
-			"project_id and lead_name are required",
-		)
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
-
 	if req.Payload == nil {
-		return nil, status.Errorf(
-			codes.InvalidArgument,
-			"payload is required",
-		)
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	return &pb.DesignMilestoneResponse{
-		Data: &pb.DesignMilestoneResponse_Data{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "MILESTONE", "COMPLETED", req.Payload, req.Recipients)
+
+	return &designpb.DesignMilestoneResponse{
+		Data: &designpb.DesignMilestoneResponse_Data{
 			ProjectId:          req.ProjectId,
 			LeadName:           req.LeadName,
 			DesignerId:         req.DesignerId,
@@ -837,33 +912,28 @@ func (s *NotifyServiceServer) CreateDesignMilestone(
 }
 
 // API 04 — Payment Requested
-func (s *NotifyServiceServer) CreateDesignPaymentRequest(
+func (s *DesignServiceServer) CreateDesignPaymentRequest(
 	_ context.Context,
-	req *pb.DesignPaymentRequestRequest,
-) (*pb.DesignPaymentRequestResponse, error) {
+	req *designpb.DesignPaymentRequestRequest,
+) (*designpb.DesignPaymentRequestResponse, error) {
 
 	if req.ProjectId == "" || req.LeadName == "" {
-		return nil, status.Errorf(
-			codes.InvalidArgument,
-			"project_id and lead_name are required",
-		)
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
-
 	if req.Payload == nil {
-		return nil, status.Errorf(
-			codes.InvalidArgument,
-			"payload is required",
-		)
+		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	return &pb.DesignPaymentRequestResponse{
-		Data: &pb.DesignPaymentRequestResponse_Data{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "PAYMENT", "REQUESTED", req.Payload, req.Recipients)
+
+	return &designpb.DesignPaymentRequestResponse{
+		Data: &designpb.DesignPaymentRequestResponse_Data{
 			ProjectId:          req.ProjectId,
 			LeadName:           req.LeadName,
 			DesignerId:         req.DesignerId,
 			NotificationType:   "PAYMENT",
 			NotificationAction: "REQUESTED",
-			PaymentType:        req.Payload.PaymentType,
+			PaymentType:        designpb.PaymentType(req.Payload.PaymentType),
 			UploadName:         req.Payload.UploadName,
 			Amount:             req.Payload.Amount,
 			CreatedAt:          time.Now().Format(time.RFC3339),
@@ -872,15 +942,15 @@ func (s *NotifyServiceServer) CreateDesignPaymentRequest(
 }
 
 // API 05 — Payment / Sales Closure Status
-func (s *NotifyServiceServer) CreateDesignPaymentStatus(
+func (s *DesignServiceServer) CreateDesignPaymentStatus(
 	_ context.Context,
-	req *pb.DesignPaymentStatusRequest,
-) (*pb.DesignPaymentStatusResponse, error) {
+	req *designpb.DesignPaymentStatusRequest,
+) (*designpb.DesignPaymentStatusResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
 
-	respPayload := &pb.DesignPaymentStatusResponse_Payload{
+	respPayload := &designpb.DesignPaymentStatusResponse_Payload{
 		Status:           req.Status,
 		DecisionType:     req.DecisionType,
 		PaymentType:      req.PaymentType,
@@ -890,23 +960,35 @@ func (s *NotifyServiceServer) CreateDesignPaymentStatus(
 		RejectionReason:  req.RejectionReason,
 	}
 
-	return &pb.DesignPaymentStatusResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignPaymentStatusResponse{
 		ProjectId:  req.ProjectId,
 		LeadName:   req.LeadName,
 		DesignerId: req.DesignerId,
 		Payload:    respPayload,
 	}, nil
 }
-func (s *NotifyServiceServer) CreateDesignDQCRequest(
+
+// API 06 — DQC Requested
+func (s *DesignServiceServer) CreateDesignDQCRequest(
 	_ context.Context,
-	req *pb.DesignDQCRequestRequest,
-) (*pb.DesignDQCRequestResponse, error) {
+	req *designpb.DesignDQCRequestRequest,
+) (*designpb.DesignDQCRequestResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
 
-	return &pb.DesignDQCRequestResponse{
-		Data: &pb.DesignDQCRequestResponse_Data{
+	payload := map[string]any{
+		"dqc_round":     req.DqcRound,
+		"review_id":     req.ReviewId,
+		"designer_name": req.DesignerName,
+	}
+
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "DQC", "REQUESTED", payload, req.Recipients)
+
+	return &designpb.DesignDQCRequestResponse{
+		Data: &designpb.DesignDQCRequestResponse_Data{
 			ProjectId:          req.ProjectId,
 			LeadName:           req.LeadName,
 			DesignerId:         req.DesignerId,
@@ -921,15 +1003,15 @@ func (s *NotifyServiceServer) CreateDesignDQCRequest(
 }
 
 // API 07 — DQC Status
-func (s *NotifyServiceServer) CreateDesignDQCStatus(
+func (s *DesignServiceServer) CreateDesignDQCStatus(
 	_ context.Context,
-	req *pb.DesignDQCStatusRequest,
-) (*pb.DesignDQCStatusResponse, error) {
+	req *designpb.DesignDQCStatusRequest,
+) (*designpb.DesignDQCStatusResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
 
-	respPayload := &pb.DesignDQCStatusResponse_Payload{
+	respPayload := &designpb.DesignDQCStatusResponse_Payload{
 		Status:          req.Status,
 		DecisionType:    req.DecisionType,
 		DqcRound:        req.DqcRound,
@@ -937,7 +1019,9 @@ func (s *NotifyServiceServer) CreateDesignDQCStatus(
 		RejectionReason: req.RejectionReason,
 	}
 
-	return &pb.DesignDQCStatusResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignDQCStatusResponse{
 		ProjectId:  req.ProjectId,
 		LeadName:   req.LeadName,
 		DesignerId: req.DesignerId,
@@ -946,15 +1030,15 @@ func (s *NotifyServiceServer) CreateDesignDQCStatus(
 }
 
 // API 08 — MMT Visit Requested
-func (s *NotifyServiceServer) CreateDesignMMTRequest(
+func (s *DesignServiceServer) CreateDesignMMTRequest(
 	_ context.Context,
-	req *pb.DesignMMTRequestRequest,
-) (*pb.DesignMMTRequestResponse, error) {
+	req *designpb.DesignMMTRequestRequest,
+) (*designpb.DesignMMTRequestResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
 
-	respPayload := &pb.DesignMMTRequestResponse_Payload{
+	respPayload := &designpb.DesignMMTRequestResponse_Payload{
 		MmtScope:       req.MmtScope,
 		VisitDate:      req.VisitDate,
 		VisitTime:      req.VisitTime,
@@ -963,7 +1047,9 @@ func (s *NotifyServiceServer) CreateDesignMMTRequest(
 		MmtManagerName: req.MmtManagerName,
 	}
 
-	return &pb.DesignMMTRequestResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignMMTRequestResponse{
 		ProjectId:  req.ProjectId,
 		LeadName:   req.LeadName,
 		DesignerId: req.DesignerId,
@@ -972,10 +1058,10 @@ func (s *NotifyServiceServer) CreateDesignMMTRequest(
 }
 
 // API 09 — MMT Executive Assigned
-func (s *NotifyServiceServer) CreateDesignMMTAssign(
+func (s *DesignServiceServer) CreateDesignMMTAssign(
 	_ context.Context,
-	req *pb.DesignMMTAssignRequest,
-) (*pb.DesignMMTAssignResponse, error) {
+	req *designpb.DesignMMTAssignRequest,
+) (*designpb.DesignMMTAssignResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
@@ -983,13 +1069,15 @@ func (s *NotifyServiceServer) CreateDesignMMTAssign(
 		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	respPayload := &pb.DesignMMTAssignResponse_Payload{
+	respPayload := &designpb.DesignMMTAssignResponse_Payload{
 		AssignmentType: req.Payload.AssignmentType,
 		ToName:         req.Payload.ToName,
 		ToId:           req.Payload.ToId,
 	}
 
-	return &pb.DesignMMTAssignResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignMMTAssignResponse{
 		ProjectId:  req.ProjectId,
 		LeadName:   req.LeadName,
 		DesignerId: req.DesignerId,
@@ -998,10 +1086,10 @@ func (s *NotifyServiceServer) CreateDesignMMTAssign(
 }
 
 // API 10 — MMT Documents Ready
-func (s *NotifyServiceServer) CreateDesignMMTDocReady(
+func (s *DesignServiceServer) CreateDesignMMTDocReady(
 	_ context.Context,
-	req *pb.DesignMMTDocReadyRequest,
-) (*pb.DesignMMTDocReadyResponse, error) {
+	req *designpb.DesignMMTDocReadyRequest,
+) (*designpb.DesignMMTDocReadyResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
@@ -1009,14 +1097,16 @@ func (s *NotifyServiceServer) CreateDesignMMTDocReady(
 		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	respPayload := &pb.DesignMMTDocReadyResponse_Payload{
+	respPayload := &designpb.DesignMMTDocReadyResponse_Payload{
 		MmtScope:   req.Payload.MmtScope,
 		Via:        req.Payload.Via,
 		UploadName: req.Payload.UploadName,
 		ApprovedBy: req.Payload.ApprovedBy,
 	}
 
-	return &pb.DesignMMTDocReadyResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignMMTDocReadyResponse{
 		ProjectId: req.ProjectId,
 		LeadName:  req.LeadName,
 		Payload:   respPayload,
@@ -1024,27 +1114,28 @@ func (s *NotifyServiceServer) CreateDesignMMTDocReady(
 }
 
 // API 11 — Design Meeting Scheduled
-func (s *NotifyServiceServer) CreateDesignMeeting(
+func (s *DesignServiceServer) CreateDesignMeeting(
 	_ context.Context,
-	req *pb.DesignMeetingRequest,
-) (*pb.DesignMeetingResponse, error) {
+	req *designpb.DesignMeetingRequest,
+) (*designpb.DesignMeetingResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
 
-	respPayload := &pb.DesignMeetingResponse_Payload{
+	respPayload := &designpb.DesignMeetingResponse_Payload{
 		MeetingType: req.MeetingType,
 		Mod:         req.Mod,
 	}
-
 	if req.Slot != nil {
-		respPayload.Slot = &pb.DesignMeetingResponse_Payload_Slot{
+		respPayload.Slot = &designpb.DesignMeetingResponse_Payload_Slot{
 			Date:     req.Slot.Date,
 			TimeSlot: req.Slot.TimeSlot,
 		}
 	}
 
-	return &pb.DesignMeetingResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignMeetingResponse{
 		ProjectId: req.ProjectId,
 		LeadName:  req.LeadName,
 		Payload:   respPayload,
@@ -1052,10 +1143,10 @@ func (s *NotifyServiceServer) CreateDesignMeeting(
 }
 
 // API 12 — Designer Reassignment
-func (s *NotifyServiceServer) CreateDesignAssignDesigner(
+func (s *DesignServiceServer) CreateDesignAssignDesigner(
 	_ context.Context,
-	req *pb.DesignAssignDesignerRequest,
-) (*pb.DesignAssignDesignerResponse, error) {
+	req *designpb.DesignAssignDesignerRequest,
+) (*designpb.DesignAssignDesignerResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
@@ -1063,7 +1154,7 @@ func (s *NotifyServiceServer) CreateDesignAssignDesigner(
 		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	respPayload := &pb.DesignAssignDesignerResponse_Payload{
+	respPayload := &designpb.DesignAssignDesignerResponse_Payload{
 		AssignmentType: req.Payload.AssignmentType,
 		FromId:         req.Payload.FromId,
 		ToId:           req.Payload.ToId,
@@ -1071,7 +1162,9 @@ func (s *NotifyServiceServer) CreateDesignAssignDesigner(
 		ToName:         req.Payload.ToName,
 	}
 
-	return &pb.DesignAssignDesignerResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.Payload.ToId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignAssignDesignerResponse{
 		ProjectId: req.ProjectId,
 		LeadName:  req.LeadName,
 		Payload:   respPayload,
@@ -1079,10 +1172,10 @@ func (s *NotifyServiceServer) CreateDesignAssignDesigner(
 }
 
 // API 13 — PM Assignment
-func (s *NotifyServiceServer) CreateDesignAssignPM(
+func (s *DesignServiceServer) CreateDesignAssignPM(
 	_ context.Context,
-	req *pb.DesignAssignPMRequest,
-) (*pb.DesignAssignPMResponse, error) {
+	req *designpb.DesignAssignPMRequest,
+) (*designpb.DesignAssignPMResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
@@ -1090,25 +1183,32 @@ func (s *NotifyServiceServer) CreateDesignAssignPM(
 		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	respPayload := &pb.DesignAssignPMResponse_Payload{
+	respPayload := &designpb.DesignAssignPMResponse_Data_Payload{
 		AssignmentType: req.Payload.AssignmentType,
 		ToId:           req.Payload.ToId,
 		ToName:         req.Payload.ToName,
 	}
 
-	return &pb.DesignAssignPMResponse{
-		ProjectId:  req.ProjectId,
-		LeadName:   req.LeadName,
-		DesignerId: req.DesignerId,
-		Payload:    respPayload,
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignAssignPMResponse{
+		Data: &designpb.DesignAssignPMResponse_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   req.NotificationType,
+			NotificationAction: req.NotificationAction,
+			Payload:            respPayload,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
 	}, nil
 }
 
 // API 14 — New Quote
-func (s *NotifyServiceServer) CreateDesignQuote(
+func (s *DesignServiceServer) CreateDesignQuote(
 	_ context.Context,
-	req *pb.DesignQuoteRequest,
-) (*pb.DesignQuoteResponse, error) {
+	req *designpb.DesignQuoteRequest,
+) (*designpb.DesignQuoteResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
@@ -1116,12 +1216,14 @@ func (s *NotifyServiceServer) CreateDesignQuote(
 		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	respPayload := &pb.DesignQuoteResponse_Payload{
+	respPayload := &designpb.DesignQuoteResponse_Payload{
 		QuoteId:   req.Payload.QuoteId,
 		QuoteLink: req.Payload.QuoteLink,
 	}
 
-	return &pb.DesignQuoteResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignQuoteResponse{
 		ProjectId: req.ProjectId,
 		LeadName:  req.LeadName,
 		Payload:   respPayload,
@@ -1129,19 +1231,21 @@ func (s *NotifyServiceServer) CreateDesignQuote(
 }
 
 // API 15 — P2P Completed
-func (s *NotifyServiceServer) CreateDesignP2P(
+func (s *DesignServiceServer) CreateDesignP2P(
 	_ context.Context,
-	req *pb.DesignP2PRequest,
-) (*pb.DesignP2PResponse, error) {
+	req *designpb.DesignP2PRequest,
+) (*designpb.DesignP2PResponse, error) {
 	if req.ProjectId == "" || req.LeadName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
 	}
 
-	respPayload := &pb.DesignP2PResponse_Payload{
+	respPayload := &designpb.DesignP2PResponse_Payload{
 		DesignerName: req.DesignerName,
 	}
 
-	return &pb.DesignP2PResponse{
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignP2PResponse{
 		ProjectId:  req.ProjectId,
 		LeadName:   req.LeadName,
 		DesignerId: req.DesignerId,
@@ -1149,58 +1253,332 @@ func (s *NotifyServiceServer) CreateDesignP2P(
 	}, nil
 }
 
-// API 16 — Notification Feed
-func (s *NotifyServiceServer) GetDesignNotificationFeed(
+// API 16 — PM Approve / Reject (after DQC2)
+func (s *DesignServiceServer) CreateDesignPMStatus(
 	_ context.Context,
-	_ *pb.DesignNotificationFeedRequest,
-) (*pb.DesignNotificationFeedResponse, error) {
-	return &pb.DesignNotificationFeedResponse{
-		Data: []*pb.DesignNotificationFeedResponse_Data{},
+	req *designpb.DesignPMStatusRequest,
+) (*designpb.DesignPMStatusResponse, error) {
+	if req.ProjectId == "" || req.LeadName == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "project_id and lead_name are required")
+	}
+
+	respPayload := &designpb.DesignPMStatusResponse_Payload{
+		Status:          req.Status,
+		DecisionType:    req.DecisionType,
+		DqcRound:        req.DqcRound,
+		DesignerName:    req.DesignerName,
+		ApproverName:    req.ApproverName,
+		RejectionReason: req.RejectionReason,
+	}
+
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
+
+	return &designpb.DesignPMStatusResponse{
+		ProjectId:  req.ProjectId,
+		LeadName:   req.LeadName,
+		DesignerId: req.DesignerId,
+		Payload:    respPayload,
 	}, nil
 }
 
-// API 17 — Notification Counts
-func (s *NotifyServiceServer) GetDesignNotificationCounts(
-	_ context.Context,
-	_ *pb.DesignNotificationCountsRequest,
-) (*pb.DesignNotificationCountsResponse, error) {
-	return &pb.DesignNotificationCountsResponse{
-		Data: &pb.DesignNotificationCountsResponse_Data{
-			Total: 0,
-			ByType: &pb.DesignNotificationCountsResponse_ByType{
-				LEAD:       0,
-				PHASE:      0,
-				MILESTONE:  0,
-				PAYMENT:    0,
-				DQC:        0,
-				MMT:        0,
-				MEETING:    0,
-				ASSIGNMENT: 0,
-				QUOTE:      0,
-				P2P:        0,
+// API 17 — Notification Feed
+func (s *DesignServiceServer) GetDesignNotificationFeed(
+	ctx context.Context,
+	req *designpb.DesignNotificationFeedRequest,
+) (*designpb.DesignNotificationFeedResponse, error) {
+	limit := req.Limit
+	if limit <= 0 {
+		limit = 50
+	}
+
+	query := `SELECT project_id, lead_name, notification_type, notification_action, designer_id, payload, created_at 
+	          FROM design_user_notifications`
+	var args []any
+	var whereClauses []string
+
+	if req.ProjectId != "" {
+		whereClauses = append(whereClauses, "project_id = ?")
+		args = append(args, req.ProjectId)
+	}
+	if req.Since != "" {
+		whereClauses = append(whereClauses, "created_at > ?")
+		args = append(args, req.Since)
+	}
+
+	if len(whereClauses) > 0 {
+		query += " WHERE " + strings.Join(whereClauses, " AND ")
+	}
+
+	query += " ORDER BY created_at DESC LIMIT ?"
+	args = append(args, limit)
+
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to query feed: %v", err)
+	}
+	defer rows.Close()
+
+	var data []*designpb.DesignNotificationFeedResponse_Data
+	for rows.Next() {
+		var item designpb.DesignNotificationFeedResponse_Data
+		var payloadStr string
+		var createdAt time.Time
+
+		err := rows.Scan(
+			&item.ProjectId,
+			&item.LeadName,
+			&item.NotificationType,
+			&item.NotificationAction,
+			&item.DesignerId,
+			&payloadStr,
+			&createdAt,
+		)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to scan row: %v", err)
+		}
+		item.Payload = payloadStr
+		item.CreatedAt = createdAt.Format(time.RFC3339)
+		data = append(data, &item)
+	}
+
+	return &designpb.DesignNotificationFeedResponse{
+		Data: data,
+	}, nil
+}
+
+// API 18 — Notification Counts
+func (s *DesignServiceServer) GetDesignNotificationCounts(
+	ctx context.Context,
+	req *designpb.DesignNotificationCountsRequest,
+) (*designpb.DesignNotificationCountsResponse, error) {
+	query := `SELECT notification_type, COUNT(*) FROM design_user_notifications`
+	var args []any
+	if req.Since != "" {
+		query += " WHERE created_at > ?"
+		args = append(args, req.Since)
+	}
+	query += " GROUP BY notification_type"
+
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to query counts: %v", err)
+	}
+	defer rows.Close()
+
+	var total int32
+	byType := &designpb.DesignNotificationCountsResponse_ByType{}
+
+	for rows.Next() {
+		var notifType string
+		var count int32
+		if err := rows.Scan(&notifType, &count); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to scan count row: %v", err)
+		}
+		total += count
+		switch notifType {
+		case "LEAD":
+			byType.LEAD = count
+		case "PHASE":
+			byType.PHASE = count
+		case "MILESTONE":
+			byType.MILESTONE = count
+		case "PAYMENT":
+			byType.PAYMENT = count
+		case "DQC":
+			byType.DQC = count
+		case "MMT":
+			byType.MMT = count
+		case "MEETING":
+			byType.MEETING = count
+		case "ASSIGNMENT":
+			byType.ASSIGNMENT = count
+		case "QUOTE", "QUOTATION":
+			byType.QUOTE = count
+		case "P2P":
+			byType.P2P = count
+		}
+	}
+
+	return &designpb.DesignNotificationCountsResponse{
+		Data: &designpb.DesignNotificationCountsResponse_Data{
+			Total:  total,
+			ByType: byType,
+		},
+	}, nil
+}
+
+// API 19 — Notification Details
+func (s *DesignServiceServer) GetDesignNotificationDetails(
+	ctx context.Context,
+	req *designpb.DesignNotificationDetailsRequest,
+) (*designpb.DesignNotificationDetailsResponse, error) {
+	if req.NotificationId == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "notification_id is required")
+	}
+
+	query := `SELECT project_id, lead_name, notification_type, notification_action, designer_id, payload, created_at 
+	          FROM design_user_notifications WHERE id = ?`
+
+	var data designpb.DesignNotificationDetailsResponse_Data
+	var payloadStr string
+	var createdAt time.Time
+
+	err := s.db.QueryRowContext(ctx, query, req.NotificationId).Scan(
+		&data.ProjectId,
+		&data.LeadName,
+		&data.NotificationType,
+		&data.NotificationAction,
+		&data.DesignerId,
+		&payloadStr,
+		&createdAt,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Errorf(codes.NotFound, "notification not found")
+		}
+		return nil, status.Errorf(codes.Internal, "failed to query details: %v", err)
+	}
+
+	data.Payload = payloadStr
+	data.CreatedAt = createdAt.Format(time.RFC3339)
+
+	return &designpb.DesignNotificationDetailsResponse{
+		Data: &data,
+	}, nil
+}
+
+// GetDesignInbox queries the user-scoped inbox with filter parameters.
+func (s *DesignServiceServer) GetDesignInbox(
+	ctx context.Context,
+	req *designpb.DesignInboxRequest,
+) (*designpb.DesignInboxResponse, error) {
+	store := inbox.NewStore(s.db)
+	var since *time.Time
+	if req.Since != "" {
+		t, err := time.Parse(time.RFC3339, req.Since)
+		if err == nil {
+			since = &t
+		}
+	}
+	rows, err := store.List(req.UserId, since, req.ProjectId, int(req.Limit))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to query inbox list: %v", err)
+	}
+
+	data := make([]*designpb.DesignInboxItem, len(rows))
+	for i, r := range rows {
+		var readAt string
+		if r.ReadAt != nil {
+			readAt = r.ReadAt.Format(time.RFC3339)
+		}
+		data[i] = &designpb.DesignInboxItem{
+			Id:                 r.ID,
+			EventId:            r.EventID,
+			UserId:             r.UserID,
+			RecipientRole:      r.RecipientRole,
+			ProjectId:          r.ProjectID,
+			LeadName:           r.LeadName,
+			DesignerId:         r.DesignerID,
+			NotificationType:   r.NotificationType,
+			NotificationAction: r.NotificationAction,
+			Payload:            r.Payload,
+			CreatedAt:          r.CreatedAt.Format(time.RFC3339),
+			ReadAt:             readAt,
+		}
+	}
+
+	return &designpb.DesignInboxResponse{Data: data}, nil
+}
+
+// GetDesignInboxCounts returns unread counts grouped by notification type.
+func (s *DesignServiceServer) GetDesignInboxCounts(
+	ctx context.Context,
+	req *designpb.DesignInboxCountsRequest,
+) (*designpb.DesignInboxCountsResponse, error) {
+	store := inbox.NewStore(s.db)
+	var since *time.Time
+	if req.Since != "" {
+		t, err := time.Parse(time.RFC3339, req.Since)
+		if err == nil {
+			since = &t
+		}
+	}
+	total, byType, err := store.Counts(req.UserId, since)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to query inbox counts: %v", err)
+	}
+
+	return &designpb.DesignInboxCountsResponse{
+		Data: &designpb.DesignInboxCountsResponse_Data{
+			Total: int32(total),
+			ByType: &designpb.DesignInboxCountsResponse_ByType{
+				LEAD:       int32(byType["LEAD"]),
+				PHASE:      int32(byType["PHASE"]),
+				MILESTONE:  int32(byType["MILESTONE"]),
+				PAYMENT:    int32(byType["PAYMENT"]),
+				DQC:        int32(byType["DQC"]),
+				MMT:        int32(byType["MMT"]),
+				MEETING:    int32(byType["MEETING"]),
+				ASSIGNMENT: int32(byType["ASSIGNMENT"]),
+				QUOTE:      int32(byType["QUOTE"]),
+				P2P:        int32(byType["P2P"]),
 			},
 		},
 	}, nil
 }
 
-// API 18 — Notification Details
-func (s *NotifyServiceServer) GetDesignNotificationDetails(
-	_ context.Context,
-	req *pb.DesignNotificationDetailsRequest,
-) (*pb.DesignNotificationDetailsResponse, error) {
-	if req.NotificationId == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "notification_id is required")
+// MarkDesignNotificationRead marks a single notification read and triggers WS update.
+func (s *DesignServiceServer) MarkDesignNotificationRead(
+	ctx context.Context,
+	req *designpb.MarkDesignNotificationReadRequest,
+) (*designpb.MarkDesignNotificationReadResponse, error) {
+	store := inbox.NewStore(s.db)
+	success, err := store.MarkRead(req.Id, req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to mark read: %v", err)
 	}
+	if success {
+		inbox.DefaultHub.Broadcast([]int32{req.UserId}, map[string]any{
+			"type":   "inbox_updated",
+			"reason": "read",
+		})
+	}
+	return &designpb.MarkDesignNotificationReadResponse{Success: success}, nil
+}
 
-	return &pb.DesignNotificationDetailsResponse{
-		Data: &pb.DesignNotificationDetailsResponse_Data{
-			ProjectId:          "",
-			LeadName:           "",
-			NotificationType:   "",
-			NotificationAction: "",
-			DesignerId:         0,
-			Payload:            "",
-			CreatedAt:          "",
-		},
+// MarkAllDesignNotificationsRead marks all notifications read for the user and triggers WS update.
+func (s *DesignServiceServer) MarkAllDesignNotificationsRead(
+	ctx context.Context,
+	req *designpb.MarkAllDesignNotificationsReadRequest,
+) (*designpb.MarkAllDesignNotificationsReadResponse, error) {
+	store := inbox.NewStore(s.db)
+	count, err := store.MarkAllRead(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to mark all read: %v", err)
+	}
+	if count > 0 {
+		inbox.DefaultHub.Broadcast([]int32{req.UserId}, map[string]any{
+			"type":   "inbox_updated",
+			"reason": "read-all",
+		})
+	}
+	return &designpb.MarkAllDesignNotificationsReadResponse{
+		Success: true,
+		Count:   int32(count),
+	}, nil
+}
+
+// CreateDesignInboxTicket issues a temporary WebSocket authentication ticket.
+func (s *DesignServiceServer) CreateDesignInboxTicket(
+	ctx context.Context,
+	req *designpb.CreateDesignInboxTicketRequest,
+) (*designpb.CreateDesignInboxTicketResponse, error) {
+	ticket, err := inbox.DefaultTicketStore.Issue(req.UserId, 5*time.Minute)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to issue ticket: %v", err)
+	}
+	return &designpb.CreateDesignInboxTicketResponse{
+		Ticket:    ticket,
+		ExpiresIn: 300,
 	}, nil
 }
