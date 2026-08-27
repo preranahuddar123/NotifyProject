@@ -12,3 +12,8 @@ grpc_details:
 
 http_details:
   port: ":8081"
+
+env:
+  production:
+    NOTIFY_API_KEY: "design-notification"
+    NOTIFY_WS_ORIGINS: "https://design.hubinterior.com"
