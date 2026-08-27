@@ -148,7 +148,7 @@ func (s *Store) GetForUser(id int64, userID int32) (*Row, error) {
 func (s *Store) Counts(userID int32, since *time.Time) (total int, byType map[string]int, err error) {
 	byType = map[string]int{
 		"LEAD": 0, "PHASE": 0, "MILESTONE": 0, "PAYMENT": 0, "DQC": 0,
-		"MMT": 0, "MEETING": 0, "ASSIGNMENT": 0, "QUOTE": 0, "P2P": 0,
+		"MMT": 0, "MEETING": 0, "ASSIGNMENT": 0, "QUOTE": 0, "QUOTATION": 0, "P2P": 0, "PM": 0,
 	}
 	args := []any{userID}
 	q := `SELECT notification_type, COUNT(*) FROM design_user_notifications

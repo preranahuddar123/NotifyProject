@@ -19,11 +19,14 @@ type HTTP struct {
 	tickets *TicketStore
 }
 
+var DefaultHub = NewHub()
+var DefaultTicketStore = NewTicketStore()
+
 func NewHTTP(store *Store) *HTTP {
 	return &HTTP{
 		store:   store,
-		hub:     NewHub(),
-		tickets: NewTicketStore(),
+		hub:     DefaultHub,
+		tickets: DefaultTicketStore,
 	}
 }
 
@@ -287,7 +290,19 @@ func (h *HTTP) markAllRead(w http.ResponseWriter, r *http.Request) {
 }
 
 func queryUserID(r *http.Request) (int32, error) {
-	n, err := strconv.Atoi(strings.TrimSpace(r.URL.Query().Get("user_id")))
+	raw := strings.TrimSpace(r.URL.Query().Get("user_id"))
+	if raw == "" {
+		body, err := io.ReadAll(io.LimitReader(r.Body, 1<<16))
+		if err == nil && len(body) > 0 {
+			var req struct {
+				UserID int32 `json:"user_id"`
+			}
+			if json.Unmarshal(body, &req) == nil && req.UserID > 0 {
+				return req.UserID, nil
+			}
+		}
+	}
+	n, err := strconv.Atoi(raw)
 	if err != nil || n <= 0 {
 		return 0, fmt.Errorf("user_id is required")
 	}

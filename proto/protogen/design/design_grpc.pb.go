@@ -19,25 +19,30 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	DesignService_CreateDesignLeadPre10_FullMethodName        = "/design.DesignService/CreateDesignLeadPre10"
-	DesignService_CreateDesignLead1020_FullMethodName         = "/design.DesignService/CreateDesignLead1020"
-	DesignService_CreateDesignMilestone_FullMethodName        = "/design.DesignService/CreateDesignMilestone"
-	DesignService_CreateDesignPaymentRequest_FullMethodName   = "/design.DesignService/CreateDesignPaymentRequest"
-	DesignService_CreateDesignPaymentStatus_FullMethodName    = "/design.DesignService/CreateDesignPaymentStatus"
-	DesignService_CreateDesignDQCRequest_FullMethodName       = "/design.DesignService/CreateDesignDQCRequest"
-	DesignService_CreateDesignDQCStatus_FullMethodName        = "/design.DesignService/CreateDesignDQCStatus"
-	DesignService_CreateDesignMMTRequest_FullMethodName       = "/design.DesignService/CreateDesignMMTRequest"
-	DesignService_CreateDesignMMTAssign_FullMethodName        = "/design.DesignService/CreateDesignMMTAssign"
-	DesignService_CreateDesignMMTDocReady_FullMethodName      = "/design.DesignService/CreateDesignMMTDocReady"
-	DesignService_CreateDesignMeeting_FullMethodName          = "/design.DesignService/CreateDesignMeeting"
-	DesignService_CreateDesignAssignDesigner_FullMethodName   = "/design.DesignService/CreateDesignAssignDesigner"
-	DesignService_CreateDesignAssignPM_FullMethodName         = "/design.DesignService/CreateDesignAssignPM"
-	DesignService_CreateDesignQuote_FullMethodName            = "/design.DesignService/CreateDesignQuote"
-	DesignService_CreateDesignP2P_FullMethodName              = "/design.DesignService/CreateDesignP2P"
-	DesignService_CreateDesignPMStatus_FullMethodName         = "/design.DesignService/CreateDesignPMStatus"
-	DesignService_GetDesignNotificationFeed_FullMethodName    = "/design.DesignService/GetDesignNotificationFeed"
-	DesignService_GetDesignNotificationDetails_FullMethodName = "/design.DesignService/GetDesignNotificationDetails"
-	DesignService_GetDesignNotificationCounts_FullMethodName  = "/design.DesignService/GetDesignNotificationCounts"
+	DesignService_CreateDesignLeadPre10_FullMethodName          = "/design.DesignService/CreateDesignLeadPre10"
+	DesignService_CreateDesignLead1020_FullMethodName           = "/design.DesignService/CreateDesignLead1020"
+	DesignService_CreateDesignMilestone_FullMethodName          = "/design.DesignService/CreateDesignMilestone"
+	DesignService_CreateDesignPaymentRequest_FullMethodName     = "/design.DesignService/CreateDesignPaymentRequest"
+	DesignService_CreateDesignPaymentStatus_FullMethodName      = "/design.DesignService/CreateDesignPaymentStatus"
+	DesignService_CreateDesignDQCRequest_FullMethodName         = "/design.DesignService/CreateDesignDQCRequest"
+	DesignService_CreateDesignDQCStatus_FullMethodName          = "/design.DesignService/CreateDesignDQCStatus"
+	DesignService_CreateDesignMMTRequest_FullMethodName         = "/design.DesignService/CreateDesignMMTRequest"
+	DesignService_CreateDesignMMTAssign_FullMethodName          = "/design.DesignService/CreateDesignMMTAssign"
+	DesignService_CreateDesignMMTDocReady_FullMethodName        = "/design.DesignService/CreateDesignMMTDocReady"
+	DesignService_CreateDesignMeeting_FullMethodName            = "/design.DesignService/CreateDesignMeeting"
+	DesignService_CreateDesignAssignDesigner_FullMethodName     = "/design.DesignService/CreateDesignAssignDesigner"
+	DesignService_CreateDesignAssignPM_FullMethodName           = "/design.DesignService/CreateDesignAssignPM"
+	DesignService_CreateDesignQuote_FullMethodName              = "/design.DesignService/CreateDesignQuote"
+	DesignService_CreateDesignP2P_FullMethodName                = "/design.DesignService/CreateDesignP2P"
+	DesignService_CreateDesignPMStatus_FullMethodName           = "/design.DesignService/CreateDesignPMStatus"
+	DesignService_GetDesignNotificationFeed_FullMethodName      = "/design.DesignService/GetDesignNotificationFeed"
+	DesignService_GetDesignNotificationDetails_FullMethodName   = "/design.DesignService/GetDesignNotificationDetails"
+	DesignService_GetDesignNotificationCounts_FullMethodName    = "/design.DesignService/GetDesignNotificationCounts"
+	DesignService_GetDesignInbox_FullMethodName                 = "/design.DesignService/GetDesignInbox"
+	DesignService_GetDesignInboxCounts_FullMethodName           = "/design.DesignService/GetDesignInboxCounts"
+	DesignService_MarkDesignNotificationRead_FullMethodName     = "/design.DesignService/MarkDesignNotificationRead"
+	DesignService_MarkAllDesignNotificationsRead_FullMethodName = "/design.DesignService/MarkAllDesignNotificationsRead"
+	DesignService_CreateDesignInboxTicket_FullMethodName        = "/design.DesignService/CreateDesignInboxTicket"
 )
 
 // DesignServiceClient is the client API for DesignService service.
@@ -76,12 +81,22 @@ type DesignServiceClient interface {
 	CreateDesignP2P(ctx context.Context, in *DesignP2PRequest, opts ...grpc.CallOption) (*DesignP2PResponse, error)
 	// 16 — PM Approve / Reject (after DQC2)
 	CreateDesignPMStatus(ctx context.Context, in *DesignPMStatusRequest, opts ...grpc.CallOption) (*DesignPMStatusResponse, error)
-	// 17 — Notification Feed
+	// 17 — Legacy Notification Feed (stubs)
 	GetDesignNotificationFeed(ctx context.Context, in *DesignNotificationFeedRequest, opts ...grpc.CallOption) (*DesignNotificationFeedResponse, error)
-	// 18 — Notification Details
+	// 18 — Legacy Details
 	GetDesignNotificationDetails(ctx context.Context, in *DesignNotificationDetailsRequest, opts ...grpc.CallOption) (*DesignNotificationDetailsResponse, error)
-	// 17 — Notification Counts
+	// 18b — Legacy Counts
 	GetDesignNotificationCounts(ctx context.Context, in *DesignNotificationCountsRequest, opts ...grpc.CallOption) (*DesignNotificationCountsResponse, error)
+	// 19 — Get User Inbox Feed
+	GetDesignInbox(ctx context.Context, in *DesignInboxRequest, opts ...grpc.CallOption) (*DesignInboxResponse, error)
+	// 20 — Get Unread Counts for Bell Icon
+	GetDesignInboxCounts(ctx context.Context, in *DesignInboxCountsRequest, opts ...grpc.CallOption) (*DesignInboxCountsResponse, error)
+	// 21 — Mark Single Notification as Read
+	MarkDesignNotificationRead(ctx context.Context, in *MarkDesignNotificationReadRequest, opts ...grpc.CallOption) (*MarkDesignNotificationReadResponse, error)
+	// 22 — Mark All Notifications as Read
+	MarkAllDesignNotificationsRead(ctx context.Context, in *MarkAllDesignNotificationsReadRequest, opts ...grpc.CallOption) (*MarkAllDesignNotificationsReadResponse, error)
+	// 23 — Issue WebSocket Handshake Ticket
+	CreateDesignInboxTicket(ctx context.Context, in *CreateDesignInboxTicketRequest, opts ...grpc.CallOption) (*CreateDesignInboxTicketResponse, error)
 }
 
 type designServiceClient struct {
@@ -282,6 +297,56 @@ func (c *designServiceClient) GetDesignNotificationCounts(ctx context.Context, i
 	return out, nil
 }
 
+func (c *designServiceClient) GetDesignInbox(ctx context.Context, in *DesignInboxRequest, opts ...grpc.CallOption) (*DesignInboxResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DesignInboxResponse)
+	err := c.cc.Invoke(ctx, DesignService_GetDesignInbox_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *designServiceClient) GetDesignInboxCounts(ctx context.Context, in *DesignInboxCountsRequest, opts ...grpc.CallOption) (*DesignInboxCountsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DesignInboxCountsResponse)
+	err := c.cc.Invoke(ctx, DesignService_GetDesignInboxCounts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *designServiceClient) MarkDesignNotificationRead(ctx context.Context, in *MarkDesignNotificationReadRequest, opts ...grpc.CallOption) (*MarkDesignNotificationReadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MarkDesignNotificationReadResponse)
+	err := c.cc.Invoke(ctx, DesignService_MarkDesignNotificationRead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *designServiceClient) MarkAllDesignNotificationsRead(ctx context.Context, in *MarkAllDesignNotificationsReadRequest, opts ...grpc.CallOption) (*MarkAllDesignNotificationsReadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MarkAllDesignNotificationsReadResponse)
+	err := c.cc.Invoke(ctx, DesignService_MarkAllDesignNotificationsRead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *designServiceClient) CreateDesignInboxTicket(ctx context.Context, in *CreateDesignInboxTicketRequest, opts ...grpc.CallOption) (*CreateDesignInboxTicketResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateDesignInboxTicketResponse)
+	err := c.cc.Invoke(ctx, DesignService_CreateDesignInboxTicket_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DesignServiceServer is the server API for DesignService service.
 // All implementations must embed UnimplementedDesignServiceServer
 // for forward compatibility.
@@ -318,12 +383,22 @@ type DesignServiceServer interface {
 	CreateDesignP2P(context.Context, *DesignP2PRequest) (*DesignP2PResponse, error)
 	// 16 — PM Approve / Reject (after DQC2)
 	CreateDesignPMStatus(context.Context, *DesignPMStatusRequest) (*DesignPMStatusResponse, error)
-	// 17 — Notification Feed
+	// 17 — Legacy Notification Feed (stubs)
 	GetDesignNotificationFeed(context.Context, *DesignNotificationFeedRequest) (*DesignNotificationFeedResponse, error)
-	// 18 — Notification Details
+	// 18 — Legacy Details
 	GetDesignNotificationDetails(context.Context, *DesignNotificationDetailsRequest) (*DesignNotificationDetailsResponse, error)
-	// 17 — Notification Counts
+	// 18b — Legacy Counts
 	GetDesignNotificationCounts(context.Context, *DesignNotificationCountsRequest) (*DesignNotificationCountsResponse, error)
+	// 19 — Get User Inbox Feed
+	GetDesignInbox(context.Context, *DesignInboxRequest) (*DesignInboxResponse, error)
+	// 20 — Get Unread Counts for Bell Icon
+	GetDesignInboxCounts(context.Context, *DesignInboxCountsRequest) (*DesignInboxCountsResponse, error)
+	// 21 — Mark Single Notification as Read
+	MarkDesignNotificationRead(context.Context, *MarkDesignNotificationReadRequest) (*MarkDesignNotificationReadResponse, error)
+	// 22 — Mark All Notifications as Read
+	MarkAllDesignNotificationsRead(context.Context, *MarkAllDesignNotificationsReadRequest) (*MarkAllDesignNotificationsReadResponse, error)
+	// 23 — Issue WebSocket Handshake Ticket
+	CreateDesignInboxTicket(context.Context, *CreateDesignInboxTicketRequest) (*CreateDesignInboxTicketResponse, error)
 	mustEmbedUnimplementedDesignServiceServer()
 }
 
@@ -390,6 +465,21 @@ func (UnimplementedDesignServiceServer) GetDesignNotificationDetails(context.Con
 }
 func (UnimplementedDesignServiceServer) GetDesignNotificationCounts(context.Context, *DesignNotificationCountsRequest) (*DesignNotificationCountsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDesignNotificationCounts not implemented")
+}
+func (UnimplementedDesignServiceServer) GetDesignInbox(context.Context, *DesignInboxRequest) (*DesignInboxResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDesignInbox not implemented")
+}
+func (UnimplementedDesignServiceServer) GetDesignInboxCounts(context.Context, *DesignInboxCountsRequest) (*DesignInboxCountsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDesignInboxCounts not implemented")
+}
+func (UnimplementedDesignServiceServer) MarkDesignNotificationRead(context.Context, *MarkDesignNotificationReadRequest) (*MarkDesignNotificationReadResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method MarkDesignNotificationRead not implemented")
+}
+func (UnimplementedDesignServiceServer) MarkAllDesignNotificationsRead(context.Context, *MarkAllDesignNotificationsReadRequest) (*MarkAllDesignNotificationsReadResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method MarkAllDesignNotificationsRead not implemented")
+}
+func (UnimplementedDesignServiceServer) CreateDesignInboxTicket(context.Context, *CreateDesignInboxTicketRequest) (*CreateDesignInboxTicketResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateDesignInboxTicket not implemented")
 }
 func (UnimplementedDesignServiceServer) mustEmbedUnimplementedDesignServiceServer() {}
 func (UnimplementedDesignServiceServer) testEmbeddedByValue()                       {}
@@ -754,6 +844,96 @@ func _DesignService_GetDesignNotificationCounts_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DesignService_GetDesignInbox_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DesignInboxRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DesignServiceServer).GetDesignInbox(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DesignService_GetDesignInbox_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DesignServiceServer).GetDesignInbox(ctx, req.(*DesignInboxRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DesignService_GetDesignInboxCounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DesignInboxCountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DesignServiceServer).GetDesignInboxCounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DesignService_GetDesignInboxCounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DesignServiceServer).GetDesignInboxCounts(ctx, req.(*DesignInboxCountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DesignService_MarkDesignNotificationRead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MarkDesignNotificationReadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DesignServiceServer).MarkDesignNotificationRead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DesignService_MarkDesignNotificationRead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DesignServiceServer).MarkDesignNotificationRead(ctx, req.(*MarkDesignNotificationReadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DesignService_MarkAllDesignNotificationsRead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MarkAllDesignNotificationsReadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DesignServiceServer).MarkAllDesignNotificationsRead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DesignService_MarkAllDesignNotificationsRead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DesignServiceServer).MarkAllDesignNotificationsRead(ctx, req.(*MarkAllDesignNotificationsReadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DesignService_CreateDesignInboxTicket_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDesignInboxTicketRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DesignServiceServer).CreateDesignInboxTicket(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DesignService_CreateDesignInboxTicket_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DesignServiceServer).CreateDesignInboxTicket(ctx, req.(*CreateDesignInboxTicketRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DesignService_ServiceDesc is the grpc.ServiceDesc for DesignService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -836,6 +1016,26 @@ var DesignService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDesignNotificationCounts",
 			Handler:    _DesignService_GetDesignNotificationCounts_Handler,
+		},
+		{
+			MethodName: "GetDesignInbox",
+			Handler:    _DesignService_GetDesignInbox_Handler,
+		},
+		{
+			MethodName: "GetDesignInboxCounts",
+			Handler:    _DesignService_GetDesignInboxCounts_Handler,
+		},
+		{
+			MethodName: "MarkDesignNotificationRead",
+			Handler:    _DesignService_MarkDesignNotificationRead_Handler,
+		},
+		{
+			MethodName: "MarkAllDesignNotificationsRead",
+			Handler:    _DesignService_MarkAllDesignNotificationsRead_Handler,
+		},
+		{
+			MethodName: "CreateDesignInboxTicket",
+			Handler:    _DesignService_CreateDesignInboxTicket_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

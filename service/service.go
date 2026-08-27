@@ -7,12 +7,14 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"NotifyProject/internal/inbox"
 	designpb "NotifyProject/proto/protogen/design"
 	pb "NotifyProject/proto/protogen/notify"
 )
@@ -738,37 +740,69 @@ func NewDesignServiceServer(db *sql.DB) *DesignServiceServer {
 
 // Helper method to persist design notification in database.
 func (s *DesignServiceServer) saveDesignNotification(
+	eventID string,
 	projectID string,
 	leadName string,
 	designerID int32,
 	notifType string,
 	notifAction string,
 	payload any,
+	recipients []*designpb.Recipient,
 ) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("failed to marshal payload: %v", err)
 	}
 
-	_, err = s.db.Exec(
-		`INSERT INTO design_user_notifications 
-		 (event_id, user_id, recipient_role, project_id, lead_name, designer_id, 
-		  notification_type, notification_action, payload, created_at)
-		 VALUES (UUID(), ?, 'designer', ?, ?, ?, ?, ?, ?, NOW())`,
-		designerID,
-		projectID,
-		leadName,
-		designerID,
-		notifType,
-		notifAction,
-		string(payloadBytes),
-	)
-	if err != nil {
-		log.Printf("[service] Failed to save design notification: %v", err)
-		return err
+	if len(recipients) == 0 {
+		recipients = []*designpb.Recipient{
+			{UserId: designerID, Role: "designer"},
+		}
 	}
 
-	log.Printf("[service] Saved design notification: project=%s type=%s action=%s", projectID, notifType, notifAction)
+	var leadID int32
+	projectIDStr := strings.TrimPrefix(projectID, "HUB-")
+	if idVal, parseErr := strconv.Atoi(projectIDStr); parseErr == nil {
+		leadID = int32(idVal)
+	}
+
+	var userIDs []int32
+	for _, rec := range recipients {
+		if rec.UserId <= 0 {
+			continue
+		}
+		_, err = s.db.Exec(
+			`INSERT INTO design_user_notifications 
+			 (event_id, user_id, recipient_role, lead_id, project_id, lead_name, designer_id, 
+			  notification_type, notification_action, payload, created_at)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+			 ON DUPLICATE KEY UPDATE event_id = event_id`,
+			eventID,
+			rec.UserId,
+			rec.Role,
+			leadID,
+			projectID,
+			leadName,
+			designerID,
+			notifType,
+			notifAction,
+			string(payloadBytes),
+		)
+		if err != nil {
+			log.Printf("[service] Failed to save design notification for user %d: %v", rec.UserId, err)
+			continue
+		}
+		userIDs = append(userIDs, rec.UserId)
+	}
+
+	if len(userIDs) > 0 {
+		inbox.DefaultHub.Broadcast(userIDs, map[string]any{
+			"type":     "inbox_updated",
+			"event_id": eventID,
+		})
+	}
+
+	log.Printf("[service] Saved fan-out design notification: project=%s type=%s action=%s recipients=%d", projectID, notifType, notifAction, len(userIDs))
 	return nil
 }
 
@@ -798,7 +832,7 @@ func (s *DesignServiceServer) CreateDesignLeadPre10(
 		}
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, "LEAD", "CREATED", respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "LEAD", "CREATED", respPayload, req.Recipients)
 
 	return &designpb.DesignLeadPre10Response{
 		ProjectId:          req.ProjectId,
@@ -830,7 +864,7 @@ func (s *DesignServiceServer) CreateDesignLead1020(
 		}
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, "PHASE", "PHASE_ENTERED", payload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "PHASE", "PHASE_ENTERED", payload, req.Recipients)
 
 	return &designpb.DesignLead1020Response{
 		Data: &designpb.DesignLead1020Response_Data{
@@ -859,7 +893,7 @@ func (s *DesignServiceServer) CreateDesignMilestone(
 		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, "MILESTONE", "COMPLETED", req.Payload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "MILESTONE", "COMPLETED", req.Payload, req.Recipients)
 
 	return &designpb.DesignMilestoneResponse{
 		Data: &designpb.DesignMilestoneResponse_Data{
@@ -890,7 +924,7 @@ func (s *DesignServiceServer) CreateDesignPaymentRequest(
 		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, "PAYMENT", "REQUESTED", req.Payload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "PAYMENT", "REQUESTED", req.Payload, req.Recipients)
 
 	return &designpb.DesignPaymentRequestResponse{
 		Data: &designpb.DesignPaymentRequestResponse_Data{
@@ -926,7 +960,7 @@ func (s *DesignServiceServer) CreateDesignPaymentStatus(
 		RejectionReason:  req.RejectionReason,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignPaymentStatusResponse{
 		ProjectId:  req.ProjectId,
@@ -951,7 +985,7 @@ func (s *DesignServiceServer) CreateDesignDQCRequest(
 		"designer_name": req.DesignerName,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, "DQC", "REQUESTED", payload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, "DQC", "REQUESTED", payload, req.Recipients)
 
 	return &designpb.DesignDQCRequestResponse{
 		Data: &designpb.DesignDQCRequestResponse_Data{
@@ -985,7 +1019,7 @@ func (s *DesignServiceServer) CreateDesignDQCStatus(
 		RejectionReason: req.RejectionReason,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignDQCStatusResponse{
 		ProjectId:  req.ProjectId,
@@ -1013,7 +1047,7 @@ func (s *DesignServiceServer) CreateDesignMMTRequest(
 		MmtManagerName: req.MmtManagerName,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignMMTRequestResponse{
 		ProjectId:  req.ProjectId,
@@ -1041,7 +1075,7 @@ func (s *DesignServiceServer) CreateDesignMMTAssign(
 		ToId:           req.Payload.ToId,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignMMTAssignResponse{
 		ProjectId:  req.ProjectId,
@@ -1070,7 +1104,7 @@ func (s *DesignServiceServer) CreateDesignMMTDocReady(
 		ApprovedBy: req.Payload.ApprovedBy,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignMMTDocReadyResponse{
 		ProjectId: req.ProjectId,
@@ -1099,7 +1133,7 @@ func (s *DesignServiceServer) CreateDesignMeeting(
 		}
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignMeetingResponse{
 		ProjectId: req.ProjectId,
@@ -1128,7 +1162,7 @@ func (s *DesignServiceServer) CreateDesignAssignDesigner(
 		ToName:         req.Payload.ToName,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.Payload.ToId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.Payload.ToId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignAssignDesignerResponse{
 		ProjectId: req.ProjectId,
@@ -1149,19 +1183,24 @@ func (s *DesignServiceServer) CreateDesignAssignPM(
 		return nil, status.Errorf(codes.InvalidArgument, "payload is required")
 	}
 
-	respPayload := &designpb.DesignAssignPMResponse_Payload{
+	respPayload := &designpb.DesignAssignPMResponse_Data_Payload{
 		AssignmentType: req.Payload.AssignmentType,
 		ToId:           req.Payload.ToId,
 		ToName:         req.Payload.ToName,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignAssignPMResponse{
-		ProjectId:  req.ProjectId,
-		LeadName:   req.LeadName,
-		DesignerId: req.DesignerId,
-		Payload:    respPayload,
+		Data: &designpb.DesignAssignPMResponse_Data{
+			ProjectId:          req.ProjectId,
+			LeadName:           req.LeadName,
+			DesignerId:         req.DesignerId,
+			NotificationType:   req.NotificationType,
+			NotificationAction: req.NotificationAction,
+			Payload:            respPayload,
+			CreatedAt:          time.Now().Format(time.RFC3339),
+		},
 	}, nil
 }
 
@@ -1182,7 +1221,7 @@ func (s *DesignServiceServer) CreateDesignQuote(
 		QuoteLink: req.Payload.QuoteLink,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignQuoteResponse{
 		ProjectId: req.ProjectId,
@@ -1204,7 +1243,7 @@ func (s *DesignServiceServer) CreateDesignP2P(
 		DesignerName: req.DesignerName,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignP2PResponse{
 		ProjectId:  req.ProjectId,
@@ -1232,7 +1271,7 @@ func (s *DesignServiceServer) CreateDesignPMStatus(
 		RejectionReason: req.RejectionReason,
 	}
 
-	_ = s.saveDesignNotification(req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload)
+	_ = s.saveDesignNotification(req.EventId, req.ProjectId, req.LeadName, req.DesignerId, req.NotificationType, req.NotificationAction, respPayload, req.Recipients)
 
 	return &designpb.DesignPMStatusResponse{
 		ProjectId:  req.ProjectId,
@@ -1405,5 +1444,141 @@ func (s *DesignServiceServer) GetDesignNotificationDetails(
 
 	return &designpb.DesignNotificationDetailsResponse{
 		Data: &data,
+	}, nil
+}
+
+// GetDesignInbox queries the user-scoped inbox with filter parameters.
+func (s *DesignServiceServer) GetDesignInbox(
+	ctx context.Context,
+	req *designpb.DesignInboxRequest,
+) (*designpb.DesignInboxResponse, error) {
+	store := inbox.NewStore(s.db)
+	var since *time.Time
+	if req.Since != "" {
+		t, err := time.Parse(time.RFC3339, req.Since)
+		if err == nil {
+			since = &t
+		}
+	}
+	rows, err := store.List(req.UserId, since, req.ProjectId, int(req.Limit))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to query inbox list: %v", err)
+	}
+
+	data := make([]*designpb.DesignInboxItem, len(rows))
+	for i, r := range rows {
+		var readAt string
+		if r.ReadAt != nil {
+			readAt = r.ReadAt.Format(time.RFC3339)
+		}
+		data[i] = &designpb.DesignInboxItem{
+			Id:                 r.ID,
+			EventId:            r.EventID,
+			UserId:             r.UserID,
+			RecipientRole:      r.RecipientRole,
+			ProjectId:          r.ProjectID,
+			LeadName:           r.LeadName,
+			DesignerId:         r.DesignerID,
+			NotificationType:   r.NotificationType,
+			NotificationAction: r.NotificationAction,
+			Payload:            r.Payload,
+			CreatedAt:          r.CreatedAt.Format(time.RFC3339),
+			ReadAt:             readAt,
+		}
+	}
+
+	return &designpb.DesignInboxResponse{Data: data}, nil
+}
+
+// GetDesignInboxCounts returns unread counts grouped by notification type.
+func (s *DesignServiceServer) GetDesignInboxCounts(
+	ctx context.Context,
+	req *designpb.DesignInboxCountsRequest,
+) (*designpb.DesignInboxCountsResponse, error) {
+	store := inbox.NewStore(s.db)
+	var since *time.Time
+	if req.Since != "" {
+		t, err := time.Parse(time.RFC3339, req.Since)
+		if err == nil {
+			since = &t
+		}
+	}
+	total, byType, err := store.Counts(req.UserId, since)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to query inbox counts: %v", err)
+	}
+
+	return &designpb.DesignInboxCountsResponse{
+		Data: &designpb.DesignInboxCountsResponse_Data{
+			Total: int32(total),
+			ByType: &designpb.DesignInboxCountsResponse_ByType{
+				LEAD:       int32(byType["LEAD"]),
+				PHASE:      int32(byType["PHASE"]),
+				MILESTONE:  int32(byType["MILESTONE"]),
+				PAYMENT:    int32(byType["PAYMENT"]),
+				DQC:        int32(byType["DQC"]),
+				MMT:        int32(byType["MMT"]),
+				MEETING:    int32(byType["MEETING"]),
+				ASSIGNMENT: int32(byType["ASSIGNMENT"]),
+				QUOTE:      int32(byType["QUOTE"]),
+				P2P:        int32(byType["P2P"]),
+			},
+		},
+	}, nil
+}
+
+// MarkDesignNotificationRead marks a single notification read and triggers WS update.
+func (s *DesignServiceServer) MarkDesignNotificationRead(
+	ctx context.Context,
+	req *designpb.MarkDesignNotificationReadRequest,
+) (*designpb.MarkDesignNotificationReadResponse, error) {
+	store := inbox.NewStore(s.db)
+	success, err := store.MarkRead(req.Id, req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to mark read: %v", err)
+	}
+	if success {
+		inbox.DefaultHub.Broadcast([]int32{req.UserId}, map[string]any{
+			"type":   "inbox_updated",
+			"reason": "read",
+		})
+	}
+	return &designpb.MarkDesignNotificationReadResponse{Success: success}, nil
+}
+
+// MarkAllDesignNotificationsRead marks all notifications read for the user and triggers WS update.
+func (s *DesignServiceServer) MarkAllDesignNotificationsRead(
+	ctx context.Context,
+	req *designpb.MarkAllDesignNotificationsReadRequest,
+) (*designpb.MarkAllDesignNotificationsReadResponse, error) {
+	store := inbox.NewStore(s.db)
+	count, err := store.MarkAllRead(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to mark all read: %v", err)
+	}
+	if count > 0 {
+		inbox.DefaultHub.Broadcast([]int32{req.UserId}, map[string]any{
+			"type":   "inbox_updated",
+			"reason": "read-all",
+		})
+	}
+	return &designpb.MarkAllDesignNotificationsReadResponse{
+		Success: true,
+		Count:   int32(count),
+	}, nil
+}
+
+// CreateDesignInboxTicket issues a temporary WebSocket authentication ticket.
+func (s *DesignServiceServer) CreateDesignInboxTicket(
+	ctx context.Context,
+	req *designpb.CreateDesignInboxTicketRequest,
+) (*designpb.CreateDesignInboxTicketResponse, error) {
+	ticket, err := inbox.DefaultTicketStore.Issue(req.UserId, 5*time.Minute)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to issue ticket: %v", err)
+	}
+	return &designpb.CreateDesignInboxTicketResponse{
+		Ticket:    ticket,
+		ExpiresIn: 300,
 	}, nil
 }

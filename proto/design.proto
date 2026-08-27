@@ -7,8 +7,13 @@ import "google/api/annotations.proto";
 option go_package = "./protogen/design";
 
 // -----------------------------------------------------------------------
-// PaymentType enum (shared with notify)
+// Shared Message Types
 // -----------------------------------------------------------------------
+
+message Recipient {
+  int32 user_id = 1;
+  string role = 2;
+}
 
 enum PaymentType {
   PAYMENT_TYPE_UNSPECIFIED = 0;
@@ -21,6 +26,7 @@ enum PaymentType {
 // Design Notification Messages (APIs 01-18)
 // -----------------------------------------------------------------------
 
+// 01 — Pre-10% New Lead
 message DesignLeadPre10Request {
   string project_id = 1;
   string lead_name = 2;
@@ -41,6 +47,8 @@ message DesignLeadPre10Request {
   }
 
   Payload payload = 4;
+  string event_id = 5;
+  repeated Recipient recipients = 6;
 }
 
 message DesignLeadPre10Response {
@@ -81,6 +89,8 @@ message DesignLead1020Request {
   }
 
   Payload payload = 4;
+  string event_id = 5;
+  repeated Recipient recipients = 6;
 }
 
 message DesignLead1020Response {
@@ -119,6 +129,8 @@ message DesignMilestoneRequest {
   }
 
   Payload payload = 4;
+  string event_id = 5;
+  repeated Recipient recipients = 6;
 }
 
 message DesignMilestoneResponse {
@@ -151,6 +163,8 @@ message DesignPaymentRequestRequest {
   }
 
   Payload payload = 4;
+  string event_id = 5;
+  repeated Recipient recipients = 6;
 }
 
 message DesignPaymentRequestResponse {
@@ -184,6 +198,8 @@ message DesignPaymentStatusRequest {
   double amount = 11;
   string created_at = 12;
   string rejection_reason = 13;
+  string event_id = 14;
+  repeated Recipient recipients = 15;
 }
 
 message DesignPaymentStatusResponse {
@@ -212,6 +228,8 @@ message DesignDQCRequestRequest {
   string dqc_round = 4;
   int32 review_id = 5;
   string designer_name = 6;
+  string event_id = 7;
+  repeated Recipient recipients = 8;
 }
 
 message DesignDQCRequestResponse {
@@ -242,6 +260,8 @@ message DesignDQCStatusRequest {
   string designer_name = 9;
   string created_at = 10;
   string rejection_reason = 11;
+  string event_id = 12;
+  repeated Recipient recipients = 13;
 }
 
 message DesignDQCStatusResponse {
@@ -274,6 +294,8 @@ message DesignMMTRequestRequest {
   string designer_name = 10;
   string mmt_manager_name = 11;
   string created_at = 12;
+  string event_id = 13;
+  repeated Recipient recipients = 14;
 }
 
 message DesignMMTRequestResponse {
@@ -309,6 +331,8 @@ message DesignMMTAssignRequest {
 
   Payload payload = 6;
   string created_at = 7;
+  string event_id = 8;
+  repeated Recipient recipients = 9;
 }
 
 message DesignMMTAssignResponse {
@@ -342,6 +366,8 @@ message DesignMMTDocReadyRequest {
 
   Payload payload = 6;
   string created_at = 7;
+  string event_id = 8;
+  repeated Recipient recipients = 9;
 }
 
 message DesignMMTDocReadyResponse {
@@ -375,6 +401,8 @@ message DesignMeetingRequest {
 
   Slot slot = 8;
   string created_at = 9;
+  string event_id = 10;
+  repeated Recipient recipients = 11;
 }
 
 message DesignMeetingResponse {
@@ -413,6 +441,8 @@ message DesignAssignDesignerRequest {
 
   Payload payload = 5;
   string created_at = 6;
+  string event_id = 7;
+  repeated Recipient recipients = 8;
 }
 
 message DesignAssignDesignerResponse {
@@ -446,20 +476,29 @@ message DesignAssignPMRequest {
 
   Payload payload = 6;
   string created_at = 7;
+  string event_id = 8;
+  repeated Recipient recipients = 9;
 }
 
 message DesignAssignPMResponse {
-  string project_id = 1;
-  string lead_name = 2;
-  int32 designer_id = 3;
+  message Data {
+    string project_id = 1;
+    string lead_name = 2;
+    int32 designer_id = 3;
+    string notification_type = 4;
+    string notification_action = 5;
 
-  message Payload {
-    string assignment_type = 1;
-    int32 to_id = 2;
-    string to_name = 3;
+    message Payload {
+      string assignment_type = 1;
+      int32 to_id = 2;
+      string to_name = 3;
+    }
+
+    Payload payload = 6;
+    string created_at = 7;
   }
 
-  Payload payload = 4;
+  Data data = 1;
 }
 
 // 14 — New Quote
@@ -477,6 +516,8 @@ message DesignQuoteRequest {
 
   Payload payload = 6;
   string created_at = 7;
+  string event_id = 8;
+  repeated Recipient recipients = 9;
 }
 
 message DesignQuoteResponse {
@@ -500,6 +541,8 @@ message DesignP2PRequest {
   string notification_action = 5;
   string designer_name = 6;
   string created_at = 7;
+  string event_id = 8;
+  repeated Recipient recipients = 9;
 }
 
 message DesignP2PResponse {
@@ -528,6 +571,8 @@ message DesignPMStatusRequest {
   string approver_name = 10;
   string created_at = 11;
   string rejection_reason = 12;
+  string event_id = 13;
+  repeated Recipient recipients = 14;
 }
 
 message DesignPMStatusResponse {
@@ -612,6 +657,90 @@ message DesignNotificationDetailsResponse {
   }
 
   Data data = 1;
+}
+
+// -----------------------------------------------------------------------
+// 19+ — Inbox / Bell Notifications
+// -----------------------------------------------------------------------
+
+message DesignInboxRequest {
+  int32 user_id = 1;
+  string since = 2;
+  string project_id = 3;
+  int32 limit = 4;
+}
+
+message DesignInboxItem {
+  int64 id = 1;
+  string event_id = 2;
+  int32 user_id = 3;
+  string recipient_role = 4;
+  string project_id = 5;
+  string lead_name = 6;
+  int32 designer_id = 7;
+  string notification_type = 8;
+  string notification_action = 9;
+  string payload = 10;
+  string created_at = 11;
+  string read_at = 12;
+}
+
+message DesignInboxResponse {
+  repeated DesignInboxItem data = 1;
+}
+
+message DesignInboxCountsRequest {
+  int32 user_id = 1;
+  string since = 2;
+}
+
+message DesignInboxCountsResponse {
+  message ByType {
+    int32 LEAD = 1;
+    int32 PHASE = 2;
+    int32 MILESTONE = 3;
+    int32 PAYMENT = 4;
+    int32 DQC = 5;
+    int32 MMT = 6;
+    int32 MEETING = 7;
+    int32 ASSIGNMENT = 8;
+    int32 QUOTE = 9;
+    int32 P2P = 10;
+  }
+
+  message Data {
+    int32 total = 1;
+    ByType by_type = 2;
+  }
+
+  Data data = 1;
+}
+
+message MarkDesignNotificationReadRequest {
+  int64 id = 1;
+  int32 user_id = 2;
+}
+
+message MarkDesignNotificationReadResponse {
+  bool success = 1;
+}
+
+message MarkAllDesignNotificationsReadRequest {
+  int32 user_id = 1;
+}
+
+message MarkAllDesignNotificationsReadResponse {
+  bool success = 1;
+  int32 count = 2;
+}
+
+message CreateDesignInboxTicketRequest {
+  int32 user_id = 1;
+}
+
+message CreateDesignInboxTicketResponse {
+  string ticket = 1;
+  int32 expires_in = 2;
 }
 
 // -----------------------------------------------------------------------
@@ -774,7 +903,7 @@ service DesignService {
     };
   }
 
-  // 17 — Notification Feed
+  // 17 — Legacy Notification Feed (stubs)
   rpc GetDesignNotificationFeed(
       DesignNotificationFeedRequest
   ) returns (DesignNotificationFeedResponse) {
@@ -783,7 +912,7 @@ service DesignService {
     };
   }
 
-  // 18 — Notification Details
+  // 18 — Legacy Details
   rpc GetDesignNotificationDetails(
       DesignNotificationDetailsRequest
   ) returns (DesignNotificationDetailsResponse) {
@@ -792,12 +921,54 @@ service DesignService {
     };
   }
 
-  // 17 — Notification Counts
+  // 18b — Legacy Counts
   rpc GetDesignNotificationCounts(
       DesignNotificationCountsRequest
   ) returns (DesignNotificationCountsResponse) {
     option (google.api.http) = {
       get: "/v1/design/notifications/counts"
+    };
+  }
+
+  // =====================================================================
+  // New User-Scoped Inbox & Bell API Services
+  // =====================================================================
+
+  // 19 — Get User Inbox Feed
+  rpc GetDesignInbox(DesignInboxRequest) returns (DesignInboxResponse) {
+    option (google.api.http) = {
+      get: "/v1/design/inbox"
+    };
+  }
+
+  // 20 — Get Unread Counts for Bell Icon
+  rpc GetDesignInboxCounts(DesignInboxCountsRequest) returns (DesignInboxCountsResponse) {
+    option (google.api.http) = {
+      get: "/v1/design/inbox/counts"
+    };
+  }
+
+  // 21 — Mark Single Notification as Read
+  rpc MarkDesignNotificationRead(MarkDesignNotificationReadRequest) returns (MarkDesignNotificationReadResponse) {
+    option (google.api.http) = {
+      post: "/v1/design/inbox/{id}/read"
+      body: "*"
+    };
+  }
+
+  // 22 — Mark All Notifications as Read
+  rpc MarkAllDesignNotificationsRead(MarkAllDesignNotificationsReadRequest) returns (MarkAllDesignNotificationsReadResponse) {
+    option (google.api.http) = {
+      post: "/v1/design/inbox/read-all"
+      body: "*"
+    };
+  }
+
+  // 23 — Issue WebSocket Handshake Ticket
+  rpc CreateDesignInboxTicket(CreateDesignInboxTicketRequest) returns (CreateDesignInboxTicketResponse) {
+    option (google.api.http) = {
+      post: "/v1/design/inbox/ws-ticket"
+      body: "*"
     };
   }
 }

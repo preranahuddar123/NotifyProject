@@ -576,6 +576,175 @@ func local_request_DesignService_GetDesignNotificationCounts_0(ctx context.Conte
 	return msg, metadata, err
 }
 
+var filter_DesignService_GetDesignInbox_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+
+func request_DesignService_GetDesignInbox_0(ctx context.Context, marshaler runtime.Marshaler, client DesignServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DesignInboxRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_DesignService_GetDesignInbox_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.GetDesignInbox(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_DesignService_GetDesignInbox_0(ctx context.Context, marshaler runtime.Marshaler, server DesignServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DesignInboxRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_DesignService_GetDesignInbox_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.GetDesignInbox(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+var filter_DesignService_GetDesignInboxCounts_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+
+func request_DesignService_GetDesignInboxCounts_0(ctx context.Context, marshaler runtime.Marshaler, client DesignServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DesignInboxCountsRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_DesignService_GetDesignInboxCounts_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.GetDesignInboxCounts(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_DesignService_GetDesignInboxCounts_0(ctx context.Context, marshaler runtime.Marshaler, server DesignServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DesignInboxCountsRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_DesignService_GetDesignInboxCounts_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.GetDesignInboxCounts(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_DesignService_MarkDesignNotificationRead_0(ctx context.Context, marshaler runtime.Marshaler, client DesignServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq MarkDesignNotificationReadRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+	msg, err := client.MarkDesignNotificationRead(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_DesignService_MarkDesignNotificationRead_0(ctx context.Context, marshaler runtime.Marshaler, server DesignServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq MarkDesignNotificationReadRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+	protoReq.Id, err = runtime.Int64(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+	msg, err := server.MarkDesignNotificationRead(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_DesignService_MarkAllDesignNotificationsRead_0(ctx context.Context, marshaler runtime.Marshaler, client DesignServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq MarkAllDesignNotificationsReadRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.MarkAllDesignNotificationsRead(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_DesignService_MarkAllDesignNotificationsRead_0(ctx context.Context, marshaler runtime.Marshaler, server DesignServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq MarkAllDesignNotificationsReadRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.MarkAllDesignNotificationsRead(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_DesignService_CreateDesignInboxTicket_0(ctx context.Context, marshaler runtime.Marshaler, client DesignServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateDesignInboxTicketRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.CreateDesignInboxTicket(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_DesignService_CreateDesignInboxTicket_0(ctx context.Context, marshaler runtime.Marshaler, server DesignServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateDesignInboxTicketRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.CreateDesignInboxTicket(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 // RegisterDesignServiceHandlerServer registers the http handlers for service DesignService to "mux".
 // UnaryRPC     :call DesignServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -962,6 +1131,106 @@ func RegisterDesignServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		}
 		forward_DesignService_GetDesignNotificationCounts_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_DesignService_GetDesignInbox_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/design.DesignService/GetDesignInbox", runtime.WithHTTPPathPattern("/v1/design/inbox"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_DesignService_GetDesignInbox_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_GetDesignInbox_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_DesignService_GetDesignInboxCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/design.DesignService/GetDesignInboxCounts", runtime.WithHTTPPathPattern("/v1/design/inbox/counts"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_DesignService_GetDesignInboxCounts_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_GetDesignInboxCounts_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_DesignService_MarkDesignNotificationRead_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/design.DesignService/MarkDesignNotificationRead", runtime.WithHTTPPathPattern("/v1/design/inbox/{id}/read"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_DesignService_MarkDesignNotificationRead_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_MarkDesignNotificationRead_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_DesignService_MarkAllDesignNotificationsRead_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/design.DesignService/MarkAllDesignNotificationsRead", runtime.WithHTTPPathPattern("/v1/design/inbox/read-all"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_DesignService_MarkAllDesignNotificationsRead_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_MarkAllDesignNotificationsRead_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_DesignService_CreateDesignInboxTicket_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/design.DesignService/CreateDesignInboxTicket", runtime.WithHTTPPathPattern("/v1/design/inbox/ws-ticket"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_DesignService_CreateDesignInboxTicket_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_CreateDesignInboxTicket_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 
 	return nil
 }
@@ -1325,49 +1594,144 @@ func RegisterDesignServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		}
 		forward_DesignService_GetDesignNotificationCounts_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_DesignService_GetDesignInbox_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/design.DesignService/GetDesignInbox", runtime.WithHTTPPathPattern("/v1/design/inbox"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_DesignService_GetDesignInbox_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_GetDesignInbox_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_DesignService_GetDesignInboxCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/design.DesignService/GetDesignInboxCounts", runtime.WithHTTPPathPattern("/v1/design/inbox/counts"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_DesignService_GetDesignInboxCounts_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_GetDesignInboxCounts_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_DesignService_MarkDesignNotificationRead_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/design.DesignService/MarkDesignNotificationRead", runtime.WithHTTPPathPattern("/v1/design/inbox/{id}/read"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_DesignService_MarkDesignNotificationRead_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_MarkDesignNotificationRead_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_DesignService_MarkAllDesignNotificationsRead_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/design.DesignService/MarkAllDesignNotificationsRead", runtime.WithHTTPPathPattern("/v1/design/inbox/read-all"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_DesignService_MarkAllDesignNotificationsRead_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_MarkAllDesignNotificationsRead_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_DesignService_CreateDesignInboxTicket_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/design.DesignService/CreateDesignInboxTicket", runtime.WithHTTPPathPattern("/v1/design/inbox/ws-ticket"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_DesignService_CreateDesignInboxTicket_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_DesignService_CreateDesignInboxTicket_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
 var (
-	pattern_DesignService_CreateDesignLeadPre10_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "lead", "pre-10"}, ""))
-	pattern_DesignService_CreateDesignLead1020_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "lead", "10-20"}, ""))
-	pattern_DesignService_CreateDesignMilestone_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "milestone"}, ""))
-	pattern_DesignService_CreateDesignPaymentRequest_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "payment", "request"}, ""))
-	pattern_DesignService_CreateDesignPaymentStatus_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "payment", "status"}, ""))
-	pattern_DesignService_CreateDesignDQCRequest_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "dqc", "request"}, ""))
-	pattern_DesignService_CreateDesignDQCStatus_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "dqc", "status"}, ""))
-	pattern_DesignService_CreateDesignMMTRequest_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "mmt", "request"}, ""))
-	pattern_DesignService_CreateDesignMMTAssign_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "mmt", "assign"}, ""))
-	pattern_DesignService_CreateDesignMMTDocReady_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "mmt", "doc-ready"}, ""))
-	pattern_DesignService_CreateDesignMeeting_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "meeting"}, ""))
-	pattern_DesignService_CreateDesignAssignDesigner_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "assign", "designer"}, ""))
-	pattern_DesignService_CreateDesignAssignPM_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "assign", "pm"}, ""))
-	pattern_DesignService_CreateDesignQuote_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "quote"}, ""))
-	pattern_DesignService_CreateDesignP2P_0              = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "p2p"}, ""))
-	pattern_DesignService_CreateDesignPMStatus_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "pm", "status"}, ""))
-	pattern_DesignService_GetDesignNotificationFeed_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "design", "notifications"}, ""))
-	pattern_DesignService_GetDesignNotificationDetails_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "design", "notifications", "notification_id"}, ""))
-	pattern_DesignService_GetDesignNotificationCounts_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "counts"}, ""))
+	pattern_DesignService_CreateDesignLeadPre10_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "lead", "pre-10"}, ""))
+	pattern_DesignService_CreateDesignLead1020_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "lead", "10-20"}, ""))
+	pattern_DesignService_CreateDesignMilestone_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "milestone"}, ""))
+	pattern_DesignService_CreateDesignPaymentRequest_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "payment", "request"}, ""))
+	pattern_DesignService_CreateDesignPaymentStatus_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "payment", "status"}, ""))
+	pattern_DesignService_CreateDesignDQCRequest_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "dqc", "request"}, ""))
+	pattern_DesignService_CreateDesignDQCStatus_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "dqc", "status"}, ""))
+	pattern_DesignService_CreateDesignMMTRequest_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "mmt", "request"}, ""))
+	pattern_DesignService_CreateDesignMMTAssign_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "mmt", "assign"}, ""))
+	pattern_DesignService_CreateDesignMMTDocReady_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "mmt", "doc-ready"}, ""))
+	pattern_DesignService_CreateDesignMeeting_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "meeting"}, ""))
+	pattern_DesignService_CreateDesignAssignDesigner_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "assign", "designer"}, ""))
+	pattern_DesignService_CreateDesignAssignPM_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "assign", "pm"}, ""))
+	pattern_DesignService_CreateDesignQuote_0              = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "quote"}, ""))
+	pattern_DesignService_CreateDesignP2P_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "p2p"}, ""))
+	pattern_DesignService_CreateDesignPMStatus_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"v1", "design", "notifications", "pm", "status"}, ""))
+	pattern_DesignService_GetDesignNotificationFeed_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "design", "notifications"}, ""))
+	pattern_DesignService_GetDesignNotificationDetails_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "design", "notifications", "notification_id"}, ""))
+	pattern_DesignService_GetDesignNotificationCounts_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "notifications", "counts"}, ""))
+	pattern_DesignService_GetDesignInbox_0                 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "design", "inbox"}, ""))
+	pattern_DesignService_GetDesignInboxCounts_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "inbox", "counts"}, ""))
+	pattern_DesignService_MarkDesignNotificationRead_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "design", "inbox", "id", "read"}, ""))
+	pattern_DesignService_MarkAllDesignNotificationsRead_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "inbox", "read-all"}, ""))
+	pattern_DesignService_CreateDesignInboxTicket_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "design", "inbox", "ws-ticket"}, ""))
 )
 
 var (
-	forward_DesignService_CreateDesignLeadPre10_0        = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignLead1020_0         = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignMilestone_0        = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignPaymentRequest_0   = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignPaymentStatus_0    = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignDQCRequest_0       = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignDQCStatus_0        = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignMMTRequest_0       = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignMMTAssign_0        = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignMMTDocReady_0      = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignMeeting_0          = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignAssignDesigner_0   = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignAssignPM_0         = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignQuote_0            = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignP2P_0              = runtime.ForwardResponseMessage
-	forward_DesignService_CreateDesignPMStatus_0         = runtime.ForwardResponseMessage
-	forward_DesignService_GetDesignNotificationFeed_0    = runtime.ForwardResponseMessage
-	forward_DesignService_GetDesignNotificationDetails_0 = runtime.ForwardResponseMessage
-	forward_DesignService_GetDesignNotificationCounts_0  = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignLeadPre10_0          = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignLead1020_0           = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignMilestone_0          = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignPaymentRequest_0     = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignPaymentStatus_0      = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignDQCRequest_0         = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignDQCStatus_0          = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignMMTRequest_0         = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignMMTAssign_0          = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignMMTDocReady_0        = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignMeeting_0            = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignAssignDesigner_0     = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignAssignPM_0           = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignQuote_0              = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignP2P_0                = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignPMStatus_0           = runtime.ForwardResponseMessage
+	forward_DesignService_GetDesignNotificationFeed_0      = runtime.ForwardResponseMessage
+	forward_DesignService_GetDesignNotificationDetails_0   = runtime.ForwardResponseMessage
+	forward_DesignService_GetDesignNotificationCounts_0    = runtime.ForwardResponseMessage
+	forward_DesignService_GetDesignInbox_0                 = runtime.ForwardResponseMessage
+	forward_DesignService_GetDesignInboxCounts_0           = runtime.ForwardResponseMessage
+	forward_DesignService_MarkDesignNotificationRead_0     = runtime.ForwardResponseMessage
+	forward_DesignService_MarkAllDesignNotificationsRead_0 = runtime.ForwardResponseMessage
+	forward_DesignService_CreateDesignInboxTicket_0        = runtime.ForwardResponseMessage
 )
